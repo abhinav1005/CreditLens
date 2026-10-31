@@ -55,8 +55,10 @@ jobs:
       - run: uv sync --locked
 
       # Responses are cached by content hash, so unchanged cases cost nothing. A unique key
-      # per run saves new entries; restore-keys picks up the most recent cache.
-      - uses: actions/cache@v4
+      # per run saves new entries; restore-keys picks up the most recent cache. Restore and
+      # save are separate steps so the cache is saved even when the gate fails: the answers
+      # are valid either way, and otherwise every push after a failure pays again.
+      - uses: actions/cache/restore@v4
         with:
           path: .cache
           key: eval-cache-${{ github.run_id }}
@@ -66,6 +68,13 @@ jobs:
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: uv run python -m evals run --suite golden --tags smoke --run-id pr-smoke
+
+      - name: Save response cache
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: .cache
+          key: eval-cache-${{ github.run_id }}
 
       - name: Gate
         id: gate
