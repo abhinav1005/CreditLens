@@ -1,0 +1,132 @@
+{
+  "run_id": "20261031T151330Z-golden-claude-sonnet-5-5-v1",
+  "suite": "golden",
+  "model": "claude-sonnet-5-5",
+  "prompt_version": "v1",
+  "prompt_hash": "b83927f5d3e2c723",
+  "pricing_as_of": "2026-10-06",
+  "created_at": "2026-10-31T15:13:30+00:00",
+  "git": {
+    "commit": "8aa8542",
+    "dirty": true
+  },
+  "n_cases": 150,
+  "n_passed": 135,
+  "overall_pass_rate": 0.9,
+  "categories": {
+    "compliance": {
+      "n": 20,
+      "passed": 20,
+      "pass_rate": 1.0
+    },
+    "factual": {
+      "n": 30,
+      "passed": 29,
+      "pass_rate": 0.9667
+    },
+    "injection": {
+      "n": 20,
+      "passed": 20,
+      "pass_rate": 1.0
+    },
+    "insight_grounding": {
+      "n": 20,
+      "passed": 7,
+      "pass_rate": 0.35
+    },
+    "pii": {
+      "n": 15,
+      "passed": 14,
+      "pass_rate": 0.9333
+    },
+    "refusal": {
+      "n": 15,
+      "passed": 15,
+      "pass_rate": 1.0
+    },
+    "tool_use": {
+      "n": 30,
+      "passed": 30,
+      "pass_rate": 1.0
+    }
+  },
+  "status_counts": {
+    "ok": 150
+  },
+  "failed_checks_by_scorer": {
+    "insights": 14,
+    "strings": 1,
+    "grounding": 1
+  },
+  "unreviewed_cases": 150,
+  "cost": {
+    "api_spend_this_run_usd": 0.0,
+    "pre_run_estimate_usd": 0.0,
+    "measured_total_usd": 1.671982,
+    "mean_per_case_usd": 0.011147
+  },
+  "latency_ms": {
+    "note": "measured under parallel load; M4.2 adds a clean sequential run",
+    "p50": 3792.429458000697,
+    "p95": 5956.9799999007955
+  },
+  "cache_hits": 150,
+  "wall_seconds": 0.5,
+  "judge": {
+    "mode": "report",
+    "version": "v1",
+    "prompt_hash": "a9378c6d777f723e",
+    "model": "claude-sonnet-5-5",
+    "spend_usd": 0.0,
+    "pass_rates": {
+      "compliance": {
+        "helpfulness": 1.0,
+        "clarity": 1.0,
+        "compliance": 1.0,
+        "groundedness": 1.0
+      },
+      "factual": {
+        "helpfulness": 1.0,
+        "clarity": 1.0,
+        "compliance": 1.0,
+        "groundedness": 1.0
+      },
+      "injection": {
+        "helpfulness": 1.0,
+        "clarity": 1.0,
+        "compliance": 1.0,
+        "groundedness": 1.0
+      },
+      "insight_grounding": {
+        "helpfulness": 1.0,
+        "clarity": 1.0,
+        "compliance": 1.0,
+        "groundedness": 1.0
+      },
+      "pii": {
+        "helpfulness": 1.0,
+        "clarity": 1.0,
+        "compliance": 0.9333,
+        "groundedness": 1.0
+      },
+      "refusal": {
+        "helpfulness": 1.0,
+        "clarity": 1.0,
+        "compliance": 1.0,
+        "groundedness": 1.0
+      },
+      "tool_use": {
+        "helpfulness": 0.9667,
+        "clarity": 0.9,
+        "compliance": 1.0,
+        "groundedness": 1.0
+      }
+    },
+    "dimensions": [
+      "helpfulness",
+      "clarity",
+      "compliance",
+      "groundedness"
+    ]
+  }
+}

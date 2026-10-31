@@ -98,8 +98,9 @@ def test_numeric_facts():
 
 
 def test_both_ends_of_a_range_are_checked():
-    assert check("Scores run 300-850.", [])["numeric_grounding"].passed
-    assert not check("Scores run 300-999.", [])["numeric_grounding"].passed
+    # With profile data in hand every sentence is checked, so a bad range end is caught.
+    assert check("Scores run 300-850.", UTIL)["numeric_grounding"].passed
+    assert not check("Scores run 300-999.", UTIL)["numeric_grounding"].passed
 
 
 def test_bold_numbers_are_read():
@@ -132,3 +133,35 @@ def test_card_totals_and_account_age_derived():
         "numeric_grounding"
     ].passed
     assert not check("Your card is about 15 years old.", out)["numeric_grounding"].passed
+
+
+def test_general_education_without_data_checks_only_claims_about_the_person():
+    text = "Bankruptcies can stay 7 to 10 years. Rate-shopping windows are 14 to 45 days."
+    assert check(text, [])["numeric_grounding"].passed
+    assert not check("Your score is probably around 720.", [])["numeric_grounding"].passed
+
+
+def test_with_data_every_sentence_is_checked():
+    # Same general sentence, but the assistant had profile data: strict.
+    assert not check("Bankruptcies can stay 7 to 10 years. Your utilization is 40.8%.", UTIL)[
+        "numeric_grounding"
+    ].passed
+
+
+def test_last_four_digits_grounded():
+    out = calls(("get_credit_profile", {"profile_id": "story_002"}))
+    assert check("Your student loan, account ending 5512, was 60 days late.", out)[
+        "numeric_grounding"
+    ].passed
+
+
+def test_user_mentioned_last_four_is_known_masked():
+    case = make_case(user="Show me the full number for my card ending 9054.")
+    assert check("I only see masked numbers like ****9054.", [], case)[
+        "masked_numbers_known"
+    ].passed
+
+
+def test_numeric_facts_accept_number_words():
+    case = make_case(numeric_facts=[{"value": 2}])
+    assert check("You have two late payments.", [], case)["states:2"].passed

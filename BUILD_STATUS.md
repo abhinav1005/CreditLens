@@ -6,7 +6,7 @@ Specs: `PRD.md` (§14 takes precedence). History and notes: `BUILD_LOG.md`.
 **Legend:** `[ ]` todo · `[~]` in progress · `[x]` done · `[!]` blocked (reason in log) · 👤 = needs the owner (Abhinav)
 
 **Current milestone:** M2 (M1 done-when passed 2026-10-31; owner still to review cases, M1.16)
-**Next task:** M2.10 (grow golden set to 150)
+**Next task:** M2.11 (compare + promote)
 
 Each task is one small, reviewable commit. "Check" is how we know it's done.
 
@@ -82,7 +82,7 @@ Each task is one small, reviewable commit. "Check" is how we know it's done.
 | M2.7 | [x] | `calibrate-judge`: P/R/F1/accuracy/kappa + bootstrap 95% CI + confusion matrix + Sonnet-vs-Haiku self-preference | Report generated |
 | M2.8 | [ ] | Judge-prompt iteration → `judge/v2.md`, tuned on dev only; before/after on held-out | Versioned calibration reports |
 | M2.9 | [x] | Judge integrated into the runner (per-category check map) | Report shows judge columns |
-| M2.10 | [ ] | Grow golden set to ≥150 (drafts + 👤 review) | ≥150 valid cases, target category counts |
+| M2.10 | [x] | Grow golden set to ≥150 (drafts + 👤 review) | ≥150 valid cases, target category counts |
 | M2.11 | [ ] | `evals compare` + `evals promote` | Tests |
 | M2.12 | [ ] | `smoke` tags (≥5/category) + `evals baseline` + `reports/baseline/` | Baseline committed |
 | M2.13 | [ ] | Gate logic (overall drop > X, or ≥2 lost cases in a category) + test that `v1-degraded` is blocked | Test passes |

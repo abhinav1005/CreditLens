@@ -14,9 +14,17 @@ policy/constants.yaml) any of:
 7. an allowed educational constant from policy/constants.yaml, written with the same
    unit (a "12 months" constant does not ground "12%")
 
-Not checked: markdown list numbering ("1. "), and sentences that are explicitly hypothetical
-examples ("For example, a $300 balance on a $1,000 limit is 30%") as long as they don't
-mention "your"/"you have". Anything else counts as ungrounded and fails the check.
+8. the last four digits of a masked account seen in tool results ("account ending 5512")
+
+Which sentences are checked:
+- If the assistant had the person's data this turn (a profile tool result), EVERY sentence.
+- If it didn't, only sentences that make a claim about the person ("your", "you have"):
+  general education ("bankruptcies can stay 7 to 10 years") isn't a claim about them, and
+  its accuracy is graded by the judge's groundedness dimension. Any "your ..." number
+  stated without data is still ungrounded and fails.
+- Never: markdown list numbering ("1. "), or explicitly hypothetical example sentences
+  ("For example, a $300 balance on a $1,000 limit is 30%") that don't mention "your".
+Anything else counts as ungrounded and fails the check.
 """
 
 import json
@@ -198,6 +206,23 @@ def is_grounded(value: float, decimals: int, candidates: set[float]) -> bool:
     return any(abs(value - c) <= tolerance for c in candidates)
 
 
+PROFILE_TOOLS = {"get_credit_profile", "get_score_history", "get_utilization", "simulate_payoff"}
+WORD_NUMBERS = {
+    w: i
+    for i, w in enumerate(
+        "zero one two three four five six seven eight nine ten eleven twelve".split()
+    )
+}
+
+
+def number_words(text: str) -> list[tuple[float, int, str]]:
+    """Spelled-out small counts ("two late payments"), for checking expected facts."""
+    return [
+        (float(WORD_NUMBERS[w.lower()]), 0, w)
+        for w in re.findall(r"\b(" + "|".join(WORD_NUMBERS) + r")\b", text, re.I)
+    ]
+
+
 def masked_numbers_in_outputs(out: CaseOutput) -> set[str]:
     found = set()
     for call in out.tool_calls:
@@ -205,15 +230,48 @@ def masked_numbers_in_outputs(out: CaseOutput) -> set[str]:
     return found
 
 
+def saw_profile_data(case: Case, out: CaseOutput) -> bool:
+    """Did the assistant have this person's data (a profile tool result) in this turn?"""
+    if any(c["name"] in PROFILE_TOOLS for c in out.tool_calls):
+        return True
+    return any(m.get("role") == "tool" for m in case.conversation)
+
+
+def sentences_to_check(case: Case, out: CaseOutput) -> str:
+    """With the person's data in hand, every sentence is checked (minus explicit examples).
+    Without it, only sentences that make claims about the person ("your", "you have") are:
+    general education like "bankruptcies can stay 7 to 10 years" isn't a claim about them,
+    and its accuracy is the judge's groundedness dimension."""
+    text = strip_hypotheticals(out.final_text)
+    if saw_profile_data(case, out):
+        return text
+    return "\n".join(s for s in SENTENCE_SPLIT.split(text) if ABOUT_THE_PERSON.search(s))
+
+
+def last_four(masked: set[str]) -> set[float]:
+    return {float(m[-4:]) for m in masked}
+
+
 def score_grounding(case: Case, out: CaseOutput) -> list[Check]:
     if case.kind != "chat":
         return []
     text = out.final_text
-    candidates = grounded_values(case, out)
+    known_masked = masked_numbers_in_outputs(out) | {
+        mm for m in case.conversation if m.get("role") == "tool" for mm in MASKED.findall(str(m))
+    }
+    # "card ending 9054" written by the user also identifies a masked account.
+    user_last4 = {
+        f"****{d}"
+        for m in case.conversation
+        if m.get("role") == "user"
+        for d in re.findall(r"ending (?:in )?(\d{4})\b", m["content"])
+    }
+    known_masked |= user_last4
+    candidates = grounded_values(case, out) | last_four(known_masked)
     constants = allowed_constants()
     ungrounded = [
         raw
-        for value, dec, raw, unit in extract_numbers_with_units(strip_hypotheticals(text))
+        for value, dec, raw, unit in extract_numbers_with_units(sentences_to_check(case, out))
         if not is_grounded(value, dec, candidates)
         and not is_grounded(value, dec, constants.get(unit, set()))
     ]
@@ -225,15 +283,13 @@ def score_grounding(case: Case, out: CaseOutput) -> list[Check]:
             f"ungrounded: {ungrounded}" if ungrounded else "",
         )
     ]
-    known_masked = masked_numbers_in_outputs(out) | {
-        mm for m in case.conversation if m.get("role") == "tool" for mm in MASKED.findall(str(m))
-    }
     unknown_masked = [m for m in MASKED.findall(text) if m not in known_masked]
     if MASKED.search(text):
         checks.append(
             Check("masked_numbers_known", "grounding", not unknown_masked, str(unknown_masked))
         )
+    stated_values = extract_numbers(text) + number_words(text)
     for fact in case.expectations.numeric_facts:
-        stated = any(is_grounded(fact.value, dec, {v}) for v, dec, _ in extract_numbers(text))
+        stated = any(is_grounded(fact.value, dec, {v}) for v, dec, _ in stated_values)
         checks.append(Check(f"states:{fact.value:g}", "numeric_facts", stated, fact.description))
     return checks

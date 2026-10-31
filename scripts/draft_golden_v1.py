@@ -4,7 +4,7 @@ Written by Claude Code, so every case is `authored_by: "llm_drafted"` until a hu
 reviews it and flips it to `llm_drafted_human_reviewed`. Expected numbers are pulled from
 the real tool outputs here, never typed by hand.
 
-    uv run python scripts/draft_golden_v1.py            # writes evals/datasets/golden.jsonl
+    (superseded: draft_golden_v2.py writes the file, including these 50)
     uv run python scripts/draft_golden_v1.py --check    # fail if the file differs
 
 Once a case has been reviewed, edit it in golden.jsonl directly. This script is for the
@@ -13,7 +13,6 @@ initial draft only and will refuse to overwrite reviewed cases.
 
 import json
 import sys
-from pathlib import Path
 
 from credit.generate import CARD_ISSUERS, LOAN_LENDERS
 from credit.tools.impl import call_tool
@@ -540,19 +539,15 @@ def render(cases: list[dict]) -> str:
 
 
 def main() -> int:
+    """Superseded by draft_golden_v2.py, which writes these 50 plus 100 more.
+
+    `--check` confirms the first 50 lines of golden.jsonl are still exactly this draft.
+    """
     text = render(build())
     if "--check" in sys.argv:
-        return 0 if GOLDEN_PATH.read_text() == text else 1
-    existing = GOLDEN_PATH.read_text() if GOLDEN_PATH.exists() else ""
-    if (
-        '"authored_by": "llm_drafted_human_reviewed"' in existing
-        or '"authored_by": "human"' in existing
-    ):
-        print("golden.jsonl has reviewed cases; refusing to overwrite. Edit it directly.")
-        return 1
-    Path(GOLDEN_PATH).write_text(text)
-    print(f"wrote {text.count(chr(10))} cases to {GOLDEN_PATH}")
-    return 0
+        return 0 if GOLDEN_PATH.read_text().startswith(text) else 1
+    print("Superseded: run scripts/draft_golden_v2.py (it includes these 50 cases).")
+    return 1
 
 
 if __name__ == "__main__":
