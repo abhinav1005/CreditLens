@@ -34,7 +34,6 @@ Entry format:
 - First GitHub runs: **CI passed** (38s). **Eval gate failed** because every case errored: `400 Your credit balance is too low`. Confirmed locally: the account is out of credit after about $3.85 total this session ($2.67 assistant + $1.15 judge + live tests). The gate now reports errored runs as "could not run (not a quality result)" instead of as lost cases.
 **Blockers:** (1) Owner must add API credit (console.anthropic.com → Billing). (2) M2.5: ≥100 hand labels. (3) M1.16: case review.
 **Next:** After credit is added: re-run the Eval gate workflow on main (`gh workflow run "Eval gate" --repo abhinav1005/CreditLens`), check it passes against the baseline. Then M2.15: branch `demo/degraded-prompt`, set `system_prompt_version: v1-degraded` in config.yaml, open a PR, confirm the gate blocks it with a comment, close the PR without merging. A smoke run costs about $0.46 cold.
-**Next (old):** M2.14: GitHub Actions. `.github/workflows/ci.yml` (lint, format, consistency checks, unit tests on every PR) and `eval-gate.yml` (on PRs touching prompts/, src/assistant/, src/guardrails/, config.yaml: restore `.cache`, smoke run, gate, PR comment). Needs the owner's OK to create a private GitHub repo and push (M0.4), plus an ANTHROPIC_API_KEY secret.
 
 ## 2026-10-31 — Session 3 (first live run, M1 exit)
 **Done:**
