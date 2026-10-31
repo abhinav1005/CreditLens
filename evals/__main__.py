@@ -45,7 +45,28 @@ def main(argv: list[str] | None = None) -> int:
     pool.add_argument("--prompts", default="v1,v1-degraded")
     pool.add_argument("--max-cost-usd", type=float, default=3.0)
 
+    label = sub.add_parser("label", help="hand-label pool items (blind to judge and model)")
+    label.add_argument("--labeler", required=True, help="your name, recorded on each label")
+    label.add_argument("--batch", type=int, default=25)
+
     args = parser.parse_args(argv)
+
+    if args.command == "label":
+        from evals.labeler import label_items, load_labels
+        from evals.labeling import load_pool
+
+        cases = {c.id: c for c in load_cases()}
+        mine = [lab for lab in load_labels() if lab["labeler"] == args.labeler]
+        n = label_items(
+            load_pool(),
+            cases,
+            {lab["item_id"] for lab in mine},
+            args.labeler,
+            batch=args.batch,
+            done_count=len(mine),
+        )
+        print(f"labeled {n} this session")
+        return 0
 
     if args.command == "build-pool":
         from collections import Counter

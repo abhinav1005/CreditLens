@@ -6,7 +6,7 @@ Specs: `PRD.md` (§14 takes precedence). History and notes: `BUILD_LOG.md`.
 **Legend:** `[ ]` todo · `[~]` in progress · `[x]` done · `[!]` blocked (reason in log) · 👤 = needs the owner (Abhinav)
 
 **Current milestone:** M2 (M1 done-when passed 2026-10-31; owner still to review cases, M1.16)
-**Next task:** M2.4 (CLI labeler)
+**Next task:** M2.6 (freeze held-out split), then M2.7. M2.5 is owner labeling
 
 Each task is one small, reviewable commit. "Check" is how we know it's done.
 
@@ -76,7 +76,7 @@ Each task is one small, reviewable commit. "Check" is how we know it's done.
 | M2.1 | [x] | `prompts/judge/v1.md` + judge module (pinned Sonnet; pass/fail per dimension, rationale first, structured output) | Tests with fake provider |
 | M2.2 | [x] | `prompts/system/v1-degraded.md` | Exists, immutable |
 | M2.3 | [x] | Labeling-pool builder (≥2 models × ≥2 prompt versions × hard categories; sampling recorded) | Pool of ≥130 responses |
-| M2.4 | [ ] | CLI labeler: blind to judge, shuffled, keyboard-driven, writes `labels.jsonl` | Manual try-out |
+| M2.4 | [x] | CLI labeler: blind to judge, shuffled, keyboard-driven, writes `labels.jsonl` | Manual try-out |
 | M2.5 👤 | [ ] | Owner labels ≥100 responses (4 batches of 25) | ≥100 labels |
 | M2.6 | [ ] | Freeze held-out 30 (committed split file) | Split file committed before M2.8 |
 | M2.7 | [ ] | `calibrate-judge`: P/R/F1/accuracy/kappa + bootstrap 95% CI + confusion matrix + Sonnet-vs-Haiku self-preference | Report generated |
