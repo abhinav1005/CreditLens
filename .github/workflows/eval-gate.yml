@@ -15,9 +15,20 @@ on:
       - "policy/**"
       - "evals/**"
       - "reports/baseline/**"
-  # Runs on main too, so PR branches can restore a warm response cache from main.
+  # Runs on main too (same paths), so PR branches can restore a warm response cache from main.
+  # Docs-only pushes don't trigger a paid smoke run.
   push:
     branches: [main]
+    paths:
+      - "prompts/**"
+      - "src/assistant/**"
+      - "src/guardrails/**"
+      - "src/credit/**"
+      - "config.yaml"
+      - "config/**"
+      - "policy/**"
+      - "evals/**"
+      - "reports/baseline/**"
   workflow_dispatch:
 
 permissions:
