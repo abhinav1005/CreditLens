@@ -5,8 +5,8 @@ Specs: `PRD.md` (§14 takes precedence). History and notes: `BUILD_LOG.md`.
 
 **Legend:** `[ ]` todo · `[~]` in progress · `[x]` done · `[!]` blocked (reason in log) · 👤 = needs the owner (Abhinav)
 
-**Current milestone:** M2 done-when PASSED 2026-10-31 (PR #1 blocked by the gate). Open in M2: owner labels (M2.5), then calibration (M2.7 run) + judge iteration (M2.8). Next build milestone: M3
-**Next task:** M3.8 (guardrails section + on/off end-to-end)
+**Current milestone:** M3 done-when PASSED 2026-10-31 (report.md has a Guardrails section with per-guardrail test P/R). Open from M2: owner labels → calibration. Next: M4
+**Next task:** M4.1 (OpenAI provider; needs OPENAI_API_KEY) or M4.2+ (Anthropic-only parts first)
 
 Each task is one small, reviewable commit. "Check" is how we know it's done.
 
@@ -102,7 +102,7 @@ Each task is one small, reviewable commit. "Check" is how we know it's done.
 | M3.5 | [x] | Indirect injection via tool results (`inj_*` profiles) | Cases in suite |
 | M3.6 | [x] | `policy/compliance.md` + rules + classifier; `compliance.jsonl` with compliant hard negatives | P/R reported |
 | M3.7 | [x] | Compliance action: regenerate once → fallback; rates reported | Tests |
-| M3.8 | [ ] | Report guardrails section: per-guardrail P/R + end-to-end attack success on vs off | **M3 exit** |
+| M3.8 | [x] | Report guardrails section: per-guardrail P/R + end-to-end attack success on vs off | **M3 exit** |
 
 ## M4 — Models, cost, latency
 

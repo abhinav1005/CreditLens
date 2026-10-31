@@ -51,6 +51,7 @@ def render_report(summary: dict, results: list[dict]) -> str:
             "",
         ]
         + _judge_section(s.get("judge", {"mode": "off"}))
+        + _guardrail_section(s.get("guardrails"))
         + [
             "## Failed checks by scorer",
             "",
@@ -88,4 +89,42 @@ def _judge_section(judge: dict) -> list[str]:
     ]
     for cat, rates in judge["pass_rates"].items():
         lines.append(f"| {cat} | " + " | ".join(_pct(rates.get(d)) for d in dims) + " |")
+    return lines + [""]
+
+
+def _guardrail_section(g: dict | None) -> list[str]:
+    """Per-guardrail test-set precision/recall (from reports/guardrails/) + what fired here."""
+    import json
+    from pathlib import Path
+
+    if not g:
+        return []
+    enabled = g["config"].get("enabled")
+    lines = [f"## Guardrails ({'on' if enabled else 'OFF'})", ""]
+    reports = Path(__file__).resolve().parents[1] / "reports" / "guardrails"
+    rows = []
+    for name in ["pii", "injection", "compliance"]:
+        path = reports / f"{name}-test.json"
+        if path.exists():
+            r = json.loads(path.read_text())
+            fp = r.get("false_positive_rate", r.get("negative_false_positive_rate"))
+            rows.append(
+                f"| {name} | {_pct(r['recall'])} | {_pct(r.get('precision'))} | {_pct(fp)} |"
+            )
+    if rows:
+        lines += [
+            "Measured on each guardrail's held-out test set (`python -m evals guardrail <name>`):",
+            "",
+            "| Guardrail | Recall | Precision | False-positive rate |",
+            "|---|---:|---:|---:|",
+            *rows,
+            "",
+        ]
+    lines.append(
+        f"In this run: {g['blocked_turns']} blocked turn(s); compliance checked "
+        f"{g['compliance_checked']}, regenerated {g['compliance_regenerated']}, "
+        f"fell back {g['compliance_fallbacks']}."
+    )
+    if g["decision_counts"]:
+        lines += [""] + [f"- `{k}`: {v}" for k, v in g["decision_counts"].items()]
     return lines + [""]

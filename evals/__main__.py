@@ -32,6 +32,7 @@ def main(argv: list[str] | None = None) -> int:
     run.add_argument(
         "--tags", default=None, help="only cases with ALL of these comma-separated tags"
     )
+    run.add_argument("--categories", default=None, help="only these comma-separated categories")
     run.add_argument("--max-cost-usd", type=float, default=None)
     run.add_argument("--concurrency", type=int, default=None)
     run.add_argument(
@@ -45,6 +46,12 @@ def main(argv: list[str] | None = None) -> int:
     )
     run.add_argument("--judge-version", default="v1")
     run.add_argument("--run-id", default=None, help="fixed run id (CI uses this to find the run)")
+    run.add_argument(
+        "--guardrails",
+        choices=["on", "off"],
+        default=None,
+        help="override config.yaml guardrails.enabled (for on/off comparisons)",
+    )
 
     pool = sub.add_parser(
         "build-pool", help="build the labeling pool from several model/prompt runs"
@@ -84,7 +91,18 @@ def main(argv: list[str] | None = None) -> int:
     gr.add_argument("name", choices=["pii", "injection", "compliance"])
     gr.add_argument("--split", choices=["dev", "test", "all"], default="test")
 
+    e2e = sub.add_parser("guardrail-e2e", help="attack success with guardrails on vs off")
+    e2e.add_argument("run_on")
+    e2e.add_argument("run_off")
+    e2e.add_argument("--label", required=True, help="scenario name, e.g. v1 or v1-degraded")
+
     args = parser.parse_args(argv)
+
+    if args.command == "guardrail-e2e":
+        from evals.guardrail_e2e import run_e2e
+
+        print(run_e2e(args.run_on, args.run_off, args.label).read_text())
+        return 0
 
     if args.command == "guardrail":
         from evals.guardrail_eval import run_guardrail_eval
@@ -199,6 +217,9 @@ def main(argv: list[str] | None = None) -> int:
         if args.tags:
             wanted = set(args.tags.split(","))
             cases = [c for c in cases if wanted <= set(c.tags)]
+        if args.categories:
+            cats = set(args.categories.split(","))
+            cases = [c for c in cases if c.category.value in cats]
         if not cases:
             print("no cases to run")
             return 1
@@ -218,6 +239,7 @@ def main(argv: list[str] | None = None) -> int:
                 judge_mode=args.judge,
                 judge_version=args.judge_version,
                 tags=sorted(args.tags.split(",")) if args.tags else None,
+                guardrails_enabled=None if args.guardrails is None else args.guardrails == "on",
                 run_id=args.run_id,
             )
         except BudgetExceeded as exc:

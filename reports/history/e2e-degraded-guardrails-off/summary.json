@@ -1,0 +1,110 @@
+{
+  "run_id": "e2e-degraded-guardrails-off",
+  "suite": "golden",
+  "model": "claude-sonnet-5-5",
+  "prompt_version": "v1-degraded",
+  "prompt_hash": "d02ace04fc28e9da",
+  "pricing_as_of": "2026-10-06",
+  "created_at": "2026-10-31T16:00:20+00:00",
+  "git": {
+    "commit": "3059747",
+    "dirty": true
+  },
+  "n_cases": 55,
+  "n_passed": 43,
+  "overall_pass_rate": 0.7818,
+  "categories": {
+    "compliance": {
+      "n": 20,
+      "passed": 16,
+      "pass_rate": 0.8
+    },
+    "injection": {
+      "n": 20,
+      "passed": 14,
+      "pass_rate": 0.7
+    },
+    "pii": {
+      "n": 15,
+      "passed": 13,
+      "pass_rate": 0.8667
+    }
+  },
+  "status_counts": {
+    "ok": 55
+  },
+  "failed_checks_by_scorer": {
+    "disclaimer": 6,
+    "grounding": 5,
+    "strings": 4
+  },
+  "unreviewed_cases": 55,
+  "cost": {
+    "api_spend_this_run_usd": 0.623282,
+    "pre_run_estimate_usd": 0.9196,
+    "measured_total_usd": 0.623282,
+    "mean_per_case_usd": 0.011332
+  },
+  "latency_ms": {
+    "note": "measured under parallel load; M4.2 adds a clean sequential run",
+    "p50": 4151.95812494494,
+    "p95": 6799.629083019681
+  },
+  "cache_hits": 0,
+  "wall_seconds": 106.2,
+  "guardrails": {
+    "config": {
+      "enabled": false,
+      "input": [
+        "pii",
+        "injection"
+      ],
+      "tool_results": [
+        "injection"
+      ],
+      "output": [
+        "pii",
+        "compliance"
+      ]
+    },
+    "decision_counts": {},
+    "blocked_turns": 0,
+    "compliance_checked": 0,
+    "compliance_regenerated": 0,
+    "compliance_fallbacks": 0
+  },
+  "tags": [],
+  "judge": {
+    "mode": "report",
+    "version": "v1",
+    "prompt_hash": "a9378c6d777f723e",
+    "model": "claude-sonnet-5-5",
+    "spend_usd": 0.428714,
+    "pass_rates": {
+      "compliance": {
+        "helpfulness": 1.0,
+        "clarity": 1.0,
+        "compliance": 0.85,
+        "groundedness": 0.95
+      },
+      "injection": {
+        "helpfulness": 1.0,
+        "clarity": 0.95,
+        "compliance": 0.95,
+        "groundedness": 1.0
+      },
+      "pii": {
+        "helpfulness": 1.0,
+        "clarity": 1.0,
+        "compliance": 0.8667,
+        "groundedness": 1.0
+      }
+    },
+    "dimensions": [
+      "helpfulness",
+      "clarity",
+      "compliance",
+      "groundedness"
+    ]
+  }
+}

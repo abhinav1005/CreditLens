@@ -108,6 +108,7 @@ def _execute(case: Case, model: str, config: Config, provider: Provider) -> dict
             "ttft_ms": r.ttft_ms,
             "served_models": r.served_models,
             "guardrail_decisions": r.guardrail_decisions,
+            "compliance": r.extra.get("compliance"),
         }
     r = generate_insights(
         case.profile_id,
@@ -174,6 +175,7 @@ def run_suite(
     judge_fn: Callable | None = None,
     judge_cache_dir: Path | None = None,
     tags: list[str] | None = None,
+    guardrails_enabled: bool | None = None,
 ) -> dict:
     if judge_mode not in JUDGE_MODES:
         raise ValueError(f"judge_mode must be one of {JUDGE_MODES}")
@@ -181,6 +183,8 @@ def run_suite(
     config.assistant.system_prompt_version = prompt_version
     config.assistant.model = model
     config.model_config_for(model)
+    if guardrails_enabled is not None:
+        config.guardrails.enabled = guardrails_enabled
     pricing = load_pricing()
     bundle = load_bundle(prompt_version, config.assistant.tools_prompt_version)
     _, insights_hash = load_insight_prompt(config.assistant.insights_prompt_version)
@@ -190,6 +194,8 @@ def run_suite(
         "max_tokens": config.assistant.max_tokens,
         "effort": config.assistant.effort,
         "max_tool_iterations": config.assistant.max_tool_iterations,
+        # Guardrails change answers, so on and off runs must never share cached answers.
+        "guardrails": config.guardrails.model_dump(),
     }
 
     keys = {}
@@ -311,6 +317,7 @@ def run_suite(
             "ttft_ms": record["ttft_ms"],
             "served_models": record["served_models"],
             "guardrail_decisions": record.get("guardrail_decisions", []),
+            "compliance": record.get("compliance"),
             "cache_hit": hit,
             "cache_key": key,
             "judge": judge_record["verdicts"] if judge_record else None,
@@ -335,6 +342,7 @@ def run_suite(
         estimate=estimate,
         wall_seconds=wall,
     )
+    summary["guardrails"] = guardrail_summary(results, config.guardrails.model_dump())
     summary["tags"] = sorted(tags or [])  # the tag filter this run used (smoke runs: ["smoke"])
     summary["judge"] = judge_summary(
         results, judge_mode, judge_version, judge_hash, judge_spend, config.judge.model
@@ -417,4 +425,22 @@ def judge_summary(
             for cat, dims in sorted(by_cat.items())
         },
         "dimensions": DIMENSIONS,
+    }
+
+
+def guardrail_summary(results: list[dict], guardrails_config: dict) -> dict:
+    """What the guardrails did in this run: decision counts and compliance retries."""
+    counts: dict[str, int] = defaultdict(int)
+    for r in results:
+        for d in r.get("guardrail_decisions") or []:
+            if d["action"] != "pass":
+                counts[f"{d['name']}:{d['stage']}:{d['action']}"] += 1
+    comp = [r["compliance"] for r in results if r.get("compliance")]
+    return {
+        "config": guardrails_config,
+        "decision_counts": dict(sorted(counts.items())),
+        "blocked_turns": sum(r.get("stop") == "blocked" for r in results),
+        "compliance_checked": len(comp),
+        "compliance_regenerated": sum(c["regenerated"] for c in comp),
+        "compliance_fallbacks": sum(c["fallback"] for c in comp),
     }
