@@ -22,6 +22,7 @@ from assistant.output_filters import (
 )
 from assistant.prompts import PromptBundle, load_bundle
 from assistant.providers import Provider, ProviderRequest, get_provider
+from assistant.router import route
 from credit.tools.contracts import ToolError, ToolErrorCode
 from credit.tools.impl import call_tool
 from guardrails.pipeline import GuardrailSet, run_pipeline
@@ -114,6 +115,11 @@ def run_turn(
     if not conversation or conversation[-1]["role"] != "user":
         raise ValueError("conversation must end with a user message")
     config = config or load_config()
+    route_info = None
+    if model is None and config.routing.enabled:
+        tier, reason = route(conversation)
+        model = config.routing.cheap_model if tier == "small" else config.assistant.model
+        route_info = {"tier": tier, "reason": reason, "model": model}
     model = model or config.assistant.model
     provider = provider or get_provider(model, config)
     bundle = bundle or load_bundle(
@@ -328,7 +334,7 @@ def run_turn(
         pricing_as_of=pricing.as_of,
         retracted=retracted,
         model_requests=len(served),
-        extra={"compliance": compliance} if compliance else {},
+        extra={k: v for k, v in {"compliance": compliance, "route": route_info}.items() if v},
     )
 
 

@@ -28,6 +28,7 @@ class AssistantConfig(BaseModel):
 
 class RoutingConfig(BaseModel):
     cheap_model: str
+    enabled: bool = False  # M4.5: route general questions to cheap_model
 
 
 class JudgeConfig(BaseModel):

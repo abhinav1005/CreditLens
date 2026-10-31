@@ -10,6 +10,7 @@ assistant:
   prompt_caching: false  # M4.4 measures before/after; enable only if it actually helps
 
 routing:
+  enabled: false   # M4.5 compares always-big / always-small / routed before turning this on
   cheap_model: claude-haiku-5-5
 
 judge:

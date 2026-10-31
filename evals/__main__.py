@@ -33,6 +33,7 @@ def main(argv: list[str] | None = None) -> int:
         "--tags", default=None, help="only cases with ALL of these comma-separated tags"
     )
     run.add_argument("--categories", default=None, help="only these comma-separated categories")
+    run.add_argument("--routed", action="store_true", help="let the router pick the model per case")
     run.add_argument("--max-cost-usd", type=float, default=None)
     run.add_argument("--concurrency", type=int, default=None)
     run.add_argument(
@@ -108,7 +109,21 @@ def main(argv: list[str] | None = None) -> int:
     mx.add_argument("--max-cost-usd", type=float, default=3.0, help="limit per model")
     mx.add_argument("--judge", choices=["off", "report"], default="report")
 
+    sub.add_parser("route-check", help="router misroute rate vs golden labels (no API calls)")
+
     args = parser.parse_args(argv)
+
+    if args.command == "route-check":
+        from evals.routing import route_check
+
+        r = route_check(load_cases())
+        print(
+            f"{r['routed_small']}/{r['n_chat_cases']} chat cases routed small "
+            f"({r['routed_small_share']:.0%}); misroute rate {r['misroute_rate']:.1%}"
+            f" {r['misroutes']}; "
+            f"missed savings {r['missed_savings']}"
+        )
+        return 0
 
     if args.command == "latency":
         from evals.matrix import latency_run
@@ -281,6 +296,7 @@ def main(argv: list[str] | None = None) -> int:
                 judge_version=args.judge_version,
                 tags=sorted(args.tags.split(",")) if args.tags else None,
                 guardrails_enabled=None if args.guardrails is None else args.guardrails == "on",
+                routing=args.routed,
                 run_id=args.run_id,
             )
         except BudgetExceeded as exc:

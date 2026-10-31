@@ -94,8 +94,13 @@ def score_case(case: Case, out: CaseOutput) -> list[Check]:
 def _execute(case: Case, model: str, config: Config, provider: Provider) -> dict:
     """Run one case for real. Returns a JSON-ready record of what the system produced."""
     if case.kind == "chat":
+        routed = config.routing.enabled  # the router picks the model (and provider) per turn
         r = run_turn(
-            case.conversation, case.profile_id, config=config, provider=provider, model=model
+            case.conversation,
+            case.profile_id,
+            config=config,
+            provider=None if routed else provider,
+            model=None if routed else model,
         )
         return {
             "kind": "chat",
@@ -178,6 +183,7 @@ def run_suite(
     guardrails_enabled: bool | None = None,
     read_cache: bool = True,
     prompt_caching: bool | None = None,
+    routing: bool = False,
 ) -> dict:
     if judge_mode not in JUDGE_MODES:
         raise ValueError(f"judge_mode must be one of {JUDGE_MODES}")
@@ -189,6 +195,7 @@ def run_suite(
         config.guardrails.enabled = guardrails_enabled
     if prompt_caching is not None:
         config.assistant.prompt_caching = prompt_caching
+    config.routing.enabled = routing
     pricing = load_pricing()
     bundle = load_bundle(prompt_version, config.assistant.tools_prompt_version)
     _, insights_hash = load_insight_prompt(config.assistant.insights_prompt_version)
@@ -201,6 +208,7 @@ def run_suite(
         # Guardrails change answers, so on and off runs must never share cached answers.
         "guardrails": config.guardrails.model_dump(),
         "prompt_caching": config.assistant.prompt_caching,
+        "routing": config.routing.model_dump(),
     }
 
     keys = {}
