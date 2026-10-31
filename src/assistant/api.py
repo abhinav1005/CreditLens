@@ -20,6 +20,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
+from assistant.ab import assign_variant
 from assistant.config import ROOT, load_config
 from assistant.insights import generate_insights
 from assistant.loop import run_turn
@@ -73,14 +74,22 @@ def create_app(
 
         def worker() -> None:
             try:
+                variant, model = None, config.assistant.model
+                if config.ab_test.enabled:
+                    variant = assign_variant(conversation_id, config.ab_test.percent)
+                    if variant == "candidate":
+                        model = config.ab_test.candidate_model
                 result = run_turn(
                     conversation,
                     request.profile_id,
                     config=config,
-                    provider=provider_factory(config.assistant.model),
+                    provider=provider_factory(model),
+                    model=model,
                     on_event=events.put,
                 )
-                transcript = transcript_from_turn(result, conversation_id, source="chat")
+                transcript = transcript_from_turn(
+                    result, conversation_id, source="chat", variant=variant
+                )
                 store.put(transcript)
                 events.put(
                     {

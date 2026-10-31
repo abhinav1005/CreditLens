@@ -60,6 +60,12 @@ class GuardrailsConfig(BaseModel):
     output: list[str] = []
 
 
+class ABTestConfig(BaseModel):
+    enabled: bool = False
+    candidate_model: str = ""
+    percent: int = 0
+
+
 class GateConfig(BaseModel):
     max_overall_drop_points: float
     max_lost_per_category: int
@@ -74,6 +80,7 @@ class Config(BaseModel):
     evals: EvalsConfig
     gate: GateConfig
     guardrails: GuardrailsConfig = GuardrailsConfig()
+    ab_test: ABTestConfig = ABTestConfig()
 
     def model_config_for(self, model: str) -> ModelConfig:
         if model not in self.models:
