@@ -400,6 +400,13 @@ These take precedence over earlier sections where they conflict.
 ### Storage
 - `Storage` interface: `put`, `get(id)`, `list(date_range, limit)`; callers filter. SQLite only in the core plan.
 
+### UI and reporting (M5, 2026-10-31)
+- React + TypeScript (Vite), no router library: views by URL hash. Dev server proxies `/api` to uvicorn; docker-compose does the same with nginx (SSE unbuffered).
+- The web UI's labeling and promote call the CLI's own functions (`evals/web_routes.py`), so browser and terminal produce identical records. Labeling stays blind (no model, prompt, run, or judge verdict is sent).
+- Dashboard and README results are generated (`python -m evals dashboard`, `python -m evals readme`) from committed reports, deterministic, and `--check`ed in CI. No hand-typed numbers.
+- `src/assistant/api.py` is outside the eval code hash and the gate's paths: it wraps `run_turn` and never changes an answer, and including it made every UI change re-pay a smoke run.
+- The gate's response cache is saved even when the gate fails.
+
 ### API constraints found during the build (2026-10-31)
 These replace the matching decisions above. Source: Claude API reference, checked while writing config.
 - **No temperature 0.** Since API version 2026-10-21, `temperature`/`top_p`/`top_k` return a 400 on every model. Eval reproducibility comes from the content-hash response cache: an unchanged case is never re-sampled. Run-to-run noise on changed inputs is handled by the gate rule (a regression is ≥2 previously passing cases lost in a category), plus the overall-drop threshold.
