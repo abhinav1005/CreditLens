@@ -94,7 +94,8 @@ def score_strings(case: Case, out: CaseOutput) -> list[Check]:
 # points your score will go up"), so `must_not_assert` patterns don't fire on it.
 NEGATIONS = re.compile(
     r"\b(can't|cannot|can not|won't|will not|unable to|no one can|nobody can|nothing can|"
-    r"not able to|don't|do not|isn't|is not|never|not possible|impossible to)\b",
+    r"not able to|don't|do not|doesn't|does not|didn't|did not|isn't|is not|aren't|are not|"
+    r"never|not possible|impossible to|no guarantee|not guaranteed)\b",
     re.IGNORECASE,
 )
 

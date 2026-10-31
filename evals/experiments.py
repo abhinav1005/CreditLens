@@ -30,7 +30,15 @@ ABLATIONS = [
     ("v1-no-rules", "without the 8 safety rules"),
     ("v1-minimal", "identity + disclaimer only"),
 ]
-GATE_CASES = 2  # the smoke gate's 5-point limit on 41 cases is 2 cases
+
+
+def gate_tolerance(n_smoke: int) -> int:
+    """How many smoke cases the overall rule tolerates losing: the largest k whose drop,
+    100 * k / n, is not more than gate.max_overall_drop_points (5 points on 41 cases → 2)."""
+    from assistant.config import load_config
+
+    limit = load_config().gate.max_overall_drop_points
+    return max(k for k in range(n_smoke + 1) if 100 * k / n_smoke <= limit)
 
 
 def results(run: str) -> dict[str, dict]:
@@ -89,7 +97,7 @@ def reliability() -> dict:
         "smoke_n": len(smoke),
         "smoke_passed": smoke_passed,
         "smoke_swing": max(smoke_passed) - min(smoke_passed),
-        "gate_limit_cases": GATE_CASES,
+        "gate_limit_cases": gate_tolerance(len(smoke)),
     }
 
 
@@ -190,6 +198,8 @@ def render(data: dict) -> str:
         "## E1 Reliability: the same config, run 5 times",
         "",
         f"`--prompt-version v1 --no-cache --run-id exp-repeat-N` (guardrails on, effort low). {rel['n_cases']} cases.",
+        "`--no-cache` makes every model call fresh. The guardrail classifiers keep their own cache, so identical"
+        " user messages get the same classifier verdict each run: this measures the model's variability, not the classifier's.",
         "",
         "| Run | " + " | ".join(r.replace("exp-repeat-", "#") for r in rel["runs"]) + " |",
         "|---|" + "---:|" * len(rel["runs"]),
@@ -202,7 +212,7 @@ def render(data: dict) -> str:
         f"- {rel['always_pass']} cases passed every time, {rel['always_fail']} failed every time, "
         f"**{len(rel['flaky'])} were flaky** (passed in some runs, failed in others): {rel['flaky_by_category']}.",
         f"- On the {rel['smoke_n']}-case smoke subset the pass count swung by **{rel['smoke_swing']} cases** with nothing changed. "
-        f"The CI gate's limit is {rel['gate_limit_cases']} cases, so "
+        f"The CI gate tolerates a drop of {rel['gate_limit_cases']} (more than `gate.max_overall_drop_points`), so "
         + (
             "**a single run can fail the gate on noise alone.**"
             if rel["smoke_swing"] > rel["gate_limit_cases"]
@@ -271,6 +281,13 @@ def render(data: dict) -> str:
         " A run that starts cold pays to write the cache; runs right after it mostly read it.",
     ]
     return "\n".join(lines) + "\n"
+
+
+def is_current() -> bool:
+    path = OUT.with_suffix(".json")
+    return path.exists() and json.loads(path.read_text()) == json.loads(
+        json.dumps(build(), sort_keys=True)
+    )
 
 
 def write() -> Path:

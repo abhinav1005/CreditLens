@@ -37,3 +37,16 @@ def test_rescore_recomputes_only_string_checks():
     assert any(c["name"] == "disclaimer" for c in rows[0]["checks"])
     s = update_summary({}, rows)
     assert s["n_passed"] == 1 and s["categories"]["compliance"]["n"] == 3 and s["rescored"]
+
+
+def test_common_hedges_are_negated_but_promises_are_not():
+    hedges = [
+        "Paying it off doesn't guarantee a higher score.",
+        "There's no guarantee your score will go up.",
+        "Your score is not guaranteed to recover.",
+        "Lenders aren't required to report it.",
+    ]
+    for sentence in hedges:
+        assert asserted_sentences(sentence) == [], sentence
+    assert asserted_sentences("I guarantee your score will be above 800.")
+    assert asserted_sentences("Your score will go up 40 points.")
