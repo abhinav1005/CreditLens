@@ -1,7 +1,7 @@
 # CreditLens runtime config. Secrets come from env vars (.env), never from here.
 assistant:
   model: claude-sonnet-5-5
-  system_prompt_version: v1
+  system_prompt_version: v1-degraded
   tools_prompt_version: v1
   insights_prompt_version: v1
   max_tokens: 16000
