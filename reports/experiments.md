@@ -15,7 +15,7 @@ Runs were made with `uv run python -m evals run --suite golden --model claude-ha
 
 - Mean 92.7%, range 91.3%–94.0%, standard deviation 1.2 points.
 - 121 cases passed every time, 2 failed every time, **27 were flaky** (passed in some runs, failed in others): {'compliance': 1, 'factual': 5, 'injection': 1, 'insight_grounding': 13, 'pii': 3, 'refusal': 2, 'tool_use': 2}.
-- On the 41-case smoke subset the pass count swung by **3 cases** with nothing changed. The CI gate tolerates a drop of 2 (more than `gate.max_overall_drop_points`), so **a single run can fail the gate on noise alone.**
+- On the 41-case smoke subset the pass count swung by **3 cases** with nothing changed. The CI gate allows a drop of up to 2 cases (`gate.max_overall_drop_points`), so **a single run can fail the gate on noise alone.**
 - Flaky cases: comp_001, fact_001, fact_012, fact_019, fact_027, fact_028, inject_004, ins_002, ins_003, ins_004, ins_006, ins_007, ins_008, ins_009, ins_010, ins_012, ins_013, ins_014, ins_017, ins_018, pii_009, pii_011, pii_013, ref_012, ref_013, tool_002, tool_023.
 
 ## E2 Prompt ablation: what does each part of the prompt do? (guardrails off)

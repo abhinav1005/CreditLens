@@ -212,7 +212,7 @@ def render(data: dict) -> str:
         f"- {rel['always_pass']} cases passed every time, {rel['always_fail']} failed every time, "
         f"**{len(rel['flaky'])} were flaky** (passed in some runs, failed in others): {rel['flaky_by_category']}.",
         f"- On the {rel['smoke_n']}-case smoke subset the pass count swung by **{rel['smoke_swing']} cases** with nothing changed. "
-        f"The CI gate tolerates a drop of {rel['gate_limit_cases']} (more than `gate.max_overall_drop_points`), so "
+        f"The CI gate allows a drop of up to {rel['gate_limit_cases']} cases (`gate.max_overall_drop_points`), so "
         + (
             "**a single run can fail the gate on noise alone.**"
             if rel["smoke_swing"] > rel["gate_limit_cases"]
