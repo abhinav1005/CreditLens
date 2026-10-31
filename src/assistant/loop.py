@@ -121,6 +121,10 @@ def run_turn(
                 emit({"type": "text", "text": text})
 
     def on_text(chunk: str) -> None:
+        # Text from a new model response starts a new paragraph, so "Let me check." from
+        # a tool-calling turn doesn't run into the next turn's answer.
+        if emitted and not buffer.has_pending() and not emitted[-1][-1:].isspace():
+            chunk = "\n\n" + chunk.lstrip()
         send_sentences(buffer.feed(chunk))
 
     stop = "max_iterations"

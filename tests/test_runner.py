@@ -144,3 +144,11 @@ def test_percentile_nearest_rank():
     assert percentile([], 50) is None
     assert percentile([1, 2, 3, 4], 50) == 2
     assert percentile(list(range(1, 101)), 95) == 95
+
+
+def test_cache_key_changes_with_code(monkeypatch):
+    import evals.cache as cache_mod
+
+    before = cache_key({"c": 1}, "m", {}, "h")
+    monkeypatch.setattr(cache_mod, "code_hash", lambda: "different")
+    assert cache_key({"c": 1}, "m", {}, "h") != before

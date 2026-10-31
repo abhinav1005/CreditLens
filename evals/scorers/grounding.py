@@ -39,7 +39,8 @@ FREE_TEXT_FIELDS = {
 MONTH = re.compile(r"\b(\d{4})-(\d{2})\b")
 MASKED = re.compile(r"\*{4}\d{4}")
 # A number not glued to a word, underscore, asterisk or hyphen (skips acc_03, ****4821, p_001).
-NUMBER = re.compile(r"(?<![\w*.\-])(\d{1,3}(?:,\d{3})+|\d+)(\.\d+)?(?![\w])")
+# Hyphens are NOT excluded, so both ends of a range like "300-999" get checked.
+NUMBER = re.compile(r"(?<![\w*.])(\d{1,3}(?:,\d{3})+|\d+)(\.\d+)?(?![\w])")
 UNIT_AFTER = [
     ("percent", re.compile(r"\s?(%|percent)", re.I)),
     ("years", re.compile(r"[\s-]?years?\b", re.I)),

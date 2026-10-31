@@ -49,6 +49,9 @@ class SentenceBuffer:
             self._pending = self._pending[match.end() :]
         return sentences
 
+    def has_pending(self) -> bool:
+        return bool(self._pending)
+
     def flush(self) -> list[str]:
         rest, self._pending = self._pending, ""
         return [rest] if rest else []

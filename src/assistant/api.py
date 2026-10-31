@@ -20,7 +20,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
-from assistant.config import load_config
+from assistant.config import ROOT, load_config
 from assistant.insights import generate_insights
 from assistant.loop import run_turn
 from assistant.providers import Provider, get_provider
@@ -52,7 +52,8 @@ def create_app(
 ) -> FastAPI:
     config = load_config()
     provider_factory = provider_factory or (lambda model: get_provider(model, config))
-    store = storage or SQLiteStorage(config.storage.sqlite_path)
+    # Resolve against the repo root so the DB location doesn't depend on the cwd.
+    store = storage or SQLiteStorage(ROOT / config.storage.sqlite_path)
     app = FastAPI(title="CreditLens", description=DISCLAIMER)
 
     @app.get("/health")

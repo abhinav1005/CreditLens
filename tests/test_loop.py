@@ -105,3 +105,17 @@ def test_sentence_buffer_keeps_decimals_together():
     out = buf.feed("Utilization is 40") + buf.feed(".8% now. Next")
     assert out == ["Utilization is 40.8% now. "]
     assert buf.flush() == ["Next"]
+
+
+def test_text_from_separate_responses_is_separated():
+    fake = FakeProvider(
+        [
+            FakeTurn(
+                text="Let me check.",
+                tool_calls=[ToolCall("t1", "get_utilization", {"profile_id": "story_001"})],
+            ),
+            FakeTurn(text="Your utilization is 40.8%."),
+        ]
+    )
+    result = run_turn(USER, "story_001", provider=fake)
+    assert result.final_text == "Let me check.\n\nYour utilization is 40.8%."

@@ -1,8 +1,9 @@
 """Response cache for eval runs, keyed by a content hash.
 
 The key covers everything that can change the system's answer: the case itself, the
-model and request settings, the prompt content hash, the profile dataset, and the tool
-fixtures (a proxy for tool behavior). An unchanged case is never re-sampled, which is how
+model and request settings, the prompt content hash, the profile dataset, the tool
+fixtures, and the answer-producing code itself (see `code_hash`). An unchanged case is
+never re-sampled, which is how
 reruns stay reproducible and nearly free.
 """
 
@@ -13,10 +14,27 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 DATASET_FILE = ROOT / "data" / "profiles" / "v1.json"
 FIXTURES_FILE = ROOT / "contracts" / "tools" / "fixtures" / "v1.json"
+CODE_DIRS = ["src/assistant", "src/guardrails", "src/credit"]
 
 
 def _file_hash(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()[:16]
+
+
+def code_hash() -> str:
+    """Hash of the code that produces answers (assistant, guardrails, tools, config).
+
+    Any edit here, such as adding a guardrail filter in M3, must invalidate cached answers.
+    Otherwise evals would keep scoring outputs from the old pipeline.
+    """
+    files = sorted(
+        p for d in CODE_DIRS for p in (ROOT / d).rglob("*.py") if "__pycache__" not in p.parts
+    ) + [ROOT / "config.yaml"]
+    digest = hashlib.sha256()
+    for p in files:
+        digest.update(str(p.relative_to(ROOT)).encode())
+        digest.update(p.read_bytes())
+    return digest.hexdigest()[:16]
 
 
 def cache_key(case_payload: dict, model: str, settings: dict, prompt_hash: str) -> str:
@@ -27,6 +45,7 @@ def cache_key(case_payload: dict, model: str, settings: dict, prompt_hash: str) 
         "prompt_hash": prompt_hash,
         "dataset": _file_hash(DATASET_FILE),
         "tools": _file_hash(FIXTURES_FILE),
+        "code": code_hash(),
     }
     return hashlib.sha256(json.dumps(material, sort_keys=True).encode()).hexdigest()
 

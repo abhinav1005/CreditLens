@@ -95,3 +95,8 @@ def test_numeric_facts():
     case = make_case(numeric_facts=[{"value": 40.8}])
     assert check("It's 40.8%.", UTIL, case)["states:40.8"].passed
     assert not check("It's high.", UTIL, case)["states:40.8"].passed
+
+
+def test_both_ends_of_a_range_are_checked():
+    assert check("Scores run 300-850.", [])["numeric_grounding"].passed
+    assert not check("Scores run 300-999.", [])["numeric_grounding"].passed

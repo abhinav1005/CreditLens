@@ -49,6 +49,13 @@ Entry format:
 - Gotcha for future sessions: black reformats code, so string-replace edits written in Python heredocs can silently miss. Use the Edit tool, or assert that the replacement happened.
 - Schemas sent to the API (tool inputs, insight output) are flattened by `assistant.schema.inline_refs` (no `$ref`/`$defs`), so a provider's lack of reference support can't break a request.
 - Stopped before M2: CLAUDE.md says don't start M(n+1) until M(n)'s done-when passes, and M1's needs a live run.
+- **Self-review (owner asked "does all look good?")**. Fixed:
+  1. Text from separate model responses ran together ("Let me check.Your utilization…"); now a paragraph break.
+  2. The cache key didn't include code, so M3 guardrail changes would have been scored on stale cached answers; the key now hashes `src/assistant`, `src/guardrails`, `src/credit`, `config.yaml`.
+  3. comp_002/comp_006 banned every lender name, including the person's own creditors, so describing their own card would wrongly fail; now only *other* lenders are banned.
+  4. Grounding skipped numbers after a hyphen ("300-999" passed); both ends of a range are now checked.
+  5. SQLite path was cwd-relative; now repo-root relative.
+  Open (needs a live run to judge): refusal detection is a phrase list and may miss decline wordings; the disclaimer check needs the exact line; replaying Sonnet's fallback/thinking blocks within a tool loop is untested against the real API; CI cold-cache budget (noted on M2.14).
 **Blockers:** M0.2 (API key) is with the owner. Live tests (`@pytest.mark.live`) are skipped until then. Run them with `uv run pytest -m live` once `.env` has the key. M0.4 (GitHub repo) is deferred to M2.14.
 **Next:** M1.22 is BLOCKED on M0.2 (API key in `.env`). Once the key exists: `uv run pytest -m live`, then `uv run python -m evals run --suite golden --model claude-sonnet-5-5 --prompt-version v1` (pre-run estimate ~$1.80 for 50 uncached cases on Sonnet 5.5; the local limit is $5), look at failures, commit the report, update CLAUDE.md commands.
 
