@@ -34,6 +34,7 @@ Entry format:
 - M1.14: `src/assistant/insights.py` (code gathers 3 tool outputs → one structured-output call → Pydantic `InsightCards` (1-3 cards, evidence required) → 1 retry with the validation error; retries counted), `prompts/insights/v1.md` (locked), `GET /insights/{profile_id}` (502 if both attempts fail). Live test written, skipped until key.
 - M1.15: `evals/cases.py` (`Case` schema: kind chat|insights, 7 categories, expectations incl. must_call_tools with partial-arg match, must/must-not contain, regex must_not_match, expected_refusal, disclaimer, numeric_facts, must_mention_factors, rubric_notes; `load_cases` reports every problem at once), `python -m evals validate`, empty `evals/datasets/golden.jsonl`.
 - M1.18: `evals/scorers/base.py` (`CaseOutput`, `Check`) + `evals/scorers/deterministic.py` (tool calls with partial-arg match, must/must-not strings + regex, refusal markers, disclaimer line, factor keywords, insight schema validity, turn completed).
+- M1.19: `evals/scorers/grounding.py` (number extraction skipping ids, masked numbers and month splits; grounded set = tool values (free-text fields excluded), list lengths, same-field differences, before/after deltas, balance÷limit %, user-stated numbers, constants; half-unit rounding tolerance; masked numbers must exist in tool output; `numeric_facts` checks) + `policy/constants.yaml` (11 constants, each with a reason).
 **Decisions:**
 - Domain code lives in `src/credit/` (factors, profile schema, scoring, months, generator, tools). `data/generate_profiles.py` will be a thin CLI wrapper.
 - Profiles have no person names at all, only ids (`p_001`, `story_001`, `inj_001`). Data window is the 12 months ending 2026-06, fixed so output doesn't depend on today's date.
@@ -42,7 +43,7 @@ Entry format:
 - Sonnet 5.5 has `refusal_fallback: true` (server-side `fallbacks: "default"`, beta `server-side-fallback-2026-07-01`), so a refused request is re-run on a fallback model. `served_model` is recorded on every response so evals can see when this happened.
 - Tool executor (`assistant.loop.execute_tool`) refuses any `profile_id` other than the conversation's own, a deterministic guard against injection steering the model to other profiles.
 **Blockers:** M0.2 (API key) is with the owner. Live tests (`@pytest.mark.live`) are skipped until then. Run them with `uv run pytest -m live` once `.env` has the key. M0.4 (GitHub repo) is deferred to M2.14.
-**Next:** M1.19: numeric grounding scorer in `evals/scorers/grounding.py` + `policy/constants.yaml` (allowed educational constants, rounding tolerance, same-series differences, balance ÷ limit).
+**Next:** M1.20: insight-card scorer in `evals/scorers/insights.py`. Every number in a card summary appears in that card's evidence; every evidence item resolves (tool + dot-path field) to the same value in the actual tool outputs; factor_code is in the profile's top_factors.
 
 ## 2026-10-31 — Session 1 (planning)
 **Done:** Read PRD. Grilling session settled 46 design decisions, written to PRD.md §14 (v2) and CLAUDE.md. Created BUILD_STATUS.md and BUILD_LOG.md.
