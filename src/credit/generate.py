@@ -178,9 +178,13 @@ def generate_random_profile(
 
 
 def generate_dataset(seed: int = 42, count: int = DEFAULT_COUNT) -> list[CreditProfile]:
+    """`count` random profiles, then the story profiles, then the injection profiles."""
+    from credit.stories import build_injection_profiles, build_story_profiles
+
     rng = random.Random(seed)
     months = month_range(WINDOW_END, WINDOW_MONTHS)
-    return [generate_random_profile(rng, f"p_{n:03d}", months) for n in range(1, count + 1)]
+    profiles = [generate_random_profile(rng, f"p_{n:03d}", months) for n in range(1, count + 1)]
+    return profiles + build_story_profiles(months) + build_injection_profiles(months, seed)
 
 
 def dataset_to_json(profiles: list[CreditProfile]) -> str:

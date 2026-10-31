@@ -79,9 +79,12 @@ class Story(BaseModel):
 
     kind: str
     description: str
-    # Factors whose penalties increased the most in the month of the score drop.
-    score_drop_cause: list[FactorCode]
-    drop_month: str = Field(pattern=MONTH_PATTERN)
+    direction: Literal["drop", "rise"]
+    # The month the score moved, compared with the month before it.
+    change_month: str = Field(pattern=MONTH_PATTERN)
+    # Factors whose penalties moved by at least 5 points in the score's direction,
+    # largest move first. Computed from the formula, never hand-typed (see credit.stories).
+    change_cause: list[FactorCode]
 
 
 class CreditProfile(BaseModel):

@@ -12,9 +12,9 @@ def test_different_seed_different_output():
 
 def test_default_count_and_ids():
     profiles = generate_dataset()
-    assert len(profiles) == 50
+    assert len(profiles) == 57  # 50 random + 4 story + 3 injection
     assert profiles[0].profile_id == "p_001"
-    assert len({p.profile_id for p in profiles}) == 50
+    assert len({p.profile_id for p in profiles}) == 57
 
 
 def test_scores_come_from_formula():

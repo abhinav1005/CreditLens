@@ -1,6 +1,6 @@
 """Add a 'Done' bullet and set 'Next' in the newest BUILD_LOG.md entry.
 
-    uv run python scripts/log_done.py "M1.3: generator ..." "M1.4: story profiles"
+uv run python scripts/log_done.py "M1.3: generator ..." "M1.4: story profiles"
 """
 
 import re
