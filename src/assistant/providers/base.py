@@ -41,6 +41,7 @@ class ProviderRequest:
     max_tokens: int = 16000
     effort: str | None = None
     output_schema: dict | None = None  # JSON Schema for structured output, if any
+    cache_prompt: bool = False  # ask the provider to cache the stable prefix (tools + system)
 
 
 @dataclass

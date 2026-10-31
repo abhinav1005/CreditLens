@@ -191,6 +191,7 @@ def run_turn(
             tools=bundle.tools,
             max_tokens=config.assistant.max_tokens,
             effort=config.assistant.effort,
+            cache_prompt=config.assistant.prompt_caching,
         )
         response = provider.complete(request, on_text=on_text)
         send_sentences(buffer.flush())

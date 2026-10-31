@@ -96,7 +96,48 @@ def main(argv: list[str] | None = None) -> int:
     e2e.add_argument("run_off")
     e2e.add_argument("--label", required=True, help="scenario name, e.g. v1 or v1-degraded")
 
+    lat = sub.add_parser("latency", help="sequential, fresh-call latency run per model")
+    lat.add_argument("--models", required=True)
+    lat.add_argument("--tags", default="smoke")
+    lat.add_argument("--max-cost-usd", type=float, default=2.0)
+    lat.add_argument("--prompt-caching", choices=["on", "off"], default=None)
+    lat.add_argument("--label", default="", help="suffix for the output file, e.g. -cache-on")
+
+    mx = sub.add_parser("matrix", help="quality x cost x latency table across models")
+    mx.add_argument("--models", required=True)
+    mx.add_argument("--max-cost-usd", type=float, default=3.0, help="limit per model")
+    mx.add_argument("--judge", choices=["off", "report"], default="report")
+
     args = parser.parse_args(argv)
+
+    if args.command == "latency":
+        from evals.matrix import latency_run
+
+        wanted = set(args.tags.split(","))
+        cases = [c for c in load_cases() if wanted <= set(c.tags)]
+        for model in args.models.split(","):
+            pc = None if args.prompt_caching is None else args.prompt_caching == "on"
+            r = latency_run(
+                cases, model, max_cost_usd=args.max_cost_usd, label=args.label, prompt_caching=pc
+            )
+            print(
+                f"{model}{args.label}: n={r['n']} total p50 {r['total_ms']['p50']:.0f}ms"
+                f" p95 {r['total_ms']['p95']:.0f}ms ttft p50 {r['ttft_ms']['p50']}"
+                f" spent ${r['cost_usd']:.3f}"
+            )
+        return 0
+
+    if args.command == "matrix":
+        from evals.matrix import COMPARISON, matrix
+
+        matrix(
+            load_cases(),
+            args.models.split(","),
+            max_cost_usd=args.max_cost_usd,
+            judge_mode=args.judge,
+        )
+        print(COMPARISON.with_suffix(".md").read_text())
+        return 0
 
     if args.command == "guardrail-e2e":
         from evals.guardrail_e2e import run_e2e

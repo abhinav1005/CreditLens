@@ -63,3 +63,4 @@ en-core-web-sm = { url = "https://github.com/explosion/spacy-models/releases/dow
 # Markdown report rendering: long table rows read better unwrapped.
 "evals/guardrail_eval.py" = ["E501"]
 "evals/guardrail_e2e.py" = ["E501"]
+"evals/matrix.py" = ["E501"]

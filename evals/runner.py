@@ -176,6 +176,8 @@ def run_suite(
     judge_cache_dir: Path | None = None,
     tags: list[str] | None = None,
     guardrails_enabled: bool | None = None,
+    read_cache: bool = True,
+    prompt_caching: bool | None = None,
 ) -> dict:
     if judge_mode not in JUDGE_MODES:
         raise ValueError(f"judge_mode must be one of {JUDGE_MODES}")
@@ -185,6 +187,8 @@ def run_suite(
     config.model_config_for(model)
     if guardrails_enabled is not None:
         config.guardrails.enabled = guardrails_enabled
+    if prompt_caching is not None:
+        config.assistant.prompt_caching = prompt_caching
     pricing = load_pricing()
     bundle = load_bundle(prompt_version, config.assistant.tools_prompt_version)
     _, insights_hash = load_insight_prompt(config.assistant.insights_prompt_version)
@@ -196,6 +200,7 @@ def run_suite(
         "max_tool_iterations": config.assistant.max_tool_iterations,
         # Guardrails change answers, so on and off runs must never share cached answers.
         "guardrails": config.guardrails.model_dump(),
+        "prompt_caching": config.assistant.prompt_caching,
     }
 
     keys = {}
@@ -203,7 +208,7 @@ def run_suite(
         payload = case.model_dump(mode="json", include={"kind", "profile_id", "conversation"})
         prompt_hash = insights_hash if case.kind == "insights" else bundle.content_hash
         keys[case.id] = cache_key(payload, model, settings, prompt_hash)
-    uncached = [c for c in cases if cache.get(keys[c.id]) is None]
+    uncached = [c for c in cases if not read_cache or cache.get(keys[c.id]) is None]
     estimate = len(uncached) * estimated_cost_per_case(model, pricing)
     if estimate > max_cost_usd:
         raise BudgetExceeded(
@@ -241,7 +246,7 @@ def run_suite(
     def work(case: Case) -> dict:
         nonlocal spend
         key = keys[case.id]
-        cached = cache.get(key)
+        cached = cache.get(key) if read_cache else None  # latency runs need fresh calls
         error = None
         if cached is not None:
             record, hit = cached, True

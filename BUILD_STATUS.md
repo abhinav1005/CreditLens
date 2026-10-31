@@ -110,7 +110,7 @@ Each task is one small, reviewable commit. "Check" is how we know it's done.
 
 | ID | Status | Task | Check |
 |---|---|---|---|
-| M4.1 | [ ] | OpenAI provider. 👤 provides `OPENAI_API_KEY` | Live smoke call |
+| M4.1 | [!] | DEFERRED by owner (Anthropic-only comparison for now). OpenAI provider. 👤 provides `OPENAI_API_KEY` | Live smoke call |
 | M4.2 | [ ] | Sequential latency run (TTFT + total) | p50/p95 in report |
 | M4.3 | [ ] | `evals matrix` (Sonnet 5.5, Haiku 5.5, Haiku 4.5, OpenAI) → `reports/model-comparison.md` | Table generated |
 | M4.4 | [ ] | Prompt caching: verify cached tokens, measure before/after | Honest result in report |

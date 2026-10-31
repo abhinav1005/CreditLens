@@ -20,6 +20,7 @@ class AssistantConfig(BaseModel):
     system_prompt_version: str
     tools_prompt_version: str
     insights_prompt_version: str
+    prompt_caching: bool = False
     max_tokens: int
     max_tool_iterations: int
     effort: str

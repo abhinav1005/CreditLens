@@ -102,6 +102,10 @@ class AnthropicProvider:
             output_config["format"] = {"type": "json_schema", "schema": request.output_schema}
         if output_config:
             params["output_config"] = output_config
+        if request.cache_prompt:
+            # Automatic caching: the API caches the longest stable prefix it can (tools, then
+            # system, then earlier messages). Verified by usage.cache_read_input_tokens (M4.4).
+            params["cache_control"] = {"type": "ephemeral"}
         return params
 
     def complete(

@@ -103,3 +103,13 @@ def test_live_tool_call_smoke():
     assert resp.stop_reason == "tool_use"
     assert any(isinstance(c, ToolCall) and c.name == "get_utilization" for c in resp.tool_calls)
     assert resp.usage.input_tokens > 0
+
+
+def test_prompt_caching_flag_sets_cache_control():
+    config = load_config()
+    p = AnthropicProvider(config.model_config_for("claude-sonnet-5-5"), client=object())
+    on = p.build_params(
+        ProviderRequest(model="claude-sonnet-5-5", system="s", messages=[], cache_prompt=True)
+    )
+    off = p.build_params(ProviderRequest(model="claude-sonnet-5-5", system="s", messages=[]))
+    assert on["cache_control"] == {"type": "ephemeral"} and "cache_control" not in off

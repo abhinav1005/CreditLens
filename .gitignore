@@ -24,6 +24,7 @@ reports/*/
 # Judge calibration results are versioned (one file per judge prompt version).
 !reports/calibration/
 !reports/guardrails/
+!reports/latency/
 
 # OS / editors
 .DS_Store
