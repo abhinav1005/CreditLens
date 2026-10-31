@@ -21,9 +21,10 @@ Entry format:
 - M2.3: `evals/labeling.py` + `python -m evals build-pool`. Pool = 186 deduplicated items (Sonnet 5.5 and Haiku 5.5 × v1 and v1-degraded), fixed-seed shuffle, in `evals/datasets/labeling_pool.jsonl`. Spent $0.54. Deterministic results: Sonnet v1 44/50, Sonnet degraded 29/50, Haiku v1 39/50, Haiku degraded 31/50.
 - M2.4: `evals/labeler.py` + `python -m evals label --labeler NAME [--batch 25]`. Blind to the judge verdict and to model/prompt; p/f per dimension, s skip, q quit, optional note; appends each label to `evals/datasets/labels.jsonl` immediately; resumes.
 - M2.6: `evals/split.py` freezes the split by item-id hash (30% target), giving `label_split.json` = dev 135 / test 51, written BEFORE any labels or judge runs. Refuses to change once written.
+- M2.7: `evals/calibrate.py` + `python -m evals calibrate-judge [--judge-version v1] [--labeler NAME]`. Judges each labeled item (cached in `.cache/judge` by item + judge model + prompt hash), then per dimension × {test, dev, all, written_by_sonnet, written_by_haiku}: precision/recall/F1 (fail = positive), accuracy, kappa (written out by hand, tested equal to sklearn) with a seeded 2000-sample bootstrap 95% CI, and a confusion matrix; human-vs-human kappa when 2 labelers overlap. Writes `reports/calibration/judge-<v>.{json,md}` (committed). Added scikit-learn.
 **Decisions:**
 **Blockers:** M2.5 (≥100 hand labels) must be done by the owner.
-**Next:** M2.7: `python -m evals calibrate-judge` in `evals/calibrate.py`. Judge every labeled item (cached), then per dimension and split: precision/recall/F1 (fail = positive class), accuracy, Cohen's kappa via sklearn, a bootstrap 95% CI, and a confusion matrix; Sonnet-written vs Haiku-written kappa; writes `reports/calibration/judge-<version>.{json,md}`.
+**Next:** M2.9: judge in the runner. Add `--judge` to `evals run`; a per-category map in `evals/judge_policy.py` says which judge dimensions count toward pass/fail; judge results cached; the report gets judge columns.
 
 ## 2026-10-31 — Session 3 (first live run, M1 exit)
 **Done:**

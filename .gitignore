@@ -21,6 +21,8 @@ reports/*/
 !reports/baseline/
 # Selected runs kept for the record (copied here on purpose).
 !reports/history/
+# Judge calibration results are versioned (one file per judge prompt version).
+!reports/calibration/
 
 # OS / editors
 .DS_Store

@@ -49,7 +49,30 @@ def main(argv: list[str] | None = None) -> int:
     label.add_argument("--labeler", required=True, help="your name, recorded on each label")
     label.add_argument("--batch", type=int, default=25)
 
+    cal = sub.add_parser("calibrate-judge", help="judge vs human agreement per dimension")
+    cal.add_argument("--judge-version", default="v1")
+    cal.add_argument("--labeler", default=None, help="use only this labeler's labels")
+    cal.add_argument("--max-cost-usd", type=float, default=3.0)
+
     args = parser.parse_args(argv)
+
+    if args.command == "calibrate-judge":
+        from evals.calibrate import MAIN_DIMENSION, calibrate, write_report
+
+        report = calibrate(args.judge_version, args.labeler, max_cost_usd=args.max_cost_usd)
+        if report["n_judged"] == 0:
+            print("no labeled items yet: run `python -m evals label --labeler NAME` first")
+            return 1
+        path = write_report(report)
+        for group in ("test", "dev"):
+            m = report["results"].get(group, {}).get(MAIN_DIMENSION)
+            if m and m["n"]:
+                print(
+                    f"{group:<5} {MAIN_DIMENSION}: kappa {m['kappa']}"
+                    f" CI {m['kappa_ci95']} (n={m['n']})"
+                )
+        print(f"report: {path}")
+        return 0
 
     if args.command == "label":
         from evals.labeler import label_items, load_labels
