@@ -6,7 +6,7 @@ Specs: `PRD.md` (§14 takes precedence). History and notes: `BUILD_LOG.md`.
 **Legend:** `[ ]` todo · `[~]` in progress · `[x]` done · `[!]` blocked (reason in log) · 👤 = needs the owner (Abhinav)
 
 **Current milestone:** M3 done-when PASSED 2026-10-31 (report.md has a Guardrails section with per-guardrail test P/R). Open from M2: owner labels → calibration. Next: M4
-**Next task:** M4.1 (OpenAI provider; needs OPENAI_API_KEY) or M4.2+ (Anthropic-only parts first)
+**Next task:** M4: fix the refusal markers + card-total grounding (see BUILD_LOG Session 6), then M4.4 caching, M4.5 routed run, M4.6 long suite
 
 Each task is one small, reviewable commit. "Check" is how we know it's done.
 

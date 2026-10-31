@@ -14,6 +14,20 @@ Entry format:
 
 ---
 
+## 2026-10-31 — Session 6 (M4, stopped at usage limit)
+**Done (committed locally; this commit pushes everything):**
+- Owner: leave OpenAI for now (M4.1 deferred, PRD §14).
+- Tooling: prompt-caching switch (`assistant.prompt_caching`, off; in the cache key), fresh-call sequential `evals latency`, `evals matrix` → `reports/model-comparison.{md,json}`, router (`src/assistant/router.py`, `evals route-check`: 22% of chat cases routed small, 0 misroutes, `evals run --routed`), A/B (`src/assistant/ab.py`, `ab_test:` config, variant on transcripts) + `docs/model-upgrade.md`, context trimming (`src/assistant/context.py`, `context_budget_tokens: 12000`, `--context-budget`), long suite `evals/datasets/long.jsonl` (5 cases, ~5.2k tokens of history).
+- Latency (41 smoke, sequential, fresh): Sonnet 5.5 p50 5.9s / p95 8.1s / TTFT 2.4s / $0.42; Haiku 5.5 4.0s / 6.7s / 1.9s / $0.025; Haiku 4.5 4.2s / 7.6s / 0.7s / $0.19.
+- Matrix (150 cases, judge report): Sonnet 90.7% ($0.0106/case), **Haiku 5.5 90.0% ($0.0006/case)**, Haiku 4.5 74.0% ($0.0042). Runs in reports/history/matrix-*. Spend ≈ $5.7.
+**Found, NOT yet fixed (do first):**
+1. Haiku 4.5 refusal 40% is mostly a scorer false negative: real declines like "I only help with credit-related questions" / "I'm here specifically to help you understand your credit profile" aren't in REFUSAL_MARKERS (evals/scorers/deterministic.py). Add markers + a test, rescore from cache ($0).
+2. Haiku 5.5 compliance 85% = 3 numeric_grounding failures on card totals ("$8,052 across two cards with $11,000 in total limits") even though per-type sums were added. Debug `_walk` in evals/scorers/grounding.py (maybe closed cards or the sum per type isn't reached); rescore ($0).
+3. Then regenerate the matrix markdown (rerun `evals matrix ...`; fully cached, judge cached → ~$0).
+**Left in M4:** M4.4 caching before/after (`evals latency --prompt-caching on --label -cache-on` vs off, check usage cache_read tokens); M4.5 routed run (`evals run --routed`) vs always-big/small; M4.6 long suite with `--context-budget 2000` vs `0`; write results into reports/model-comparison.md + PRD §14; mark M4 tasks in BUILD_STATUS.md. Budget left ≈ $9.
+**Blockers:** owner labels (M2.5) → calibration; owner review of 150+5 drafted cases.
+**Next:** fix items 1–2 above.
+
 ## 2026-10-31 — Session 5 (M3 guardrails)
 **Done:**
 - M3.1: `src/guardrails/base.py` (`GuardrailResult` {name, allowed, action pass|redact|block|rewrite, text, reasons, scores}; logged without the text), `pipeline.py` (`run_pipeline`: redact passes modified text on, block stops; `GuardrailSet` input/tool_results/output), `registry.py` (`build_guardrails(config)` from config.yaml `guardrails:` lists, with `enabled: false` for off runs). `run_turn` redacts EVERY user message before the model or logs see it, can block the newest (no model call, stop="blocked"), guards each tool result (block gives a WITHHELD error to the model; the original stays in tool_calls for scoring), and runs output guardrails as sentence filters. Decisions go to TurnResult/Transcript/eval records.

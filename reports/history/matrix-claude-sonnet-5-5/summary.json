@@ -1,0 +1,156 @@
+{
+  "run_id": "matrix-claude-sonnet-5-5",
+  "suite": "golden",
+  "model": "claude-sonnet-5-5",
+  "prompt_version": "v1",
+  "prompt_hash": "b83927f5d3e2c723",
+  "pricing_as_of": "2026-10-06",
+  "created_at": "2026-10-31T16:55:52+00:00",
+  "git": {
+    "commit": "5dc2c6c",
+    "dirty": true
+  },
+  "n_cases": 150,
+  "n_passed": 136,
+  "overall_pass_rate": 0.9067,
+  "categories": {
+    "compliance": {
+      "n": 20,
+      "passed": 20,
+      "pass_rate": 1.0
+    },
+    "factual": {
+      "n": 30,
+      "passed": 30,
+      "pass_rate": 1.0
+    },
+    "injection": {
+      "n": 20,
+      "passed": 20,
+      "pass_rate": 1.0
+    },
+    "insight_grounding": {
+      "n": 20,
+      "passed": 6,
+      "pass_rate": 0.3
+    },
+    "pii": {
+      "n": 15,
+      "passed": 15,
+      "pass_rate": 1.0
+    },
+    "refusal": {
+      "n": 15,
+      "passed": 15,
+      "pass_rate": 1.0
+    },
+    "tool_use": {
+      "n": 30,
+      "passed": 30,
+      "pass_rate": 1.0
+    }
+  },
+  "status_counts": {
+    "ok": 150
+  },
+  "failed_checks_by_scorer": {
+    "insights": 14
+  },
+  "unreviewed_cases": 150,
+  "cost": {
+    "api_spend_this_run_usd": 1.589122,
+    "pre_run_estimate_usd": 2.5081,
+    "measured_total_usd": 1.589122,
+    "mean_per_case_usd": 0.010594
+  },
+  "latency_ms": {
+    "note": "measured under parallel load; M4.2 adds a clean sequential run",
+    "p50": 5145.432000048459,
+    "p95": 8501.830416033044
+  },
+  "cache_hits": 0,
+  "wall_seconds": 308.5,
+  "guardrails": {
+    "config": {
+      "enabled": true,
+      "input": [
+        "pii",
+        "injection"
+      ],
+      "tool_results": [
+        "injection"
+      ],
+      "output": [
+        "pii",
+        "compliance"
+      ]
+    },
+    "decision_counts": {
+      "injection:input:block": 10,
+      "injection:tool_result:rewrite": 10,
+      "pii:input:redact": 12
+    },
+    "blocked_turns": 10,
+    "compliance_checked": 120,
+    "compliance_regenerated": 0,
+    "compliance_fallbacks": 0
+  },
+  "tags": [],
+  "judge": {
+    "mode": "report",
+    "version": "v1",
+    "prompt_hash": "a9378c6d777f723e",
+    "model": "claude-sonnet-5-5",
+    "spend_usd": 1.14318,
+    "pass_rates": {
+      "compliance": {
+        "helpfulness": 1.0,
+        "clarity": 1.0,
+        "compliance": 0.9,
+        "groundedness": 1.0
+      },
+      "factual": {
+        "helpfulness": 1.0,
+        "clarity": 1.0,
+        "compliance": 1.0,
+        "groundedness": 1.0
+      },
+      "injection": {
+        "helpfulness": 0.8,
+        "clarity": 0.9,
+        "compliance": 1.0,
+        "groundedness": 0.85
+      },
+      "insight_grounding": {
+        "helpfulness": 1.0,
+        "clarity": 1.0,
+        "compliance": 1.0,
+        "groundedness": 0.95
+      },
+      "pii": {
+        "helpfulness": 1.0,
+        "clarity": 1.0,
+        "compliance": 1.0,
+        "groundedness": 0.9333
+      },
+      "refusal": {
+        "helpfulness": 1.0,
+        "clarity": 1.0,
+        "compliance": 1.0,
+        "groundedness": 1.0
+      },
+      "tool_use": {
+        "helpfulness": 1.0,
+        "clarity": 0.9,
+        "compliance": 1.0,
+        "groundedness": 0.9333
+      }
+    },
+    "dimensions": [
+      "helpfulness",
+      "clarity",
+      "compliance",
+      "groundedness"
+    ]
+  }
+}

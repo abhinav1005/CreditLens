@@ -1,0 +1,127 @@
+{
+  "suite": "golden",
+  "n_cases": 150,
+  "pricing_as_of": "2026-10-06",
+  "rows": [
+    {
+      "model": "claude-sonnet-5-5",
+      "run_id": "matrix-claude-sonnet-5-5",
+      "overall_pass_rate": 0.9067,
+      "categories": {
+        "compliance": 1.0,
+        "factual": 1.0,
+        "injection": 1.0,
+        "insight_grounding": 0.3,
+        "pii": 1.0,
+        "refusal": 1.0,
+        "tool_use": 1.0
+      },
+      "judge": {
+        "helpfulness": 0.9733,
+        "compliance": 0.9867,
+        "groundedness": 0.9533
+      },
+      "mean_cost_per_case_usd": 0.010594,
+      "latency": {
+        "model": "claude-sonnet-5-5",
+        "label": "",
+        "n": 41,
+        "total_ms": {
+          "p50": 5869.008000008762,
+          "p95": 8066.97762501426
+        },
+        "ttft_ms": {
+          "p50": 2404.6992920339108,
+          "p95": 6325.5865829996765
+        },
+        "cost_usd": 0.419134,
+        "run_id": "latency-claude-sonnet-5-5",
+        "settings": {
+          "prompt_caching": null,
+          "guardrails": null
+        }
+      },
+      "spend_usd": 2.7323
+    },
+    {
+      "model": "claude-haiku-5-5",
+      "run_id": "matrix-claude-haiku-5-5",
+      "overall_pass_rate": 0.9,
+      "categories": {
+        "compliance": 0.85,
+        "factual": 0.9333,
+        "injection": 1.0,
+        "insight_grounding": 0.7,
+        "pii": 1.0,
+        "refusal": 1.0,
+        "tool_use": 0.8667
+      },
+      "judge": {
+        "helpfulness": 0.96,
+        "compliance": 1.0,
+        "groundedness": 0.9467
+      },
+      "mean_cost_per_case_usd": 0.00062,
+      "latency": {
+        "model": "claude-haiku-5-5",
+        "label": "",
+        "n": 41,
+        "total_ms": {
+          "p50": 4031.669875024818,
+          "p95": 6689.097499940544
+        },
+        "ttft_ms": {
+          "p50": 1937.2052079997957,
+          "p95": 3472.480040974915
+        },
+        "cost_usd": 0.024879,
+        "run_id": "latency-claude-haiku-5-5",
+        "settings": {
+          "prompt_caching": null,
+          "guardrails": null
+        }
+      },
+      "spend_usd": 1.2356
+    },
+    {
+      "model": "claude-haiku-4-5-20251001",
+      "run_id": "matrix-claude-haiku-4-5-20251001",
+      "overall_pass_rate": 0.74,
+      "categories": {
+        "compliance": 1.0,
+        "factual": 0.6667,
+        "injection": 0.95,
+        "insight_grounding": 0.25,
+        "pii": 1.0,
+        "refusal": 0.4,
+        "tool_use": 0.8667
+      },
+      "judge": {
+        "helpfulness": 0.96,
+        "compliance": 0.9867,
+        "groundedness": 0.8333
+      },
+      "mean_cost_per_case_usd": 0.004185,
+      "latency": {
+        "model": "claude-haiku-4-5-20251001",
+        "label": "",
+        "n": 41,
+        "total_ms": {
+          "p50": 4202.631499967538,
+          "p95": 7621.559582999907
+        },
+        "ttft_ms": {
+          "p50": 747.2182089695707,
+          "p95": 1507.8316670842469
+        },
+        "cost_usd": 0.189264,
+        "run_id": "latency-claude-haiku-4-5-20251001",
+        "settings": {
+          "prompt_caching": null,
+          "guardrails": null
+        }
+      },
+      "spend_usd": 1.7574
+    }
+  ]
+}

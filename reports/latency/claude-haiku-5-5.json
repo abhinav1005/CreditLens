@@ -1,0 +1,19 @@
+{
+  "model": "claude-haiku-5-5",
+  "label": "",
+  "n": 41,
+  "total_ms": {
+    "p50": 4031.669875024818,
+    "p95": 6689.097499940544
+  },
+  "ttft_ms": {
+    "p50": 1937.2052079997957,
+    "p95": 3472.480040974915
+  },
+  "cost_usd": 0.024879,
+  "run_id": "latency-claude-haiku-5-5",
+  "settings": {
+    "prompt_caching": null,
+    "guardrails": null
+  }
+}
