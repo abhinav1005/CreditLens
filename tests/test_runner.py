@@ -152,3 +152,75 @@ def test_cache_key_changes_with_code(monkeypatch):
     before = cache_key({"c": 1}, "m", {}, "h")
     monkeypatch.setattr(cache_mod, "code_hash", lambda: "different")
     assert cache_key({"c": 1}, "m", {}, "h") != before
+
+
+def fake_judge_factory(verdict_by_dim):
+    from assistant.config import Usage
+    from evals.judge import DIMENSIONS, JudgeResult
+
+    calls = []
+
+    def fake_judge(case, out, *, config, version):
+        calls.append(case.id)
+        v = {
+            d: {"verdict": verdict_by_dim.get(d, "pass"), "rationale": f"{d} ok"}
+            for d in DIMENSIONS
+        }
+        return JudgeResult(v, Usage(), 0.001, "claude-sonnet-5-5", f"judge:{version}", "h", 0, [])
+
+    return fake_judge, calls
+
+
+def test_judge_report_mode_does_not_change_pass(tmp_path):
+    judge, calls = fake_judge_factory({"helpfulness": "fail"})
+    summary = run(
+        tmp_path,
+        [CHAT],
+        FakeProvider(responder=responder),
+        judge_mode="report",
+        judge_fn=judge,
+        judge_cache_dir=tmp_path / "jc",
+    )
+    assert summary["n_passed"] == 1 and calls == ["tool_001"]
+    assert summary["judge"]["pass_rates"]["tool_use"]["helpfulness"] == 0.0
+    assert "LLM judge" in (tmp_path / "reports" / "r1" / "report.md").read_text()
+
+
+def test_judge_gate_mode_counts_category_dimensions(tmp_path):
+    # clarity isn't counted for tool_use; helpfulness is.
+    judge, _ = fake_judge_factory({"clarity": "fail"})
+    s1 = run(
+        tmp_path,
+        [CHAT],
+        FakeProvider(responder=responder),
+        judge_mode="gate",
+        judge_fn=judge,
+        judge_cache_dir=tmp_path / "j1",
+    )
+    assert s1["n_passed"] == 1
+    judge, _ = fake_judge_factory({"helpfulness": "fail"})
+    s2 = run(
+        tmp_path,
+        [CHAT],
+        FakeProvider(responder=responder),
+        judge_mode="gate",
+        judge_fn=judge,
+        judge_cache_dir=tmp_path / "j2",
+        run_id="r2",
+    )
+    assert s2["n_passed"] == 0 and s2["failed_checks_by_scorer"] == {"judge": 1}
+
+
+def test_judge_results_cached(tmp_path):
+    judge, calls = fake_judge_factory({})
+    for rid in ["a", "b"]:
+        run(
+            tmp_path,
+            [CHAT],
+            FakeProvider(responder=responder),
+            judge_mode="report",
+            judge_fn=judge,
+            judge_cache_dir=tmp_path / "jc",
+            run_id=rid,
+        )
+    assert calls == ["tool_001"]

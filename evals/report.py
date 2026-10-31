@@ -34,23 +34,28 @@ def render_report(summary: dict, results: list[dict]) -> str:
     for cat, c in s["categories"].items():
         lines.append(f"| {cat} | {c['passed']}/{c['n']} | {_pct(c['pass_rate'])} |")
     cost, lat = s["cost"], s["latency_ms"]
-    lines += [
-        "",
-        "## Cost and latency",
-        "",
-        f"- Measured cost: ${cost['measured_total_usd']:.4f} total, "
-        + (
-            f"${cost['mean_per_case_usd']:.5f} per case"
-            if cost["mean_per_case_usd"] is not None
-            else "n/a per case"
-        ),
-        f"- API spend this run: ${cost['api_spend_this_run_usd']:.4f}"
-        f" (estimate before run: ${cost['pre_run_estimate_usd']:.4f})",
-        f"- Latency p50 {_ms(lat['p50'])}, p95 {_ms(lat['p95'])} ({lat['note']})",
-        "",
-        "## Failed checks by scorer",
-        "",
-    ]
+    lines += (
+        [
+            "",
+            "## Cost and latency",
+            "",
+            f"- Measured cost: ${cost['measured_total_usd']:.4f} total, "
+            + (
+                f"${cost['mean_per_case_usd']:.5f} per case"
+                if cost["mean_per_case_usd"] is not None
+                else "n/a per case"
+            ),
+            f"- API spend this run: ${cost['api_spend_this_run_usd']:.4f}"
+            f" (estimate before run: ${cost['pre_run_estimate_usd']:.4f})",
+            f"- Latency p50 {_ms(lat['p50'])}, p95 {_ms(lat['p95'])} ({lat['note']})",
+            "",
+        ]
+        + _judge_section(s.get("judge", {"mode": "off"}))
+        + [
+            "## Failed checks by scorer",
+            "",
+        ]
+    )
     if s["failed_checks_by_scorer"]:
         lines += [f"- {k}: {v}" for k, v in sorted(s["failed_checks_by_scorer"].items())]
     else:
@@ -64,3 +69,23 @@ def render_report(summary: dict, results: list[dict]) -> str:
         )
         lines.append(f"- **{r['case_id']}** [{r['category']}]: {reasons}")
     return "\n".join(lines) + "\n"
+
+
+def _judge_section(judge: dict) -> list[str]:
+    if judge.get("mode", "off") == "off":
+        return []
+    counted = "counted toward pass/fail" if judge["mode"] == "gate" else "shown only, not counted"
+    dims = judge["dimensions"]
+    lines = [
+        f"## LLM judge (`{judge['version']}`, `{judge['model']}`)",
+        "",
+        f"Mode `{judge['mode']}`: {counted}.",
+        "",
+        f"Judge spend this run: ${judge['spend_usd']:.4f}",
+        "",
+        "| Category | " + " | ".join(dims) + " |",
+        "|---|" + "---:|" * len(dims),
+    ]
+    for cat, rates in judge["pass_rates"].items():
+        lines.append(f"| {cat} | " + " | ".join(_pct(rates.get(d)) for d in dims) + " |")
+    return lines + [""]

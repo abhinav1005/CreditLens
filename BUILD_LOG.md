@@ -22,9 +22,10 @@ Entry format:
 - M2.4: `evals/labeler.py` + `python -m evals label --labeler NAME [--batch 25]`. Blind to the judge verdict and to model/prompt; p/f per dimension, s skip, q quit, optional note; appends each label to `evals/datasets/labels.jsonl` immediately; resumes.
 - M2.6: `evals/split.py` freezes the split by item-id hash (30% target), giving `label_split.json` = dev 135 / test 51, written BEFORE any labels or judge runs. Refuses to change once written.
 - M2.7: `evals/calibrate.py` + `python -m evals calibrate-judge [--judge-version v1] [--labeler NAME]`. Judges each labeled item (cached in `.cache/judge` by item + judge model + prompt hash), then per dimension × {test, dev, all, written_by_sonnet, written_by_haiku}: precision/recall/F1 (fail = positive), accuracy, kappa (written out by hand, tested equal to sklearn) with a seeded 2000-sample bootstrap 95% CI, and a confusion matrix; human-vs-human kappa when 2 labelers overlap. Writes `reports/calibration/judge-<v>.{json,md}` (committed). Added scikit-learn.
+- M2.9: judge in the runner. `evals run --judge off|report|gate` (default off; use report until calibration meets target). `evals/judge_policy.py` maps category → counted dimensions. Judge cached in `.cache/judge` by answer key + judge model + prompt hash; judge spend counts toward `--max-cost-usd`; the report has a judge table. Live report-mode run on golden: $0.39 judge spend, and the judge flagged pii_003 compliance (agreeing with the rule check), tool_use helpfulness 90%.
 **Decisions:**
 **Blockers:** M2.5 (≥100 hand labels) must be done by the owner.
-**Next:** M2.9: judge in the runner. Add `--judge` to `evals run`; a per-category map in `evals/judge_policy.py` says which judge dimensions count toward pass/fail; judge results cached; the report gets judge columns.
+**Next:** M2.10: grow golden to ≥150 with `scripts/draft_golden_v2.py` (adds about 100 llm_drafted cases toward the target category counts 30/30/20/15/20/15/20, numbers from tools), keeping the 50 existing cases unchanged.
 
 ## 2026-10-31 — Session 3 (first live run, M1 exit)
 **Done:**

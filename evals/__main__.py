@@ -37,6 +37,13 @@ def main(argv: list[str] | None = None) -> int:
     run.add_argument(
         "--no-cache", action="store_true", help="ignore and don't write the response cache"
     )
+    run.add_argument(
+        "--judge",
+        choices=["off", "report", "gate"],
+        default="off",
+        help="LLM judge: off, report (shown only), gate (counts toward pass/fail)",
+    )
+    run.add_argument("--judge-version", default="v1")
 
     pool = sub.add_parser(
         "build-pool", help="build the labeling pool from several model/prompt runs"
@@ -141,6 +148,8 @@ def main(argv: list[str] | None = None) -> int:
                 max_cost_usd=limit,
                 concurrency=args.concurrency,
                 use_cache=not args.no_cache,
+                judge_mode=args.judge,
+                judge_version=args.judge_version,
             )
         except BudgetExceeded as exc:
             print(f"refusing to run: {exc}")

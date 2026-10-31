@@ -27,6 +27,8 @@ from assistant.prompts import load_bundle
 from assistant.providers import Provider, get_provider
 from evals.cache import ResponseCache, cache_key
 from evals.cases import Case
+from evals.judge import judge_response, load_judge_prompt
+from evals.judge_policy import JUDGE_DIMENSIONS_BY_CATEGORY, JUDGE_MODES
 from evals.scorers.base import CaseOutput, Check
 from evals.scorers.deterministic import (
     score_completed,
@@ -148,7 +150,13 @@ def run_suite(
     reports_dir: Path = REPORTS_DIR,
     cache_dir: Path | None = None,
     run_id: str | None = None,
+    judge_mode: str = "off",
+    judge_version: str = "v1",
+    judge_fn: Callable | None = None,
+    judge_cache_dir: Path | None = None,
 ) -> dict:
+    if judge_mode not in JUDGE_MODES:
+        raise ValueError(f"judge_mode must be one of {JUDGE_MODES}")
     config = load_config().model_copy(deep=True)
     config.assistant.system_prompt_version = prompt_version
     config.assistant.model = model
@@ -181,6 +189,29 @@ def run_suite(
     lock = threading.Lock()
     provider = provider_factory(model)
 
+    judge_fn = judge_fn or judge_response
+    judge_cache = ResponseCache(judge_cache_dir or ROOT / ".cache" / "judge", enabled=use_cache)
+    _, judge_hash = load_judge_prompt(judge_version)
+    judge_spend = 0.0
+
+    def run_judge(case: Case, out: CaseOutput, answer_key: str) -> dict | None:
+        """Judge one answer, cached by (answer cache key, judge model, judge prompt hash)."""
+        nonlocal judge_spend
+        jkey = cache_key(
+            {"answer": answer_key}, config.judge.model, {"judge": judge_version}, judge_hash
+        )
+        cached = judge_cache.get(jkey)
+        if cached is not None:
+            return cached
+        result = judge_fn(case, out, config=config, version=judge_version)
+        with lock:
+            judge_spend += result.cost_usd
+        if result.verdicts is None:
+            return None
+        record = result.to_dict()
+        judge_cache.put(jkey, record)
+        return record
+
     def work(case: Case) -> dict:
         nonlocal spend
         key = keys[case.id]
@@ -190,7 +221,7 @@ def run_suite(
             record, hit = cached, True
         else:
             with lock:
-                if spend > max_cost_usd:
+                if spend + judge_spend > max_cost_usd:
                     return {
                         "case_id": case.id,
                         "category": case.category.value,
@@ -227,6 +258,18 @@ def run_suite(
             retries=record.get("retries", 0),
         )
         checks = score_case(case, out) if error is None else [Check("ran", "runner", False, error)]
+        judge_record = None
+        if judge_mode != "off" and error is None:
+            judge_record = run_judge(case, out, key)
+            if judge_record is None:
+                checks.append(Check("judge_ran", "judge", False, "judge output invalid twice"))
+            elif judge_mode == "gate":
+                counted = JUDGE_DIMENSIONS_BY_CATEGORY[case.category]
+                for dim in counted:
+                    v = judge_record["verdicts"][dim]
+                    checks.append(
+                        Check(f"judge:{dim}", "judge", v["verdict"] == "pass", v["rationale"][:300])
+                    )
         return {
             "case_id": case.id,
             "category": case.category.value,
@@ -249,6 +292,7 @@ def run_suite(
             "served_models": record["served_models"],
             "cache_hit": hit,
             "cache_key": key,
+            "judge": judge_record["verdicts"] if judge_record else None,
         }
 
     started = time.perf_counter()
@@ -269,6 +313,9 @@ def run_suite(
         spend=spend,
         estimate=estimate,
         wall_seconds=wall,
+    )
+    summary["judge"] = judge_summary(
+        results, judge_mode, judge_version, judge_hash, judge_spend, config.judge.model
     )
     out_dir = reports_dir / run_id
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -322,4 +369,30 @@ def summarize(results: list[dict], **meta) -> dict:
         },
         "cache_hits": sum(r.get("cache_hit", False) for r in results),
         "wall_seconds": round(meta["wall_seconds"], 1),
+    }
+
+
+def judge_summary(
+    results: list[dict], mode: str, version: str, prompt_hash: str, spend: float, model: str
+) -> dict:
+    """Judge pass rate per category × dimension (all dimensions, counted or not)."""
+    if mode == "off":
+        return {"mode": "off"}
+    from evals.judge import DIMENSIONS
+
+    by_cat: dict[str, dict[str, list[bool]]] = defaultdict(lambda: defaultdict(list))
+    for r in results:
+        for dim, v in (r.get("judge") or {}).items():
+            by_cat[r["category"]][dim].append(v["verdict"] == "pass")
+    return {
+        "mode": mode,
+        "version": version,
+        "prompt_hash": prompt_hash,
+        "model": model,
+        "spend_usd": round(spend, 6),
+        "pass_rates": {
+            cat: {d: round(sum(v) / len(v), 4) for d, v in dims.items() if v}
+            for cat, dims in sorted(by_cat.items())
+        },
+        "dimensions": DIMENSIONS,
     }
