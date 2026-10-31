@@ -93,7 +93,9 @@ class Case(BaseModel):
     expectations: Expectations
     tags: list[str] = []
     source: Literal["authored", "promoted_from_transcript"] = "authored"
-    authored_by: Literal["human", "llm_drafted_human_reviewed"]
+    # llm_drafted = written by an LLM, NOT yet reviewed by a human (must be reviewed before
+    # it counts toward a reported number; see `python -m evals validate`).
+    authored_by: Literal["human", "llm_drafted_human_reviewed", "llm_drafted"]
     notes: str = ""
 
     @model_validator(mode="after")
@@ -144,4 +146,7 @@ def summarize(cases: list[Case]) -> str:
         lines.append(f"  {cat.value:<18} {counts.get(cat, 0):>3} / {TARGET_COUNTS[cat]}")
     smoke = sum("smoke" in c.tags for c in cases)
     lines.append(f"  smoke-tagged       {smoke:>3}")
+    unreviewed = sum(c.authored_by == "llm_drafted" for c in cases)
+    if unreviewed:
+        lines.append(f"  WARNING: {unreviewed} case(s) are llm_drafted and not yet human-reviewed")
     return "\n".join(lines)

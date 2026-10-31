@@ -61,7 +61,7 @@ Each task is one small, reviewable commit. "Check" is how we know it's done.
 | M1.15 | [x] | Golden case schema + loader + validator (`authored_by`, `tags`, categories) | Invalid cases are rejected with a clear error |
 | M1.16 👤 | [ ] | Owner writes ~15 seed golden cases (Claude provides a template + examples per category) | 15 valid cases in `golden.jsonl` |
 | M1.17 | [ ] | Drafting script: LLM drafts ~35 cases from stories + category specs → owner reviews (👤) | 50 valid cases |
-| M1.18 | [ ] | Deterministic scorers: tool-call correctness, must/must-not contain, expected refusal, schema validity | Unit tests per scorer |
+| M1.18 | [x] | Deterministic scorers: tool-call correctness, must/must-not contain, expected refusal, schema validity | Unit tests per scorer |
 | M1.19 | [ ] | Numeric grounding scorer + `policy/constants.yaml` (tolerance, series differences, balance ÷ limit) | Unit tests incl. derived-number cases |
 | M1.20 | [ ] | Insight-card evidence scorer (evidence must match actual tool calls; `factor_code` in top factors) | Unit tests |
 | M1.21 | [ ] | `python -m evals run`: parallel, content-hash cache, `--max-cost-usd`, writes `results.jsonl` / `summary.json` / `report.md` | Second run hits cache at $0 |
