@@ -6,7 +6,7 @@ Specs: `PRD.md` (§14 takes precedence). History and notes: `BUILD_LOG.md`.
 **Legend:** `[ ]` todo · `[~]` in progress · `[x]` done · `[!]` blocked (reason in log) · 👤 = needs the owner (Abhinav)
 
 **Current milestone:** M2 (M1 done-when passed 2026-10-31; owner still to review cases, M1.16)
-**Next task:** M2.14 (GitHub Actions). Needs a GitHub repo (M0.4)
+**Next task:** M2.14/M2.15 are BLOCKED: the Anthropic account is out of credit. Owner: add credit. Also M1.16 review, M2.5 labeling
 
 Each task is one small, reviewable commit. "Check" is how we know it's done.
 
@@ -19,7 +19,7 @@ Each task is one small, reviewable commit. "Check" is how we know it's done.
 | M0.1 👤 | [x] | Install `uv` (`curl -LsSf https://astral.sh/uv/install.sh \| sh`) | `uv --version` works |
 | M0.2 👤 | [x] | Create Anthropic API key, put it in `.env` as `ANTHROPIC_API_KEY`, set a monthly spend limit in the console | Key in `.env` (never committed) |
 | M0.3 | [x] | `git init`, `.gitignore`, `.env.example`, `pyproject.toml` (Python 3.12 via uv; fastapi, pydantic, anthropic, pyyaml, pytest, ruff, black), folder skeleton per PRD §9 | `uv run pytest` and `uv run ruff check .` pass |
-| M0.4 👤 | [ ] | Create a GitHub repo (private ok). Claude can run `gh repo create` once you approve | `git push` works. Needed by M2.14. |
+| M0.4 👤 | [x] | Create a GitHub repo (private ok). Claude can run `gh repo create` once you approve | `git push` works. Needed by M2.14. |
 
 ## M1 — Core assistant
 

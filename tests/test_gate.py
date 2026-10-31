@@ -71,3 +71,25 @@ def test_committed_baseline_blocks_the_degraded_prompt():
     )
     assert not result.passed
     assert any("tool_use" in r for r in result.reasons)
+
+
+def test_errored_run_is_reported_as_infrastructure_not_regression():
+    run = {
+        cid: {
+            **r,
+            "passed": False,
+            "status": "error",
+            "checks": [
+                {
+                    "name": "ran",
+                    "passed": False,
+                    "detail": "BadRequestError: credit balance is too low",
+                }
+            ],
+        }
+        for cid, r in BASE.items()
+    }
+    result = evaluate_gate(BASE, run, **KW)
+    assert not result.passed
+    assert "could not run" in result.markdown and "credit balance is too low" in result.markdown
+    assert "lost" not in result.markdown

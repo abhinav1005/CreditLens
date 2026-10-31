@@ -30,7 +30,11 @@ Entry format:
 **Decisions:**
 **Blockers:** M2.5 (≥100 hand labels) must be done by the owner.
 - M2.14 (in progress): wrote `.github/workflows/ci.yml` (ruff, black, contract/fixture/prompt-lock checks, `evals validate`, pytest) and `eval-gate.yml` (PRs touching prompts/src/config/policy/evals/baseline + pushes to main: restore `.cache` with actions/cache, `evals run --tags smoke --run-id pr-smoke`, `evals gate pr-smoke`, post/update PR comment, upload report). Added `evals run --run-id`. Not yet run on GitHub.
-**Next:** M2.14: GitHub Actions. `.github/workflows/ci.yml` (lint, format, consistency checks, unit tests on every PR) and `eval-gate.yml` (on PRs touching prompts/, src/assistant/, src/guardrails/, config.yaml: restore `.cache`, smoke run, gate, PR comment). Needs the owner's OK to create a private GitHub repo and push (M0.4), plus an ANTHROPIC_API_KEY secret.
+- M0.4: with the owner's OK, created the **private** repo `abhinav1005/CreditLens`, pushed main, and set the `ANTHROPIC_API_KEY` repo secret from .env (never printed). A pre-push scan found no key/.env/DB/cache tracked.
+- First GitHub runs: **CI passed** (38s). **Eval gate failed** because every case errored: `400 Your credit balance is too low`. Confirmed locally: the account is out of credit after about $3.85 total this session ($2.67 assistant + $1.15 judge + live tests). The gate now reports errored runs as "could not run (not a quality result)" instead of as lost cases.
+**Blockers:** (1) Owner must add API credit (console.anthropic.com → Billing). (2) M2.5: ≥100 hand labels. (3) M1.16: case review.
+**Next:** After credit is added: re-run the Eval gate workflow on main (`gh workflow run "Eval gate" --repo abhinav1005/CreditLens`), check it passes against the baseline. Then M2.15: branch `demo/degraded-prompt`, set `system_prompt_version: v1-degraded` in config.yaml, open a PR, confirm the gate blocks it with a comment, close the PR without merging. A smoke run costs about $0.46 cold.
+**Next (old):** M2.14: GitHub Actions. `.github/workflows/ci.yml` (lint, format, consistency checks, unit tests on every PR) and `eval-gate.yml` (on PRs touching prompts/, src/assistant/, src/guardrails/, config.yaml: restore `.cache`, smoke run, gate, PR comment). Needs the owner's OK to create a private GitHub repo and push (M0.4), plus an ANTHROPIC_API_KEY secret.
 
 ## 2026-10-31 — Session 3 (first live run, M1 exit)
 **Done:**

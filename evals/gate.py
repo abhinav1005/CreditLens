@@ -34,6 +34,23 @@ def evaluate_gate(
     max_lost_per_category: int,
     names: tuple[str, str] = ("baseline", "this PR"),
 ) -> GateResult:
+    errored = {cid: r for cid, r in run.items() if r.get("status") == "error"}
+    if errored:
+        # An API/infrastructure failure isn't a quality regression: say so plainly, and
+        # fail, because nothing was actually measured for those cases.
+        first = next(iter(errored.values()))
+        detail = next((c["detail"] for c in first["checks"] if c["name"] == "ran"), "")
+        reason = (
+            f"{len(errored)} case(s) errored before scoring (not a quality result): {detail[:200]}"
+        )
+        body = [
+            "## ⚠️ Eval gate could not run",
+            "",
+            f"- {reason}",
+            "",
+            "Fix the error (API key, credits, rate limits) and re-run the workflow.",
+        ]
+        return GateResult(False, [reason], {}, "\n".join(body) + "\n")
     diff = compare_results(baseline, run)
     reasons = []
     missing = sorted(set(baseline) - set(run))
