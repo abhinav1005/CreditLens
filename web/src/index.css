@@ -557,3 +557,67 @@ caption {
   font-size: 0.85rem;
   margin: 0;
 }
+
+/* Eval browser */
+
+h3 {
+  font-size: 0.9rem;
+  margin: 8px 0 4px;
+}
+
+.badge.pass {
+  background: var(--user-bg);
+  color: var(--accent);
+}
+
+.tile-button {
+  text-align: left;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.tile-button.selected {
+  border-color: var(--accent);
+}
+
+.tile-value.small {
+  font-size: 1.25rem;
+}
+
+.case-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.case {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 12px;
+}
+
+.case > summary {
+  cursor: pointer;
+  font-size: 0.9rem;
+  overflow-wrap: anywhere;
+}
+
+.case-q {
+  margin-left: 4px;
+}
+
+.case-body {
+  padding-top: 8px;
+  gap: 4px;
+}
+
+.case-body ul {
+  margin: 0;
+  padding-left: 20px;
+  font-size: 0.85rem;
+}
+
+.toolbar select {
+  max-width: 300px;
+}

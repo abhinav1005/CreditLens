@@ -8,7 +8,8 @@
 #
 # Mounted from the repo so nothing is lost when containers are removed, and so the CLI
 # sees the same data: .cache (transcripts SQLite + response/guardrail caches) and
-# evals/datasets (labels.jsonl from the labeling view, golden.jsonl from promote).
+# evals/datasets (labels.jsonl from the labeling view, golden.jsonl from promote), and
+# reports (read-only, for the Evals tab).
 services:
   api:
     build: .
@@ -18,6 +19,7 @@ services:
     volumes:
       - ./.cache:/app/.cache
       - ./evals/datasets:/app/evals/datasets
+      - ./reports:/app/reports:ro
     ports:
       - "127.0.0.1:8000:8000"
     healthcheck:

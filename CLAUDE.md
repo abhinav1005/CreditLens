@@ -34,7 +34,7 @@ docker compose up --build                          # full stack: UI on :8080, AP
 - `src/credit/`: domain. `factors.py` (FactorCode enum), `profile.py` (schema), `scoring.py` (toy formula, `docs/scoring.md`), `generate.py` + `stories.py` (seeded data), `dataset.py` (loads committed v1.json), `tools/` (contracts, impl, static factor content).
 - `src/assistant/`: `config.py` (config + pricing + `request_cost`), `prompts.py` (versioned bundle + content hash), `providers/` (neutral types, Fake, Anthropic), `loop.py` (`run_turn`, the one code path for API and evals), `output_filters.py` (sentence buffer + filter chain), `insights.py`, `api.py`.
 - `src/storage/`: `Transcript` + `Storage` protocol, `SQLiteStorage`.
-- `web/`: React + TypeScript (Vite). `src/api.ts` (fetch + SSE parsing), `src/chatState.ts` (stream events → screen state), `src/Chat.tsx`, `src/App.tsx` (hash-based views).
+- `web/`: React + TypeScript (Vite). `src/api.ts` (fetch + SSE parsing), `src/chatState.ts` (stream events → screen state), `src/Chat.tsx`, `src/Transcripts.tsx` (+ `Promote.tsx`), `src/Evals.tsx` (saved runs, cases, compare), `src/Label.tsx`, `src/Dashboard.tsx`, `src/App.tsx` (hash-based views). Eval/labeling/promote HTTP routes live in `evals/web_routes.py`.
 - `evals/`: `cases.py` (schema/loader), `runner.py`, `cache.py`, `report.py`, `scorers/` (deterministic, grounding, insights).
 - Gotcha: black reformats code, so string-replace edits in Python heredocs can silently miss. Use the Edit tool or assert that the replacement happened.
 

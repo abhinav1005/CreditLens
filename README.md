@@ -67,7 +67,7 @@ Golden set: 150 cases (0 human-reviewed so far), 41 of them in the CI smoke gate
 
 ```mermaid
 flowchart LR
-    UI["React UI<br/>chat · transcripts · labeling · dashboard"] -- "SSE /chat" --> API["FastAPI"]
+    UI["React UI<br/>chat · transcripts · evals · labeling · dashboard"] -- "SSE /chat" --> API["FastAPI"]
     API --> IN["Input guardrails<br/>PII redaction · injection"]
     IN --> LOOP["LLM + tool loop<br/>(model router, context trimming)"]
     LOOP <--> TOOLS["Credit tools<br/>(synthetic profiles)"]
@@ -113,6 +113,8 @@ uv sync
 uv run uvicorn assistant.api:app --reload        # API on :8000
 cd web && npm install && npm run dev             # UI on :5173
 ```
+
+Open http://localhost:5173. Tabs: **Chat**, **Transcripts** (every saved conversation and its guardrail decisions), **Evals** (every saved eval run, case by case, and run-vs-run comparison), **Label** (blind labeling for judge calibration), **Dashboard** (all results).
 
 Or the whole stack in Docker: `docker compose up --build`, then open http://localhost:8080.
 

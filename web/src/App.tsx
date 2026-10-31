@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 
 import Chat from "./Chat";
 import Dashboard from "./Dashboard";
+import Evals from "./Evals";
 import Label from "./Label";
 import Transcripts from "./Transcripts";
 
@@ -9,6 +10,7 @@ import Transcripts from "./Transcripts";
 const VIEWS = [
   { id: "chat", label: "Chat" },
   { id: "transcripts", label: "Transcripts" },
+  { id: "evals", label: "Evals" },
   { id: "label", label: "Label" },
   { id: "dashboard", label: "Dashboard" },
 ] as const;
@@ -26,7 +28,8 @@ export default function App() {
     return () => window.removeEventListener("hashchange", onChange);
   }, []);
 
-  const [view, param] = hash.split("/");
+  const [view, ...params] = hash.split("/");
+  const param = params[0];
 
   return (
     <div className="app">
@@ -47,6 +50,7 @@ export default function App() {
       <main>
         {view === "chat" && <Chat />}
         {view === "transcripts" && <Transcripts selectedId={param ?? null} />}
+        {view === "evals" && <Evals params={params} />}
         {view === "label" && <Label />}
         {view === "dashboard" && <Dashboard />}
         {!VIEWS.some((v) => v.id === view) && <p>Unknown view.</p>}
