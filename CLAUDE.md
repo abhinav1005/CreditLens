@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project status
 
-M1 and M2 are done (M2 done-when: PR #1 blocked by the eval gate). Judge calibration waits on owner labels. M3 is next. Read `PRD.md` before starting any milestone. **PRD §14 (design decisions, including "API constraints found during the build") takes precedence over earlier PRD sections.** Keep this file in sync with the code as milestones land.
+M1–M4 are done (OpenAI comparison deferred, AWS dropped). Judge calibration (M2.5–M2.8) waits on owner labels. M5 (UI) is in progress; `BUILD_STATUS.md` has the next task. Read `PRD.md` before starting any milestone. **PRD §14 (design decisions, including "API constraints found during the build") takes precedence over earlier PRD sections.** Keep this file in sync with the code as milestones land.
 
 ## Commands (working now)
 
@@ -22,6 +22,8 @@ uv run python scripts/check_prompt_immutability.py # committed prompt files unch
 uv run python -m evals validate                    # validate golden.jsonl, print counts
 uv run python -m evals run --suite golden --model claude-sonnet-5-5 --prompt-version v1
 uv run uvicorn assistant.api:app --reload          # /chat (SSE), /insights/{id}, /health
+cd web && npm install && npm run dev              # React UI on :5173 (proxies /api to uvicorn on :8000)
+cd web && npm run lint && npm run build           # eslint + prettier, type-check + build
 ```
 
 ## Code map
@@ -29,6 +31,7 @@ uv run uvicorn assistant.api:app --reload          # /chat (SSE), /insights/{id}
 - `src/credit/`: domain. `factors.py` (FactorCode enum), `profile.py` (schema), `scoring.py` (toy formula, `docs/scoring.md`), `generate.py` + `stories.py` (seeded data), `dataset.py` (loads committed v1.json), `tools/` (contracts, impl, static factor content).
 - `src/assistant/`: `config.py` (config + pricing + `request_cost`), `prompts.py` (versioned bundle + content hash), `providers/` (neutral types, Fake, Anthropic), `loop.py` (`run_turn`, the one code path for API and evals), `output_filters.py` (sentence buffer + filter chain), `insights.py`, `api.py`.
 - `src/storage/`: `Transcript` + `Storage` protocol, `SQLiteStorage`.
+- `web/`: React + TypeScript (Vite). `src/api.ts` (fetch + SSE parsing), `src/chatState.ts` (stream events → screen state), `src/Chat.tsx`, `src/App.tsx` (hash-based views).
 - `evals/`: `cases.py` (schema/loader), `runner.py`, `cache.py`, `report.py`, `scorers/` (deterministic, grounding, insights).
 - Gotcha: black reformats code, so string-replace edits in Python heredocs can silently miss. Use the Edit tool or assert that the replacement happened.
 

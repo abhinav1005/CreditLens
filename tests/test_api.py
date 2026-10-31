@@ -80,3 +80,42 @@ def test_provider_failure_becomes_error_event():
 def test_health():
     client, _ = make_client([])
     assert client.get("/health").json() == {"status": "ok"}
+
+
+def test_profiles_lists_synthetic_profiles():
+    client, _ = make_client([])
+    resp = client.get("/profiles")
+    assert resp.status_code == 200
+    by_id = {p["profile_id"]: p for p in resp.json()}
+    assert "story_001" in by_id and by_id["story_001"]["story"]
+    assert 300 <= by_id["story_001"]["score"] <= 850
+
+
+def test_guardrail_flags_keep_only_actions():
+    from assistant.api import guardrail_flags
+
+    decisions = [
+        {"stage": "input", "name": "pii", "allowed": True, "action": "pass", "reasons": []},
+        {
+            "stage": "input",
+            "name": "pii",
+            "allowed": True,
+            "action": "redact",
+            "reasons": ["US_SSN"],
+            "scores": {},
+        },
+    ]
+    assert guardrail_flags(decisions) == [
+        {"stage": "input", "name": "pii", "action": "redact", "reasons": ["US_SSN"]}
+    ]
+
+
+def test_transcript_event_carries_model_and_guardrails():
+    client, _ = make_client([FakeTurn(text="Utilization is the share of your limits in use.")])
+    resp = client.post(
+        "/chat",
+        json={"profile_id": "story_001", "messages": [{"role": "user", "content": "what is it?"}]},
+    )
+    event = parse_sse(resp.text)[-1]
+    assert event[0] == "transcript"
+    assert event[1]["guardrails"] == [] and event[1]["prompt_version"]

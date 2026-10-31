@@ -7,6 +7,8 @@ the response generator yields them as SSE frames as they arrive.
 
 SSE frames:  event: <type>\\ndata: <json>\\n\\n
 Event types: tool_call, tool_result, text, retract, done, transcript, error
+The `transcript` event carries the guardrail decisions that acted (redact/block/rewrite/
+retract) so the UI can show badges. `/profiles` lists the synthetic profiles for the picker.
 """
 
 import json
@@ -47,6 +49,26 @@ def sse(event_type: str, data: dict) -> str:
     return f"event: {event_type}\ndata: {json.dumps(data)}\n\n"
 
 
+def guardrail_flags(decisions: list[dict]) -> list[dict]:
+    """The guardrail decisions that did something (not a plain pass), for UI badges."""
+    return [
+        {k: d[k] for k in ("stage", "name", "action", "reasons")}
+        for d in decisions
+        if d["action"] != "pass"
+    ]
+
+
+def profile_summary(profile) -> dict:
+    """A short description of a synthetic profile for the profile picker."""
+    return {
+        "profile_id": profile.profile_id,
+        "score": profile.score_history[-1].score,
+        "as_of": profile.months[-1],
+        "n_accounts": len(profile.accounts),
+        "story": profile.story.description if profile.story else None,
+    }
+
+
 def create_app(
     provider_factory: Callable[[str], Provider] | None = None,
     storage: Storage | None = None,
@@ -60,6 +82,10 @@ def create_app(
     @app.get("/health")
     def health() -> dict:
         return {"status": "ok"}
+
+    @app.get("/profiles")
+    def profiles() -> list[dict]:
+        return [profile_summary(p) for p in load_profiles().values()]
 
     @app.post("/chat")
     def chat(request: ChatRequest) -> StreamingResponse:
@@ -97,6 +123,10 @@ def create_app(
                         "transcript_id": transcript.transcript_id,
                         "conversation_id": conversation_id,
                         "cost_usd": round(result.cost_usd, 6),
+                        "model": result.model,
+                        "prompt_version": result.prompt_version,
+                        "latency_ms": round(result.latency_ms, 1),
+                        "guardrails": guardrail_flags(result.guardrail_decisions),
                     }
                 )
             except Exception as exc:  # surface failures to the client instead of hanging
