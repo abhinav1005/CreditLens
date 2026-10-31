@@ -19,6 +19,7 @@ class AssistantConfig(BaseModel):
     model: str
     system_prompt_version: str
     tools_prompt_version: str
+    insights_prompt_version: str
     max_tokens: int
     max_tool_iterations: int
     effort: str

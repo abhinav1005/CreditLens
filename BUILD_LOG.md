@@ -36,6 +36,7 @@ Entry format:
 - M1.18: `evals/scorers/base.py` (`CaseOutput`, `Check`) + `evals/scorers/deterministic.py` (tool calls with partial-arg match, must/must-not strings + regex, refusal markers, disclaimer line, factor keywords, insight schema validity, turn completed).
 - M1.19: `evals/scorers/grounding.py` (number extraction skipping ids, masked numbers and month splits; grounded set = tool values (free-text fields excluded), list lengths, same-field differences, before/after deltas, balance÷limit %, user-stated numbers, constants; half-unit rounding tolerance; masked numbers must exist in tool output; `numeric_facts` checks) + `policy/constants.yaml` (11 constants, each with a reason).
 - M1.20: `evals/scorers/insights.py` (per card: summary numbers ⊆ evidence values; each evidence item resolves by dot path to the identical value in the real tool output; factor_code in top_factors).
+- M1.21: `evals/runner.py` (`run_suite`: real code path per case, all scorers, AND pass rule, ThreadPool, pre-run cost estimate + mid-run budget stop, API errors fail only that case), `evals/cache.py` (key = case + model + settings + prompt hash + dataset hash + tool fixtures hash; atomic writes), `evals/report.py` (report.md), CLI `python -m evals run` (`--suite --model --prompt-version --tags --max-cost-usd --concurrency --no-cache`; CI=true uses the $1 limit).
 **Decisions:**
 - Domain code lives in `src/credit/` (factors, profile schema, scoring, months, generator, tools). `data/generate_profiles.py` will be a thin CLI wrapper.
 - Profiles have no person names at all, only ids (`p_001`, `story_001`, `inj_001`). Data window is the 12 months ending 2026-06, fixed so output doesn't depend on today's date.
@@ -43,8 +44,10 @@ Entry format:
 - **API constraints** (in PRD §14): there's no temperature 0 (sampling params return a 400), so reproducibility comes from the cache; no forced `tool_choice` on Sonnet 5.5, so insight cards use `output_config.format`; set `effort` per route; Haiku 4.5 has no effort param.
 - Sonnet 5.5 has `refusal_fallback: true` (server-side `fallbacks: "default"`, beta `server-side-fallback-2026-07-01`), so a refused request is re-run on a fallback model. `served_model` is recorded on every response so evals can see when this happened.
 - Tool executor (`assistant.loop.execute_tool`) refuses any `profile_id` other than the conversation's own, a deterministic guard against injection steering the model to other profiles.
+- `policy/constants.yaml` is now v2 and **unit-aware**: a constant grounds a number only when it's written with the same unit ("12 months" yes, "12%" no). A runner test caught the loophole.
+- Gotcha for future sessions: black reformats code, so string-replace edits written in Python heredocs can silently miss. Use the Edit tool, or assert that the replacement happened.
 **Blockers:** M0.2 (API key) is with the owner. Live tests (`@pytest.mark.live`) are skipped until then. Run them with `uv run pytest -m live` once `.env` has the key. M0.4 (GitHub repo) is deferred to M2.14.
-**Next:** M1.21: `python -m evals run` in `evals/runner.py` (parallel threads, content-hash response cache in `.cache/responses`, cost estimate + `--max-cost-usd` abort, writes `reports/<run_id>/{results.jsonl,summary.json,report.md}`).
+**Next:** M1.16 + M1.17: Claude drafts 50 golden cases (`authored_by: llm_drafted`) across all 7 categories. Then M1.22 (live run), which is blocked on M0.2.
 
 ## 2026-10-31 — Session 1 (planning)
 **Done:** Read PRD. Grilling session settled 46 design decisions, written to PRD.md §14 (v2) and CLAUDE.md. Created BUILD_STATUS.md and BUILD_LOG.md.

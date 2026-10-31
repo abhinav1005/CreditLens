@@ -1,19 +1,25 @@
 # Numbers the assistant may state without a tool result: general credit-education
 # constants. Versioned and reviewed like code. Adding a number here loosens the numeric
 # grounding check, so each entry needs a reason.
-version: v1
+#
+# `unit` limits where a constant applies, based on what follows the number in the answer:
+#   percent: "30%"    years: "7 years"    months: "12 months"    days: "60 days"
+#   none: a bare number ("between 300 and 850")
+# So "12 months" is allowed, but "12%" is not grounded by the 12-month constant.
+version: v2
 allowed_numbers:
-  - {value: 30, why: "common guideline: keep utilization under 30%"}
-  - {value: 10, why: "common guideline: under 10% utilization is often cited as better"}
-  - {value: 100, why: "100% = a maxed-out card"}
-  - {value: 300, why: "bottom of the common 300-850 score range"}
-  - {value: 850, why: "top of the common 300-850 score range"}
-  - {value: 60, why: "60 days late (payment lateness bucket)"}
-  - {value: 90, why: "90 days late (payment lateness bucket)"}
-  - {value: 7, why: "late payments and collections can stay on a report about 7 years"}
-  - {value: 2, why: "hard inquiries stay on a report about 2 years"}
-  - {value: 12, why: "12-month windows (inquiries, score history)"}
-  - {value: 24, why: "24-month window for late payments shown by the tools"}
+  - {value: 30, unit: percent, why: "common guideline: keep utilization under 30%"}
+  - {value: 10, unit: percent, why: "under 10% utilization is often cited as better"}
+  - {value: 100, unit: percent, why: "100% = a maxed-out card"}
+  - {value: 300, unit: none, why: "bottom of the common 300-850 score range"}
+  - {value: 850, unit: none, why: "top of the common 300-850 score range"}
+  - {value: 30, unit: days, why: "30 days late (payment lateness bucket)"}
+  - {value: 60, unit: days, why: "60 days late"}
+  - {value: 90, unit: days, why: "90 days late"}
+  - {value: 7, unit: years, why: "late payments and collections can stay on a report about 7 years"}
+  - {value: 2, unit: years, why: "hard inquiries stay on a report about 2 years"}
+  - {value: 12, unit: months, why: "12-month windows (inquiries, score history)"}
+  - {value: 24, unit: months, why: "24-month window for late payments shown by the tools"}
 # An answer number matches a grounded value if they differ by at most half a unit in the
 # answer's last decimal place (so 40.8 can be written "41" or "40.8", but not "40").
 rounding: half_unit_of_last_decimal

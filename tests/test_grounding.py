@@ -66,7 +66,14 @@ def test_score_difference_is_grounded():
 
 
 def test_constants_allowed():
-    assert check("Many people aim to keep utilization under 30%.", [])["numeric_grounding"].passed
+    text = "Many aim to stay under 30%. Late payments can stay 7 years; scores run 300 to 850."
+    assert check(text, [])["numeric_grounding"].passed
+
+
+def test_constants_are_unit_aware():
+    # 12 is allowed as "12 months", not as a utilization percentage.
+    assert check("Inquiries count for 12 months.", [])["numeric_grounding"].passed
+    assert not check("Your utilization is 12%.", [])["numeric_grounding"].passed
 
 
 def test_user_numbers_grounded():

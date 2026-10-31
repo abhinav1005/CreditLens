@@ -3,6 +3,7 @@ assistant:
   model: claude-sonnet-5-5
   system_prompt_version: v1
   tools_prompt_version: v1
+  insights_prompt_version: v1
   max_tokens: 16000
   max_tool_iterations: 6
   effort: low            # chat route; see PRD §14 (API notes)

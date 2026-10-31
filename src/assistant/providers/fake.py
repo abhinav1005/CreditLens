@@ -1,6 +1,12 @@
-"""A scripted provider for tests: returns pre-written turns, records every request."""
+"""A scripted provider for tests.
 
+Either replays `turns` in order, or (thread-safe, for parallel eval runs) asks
+`responder(request)` for each turn. Every request is recorded.
+"""
+
+import threading
 import time
+from collections.abc import Callable
 from dataclasses import dataclass, field
 
 from assistant.config import Usage
@@ -18,21 +24,33 @@ class FakeTurn:
 class FakeProvider:
     name = "fake"
 
-    def __init__(self, turns: list[FakeTurn]):
-        self.turns = list(turns)
+    def __init__(
+        self,
+        turns: list[FakeTurn] | None = None,
+        responder: Callable[[ProviderRequest], FakeTurn] | None = None,
+    ):
+        self.turns = list(turns or [])
+        self.responder = responder
         self.requests: list[ProviderRequest] = []
+        self._lock = threading.Lock()
+
+    def _next_turn(self, request: ProviderRequest) -> FakeTurn:
+        with self._lock:
+            self.requests.append(request)
+            if self.responder is not None:
+                return self.responder(request)
+            if not self.turns:
+                raise AssertionError("FakeProvider ran out of scripted turns")
+            return self.turns.pop(0)
 
     def complete(
         self, request: ProviderRequest, on_text: TextCallback | None = None
     ) -> ProviderResponse:
-        self.requests.append(request)
-        if not self.turns:
-            raise AssertionError("FakeProvider ran out of scripted turns")
-        turn = self.turns.pop(0)
+        turn = self._next_turn(request)
         start = time.perf_counter()
         ttft = None
         if on_text and turn.text:
-            # Stream word by word so tests exercise buffering.
+            # Stream word by word so tests exercise sentence buffering.
             for i, word in enumerate(turn.text.split(" ")):
                 if ttft is None:
                     ttft = (time.perf_counter() - start) * 1000

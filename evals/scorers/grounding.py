@@ -9,7 +9,8 @@ policy/constants.yaml) any of:
    (e.g. two months of score history), or a *_before / *_after pair
 5. utilization recomputed as balance ÷ limit (as a percentage)
 6. a number the user wrote in the conversation
-7. an allowed educational constant from policy/constants.yaml
+7. an allowed educational constant from policy/constants.yaml, written with the same
+   unit (a "12 months" constant does not ground "12%")
 
 Anything else counts as ungrounded and fails the check.
 """
@@ -39,25 +40,49 @@ MONTH = re.compile(r"\b(\d{4})-(\d{2})\b")
 MASKED = re.compile(r"\*{4}\d{4}")
 # A number not glued to a word, underscore, asterisk or hyphen (skips acc_03, ****4821, p_001).
 NUMBER = re.compile(r"(?<![\w*.\-])(\d{1,3}(?:,\d{3})+|\d+)(\.\d+)?(?![\w])")
+UNIT_AFTER = [
+    ("percent", re.compile(r"\s?(%|percent)", re.I)),
+    ("years", re.compile(r"[\s-]?years?\b", re.I)),
+    ("months", re.compile(r"[\s-]?months?\b", re.I)),
+    ("days", re.compile(r"[\s-]?days?\b", re.I)),
+]
 
 
 @lru_cache(maxsize=1)
-def allowed_constants() -> set[float]:
+def allowed_constants() -> dict[str, set[float]]:
+    """unit → allowed values."""
     data = yaml.safe_load(CONSTANTS_PATH.read_text())
-    return {float(item["value"]) for item in data["allowed_numbers"]}
+    by_unit: dict[str, set[float]] = {}
+    for item in data["allowed_numbers"]:
+        by_unit.setdefault(item["unit"], set()).add(float(item["value"]))
+    return by_unit
+
+
+def _unit_after(text: str, end: int) -> str:
+    for unit, pattern in UNIT_AFTER:
+        if pattern.match(text, end):
+            return unit
+    return "none"
 
 
 def extract_numbers(text: str) -> list[tuple[float, int, str]]:
     """(value, decimals, raw) for each number. Masked numbers are skipped; months split."""
+    return [(v, d, raw) for v, d, raw, _ in extract_numbers_with_units(text)]
+
+
+def extract_numbers_with_units(text: str) -> list[tuple[float, int, str, str]]:
     text = MASKED.sub(" ", text)
     found = []
     for year, month in MONTH.findall(text):
-        found.append((float(year), 0, f"{year}-{month}"))
-        found.append((float(month), 0, f"{year}-{month}"))
+        found.append((float(year), 0, f"{year}-{month}", "none"))
+        found.append((float(month), 0, f"{year}-{month}", "none"))
     text = MONTH.sub(" ", text)
-    for whole, frac in NUMBER.findall(text):
-        value = float(whole.replace(",", "") + (frac or ""))
-        found.append((value, len(frac) - 1 if frac else 0, whole + (frac or "")))
+    for m in NUMBER.finditer(text):
+        whole, frac = m.group(1), m.group(2) or ""
+        value = float(whole.replace(",", "") + frac)
+        found.append(
+            (value, len(frac) - 1 if frac else 0, whole + frac, _unit_after(text, m.end()))
+        )
     return found
 
 
@@ -99,7 +124,8 @@ def _walk(node, key: str | None, values: set[float]) -> None:
 
 
 def grounded_values(case: Case, out: CaseOutput) -> set[float]:
-    values: set[float] = set(allowed_constants())
+    """Values grounded by data (tools and user messages), regardless of unit."""
+    values: set[float] = set()
     for call in out.tool_calls:
         _walk(call.get("output", {}), None, values)
     # Tool results inside the case's fixed earlier turns count too.
@@ -132,8 +158,12 @@ def score_grounding(case: Case, out: CaseOutput) -> list[Check]:
         return []
     text = out.final_text
     candidates = grounded_values(case, out)
+    constants = allowed_constants()
     ungrounded = [
-        raw for value, dec, raw in extract_numbers(text) if not is_grounded(value, dec, candidates)
+        raw
+        for value, dec, raw, unit in extract_numbers_with_units(text)
+        if not is_grounded(value, dec, candidates)
+        and not is_grounded(value, dec, constants.get(unit, set()))
     ]
     checks = [
         Check(
