@@ -12,6 +12,7 @@ from pathlib import Path
 
 import yaml
 
+from assistant.schema import inline_refs
 from credit.tools.contracts import TOOL_CONTRACTS
 
 PROMPTS_DIR = Path(__file__).resolve().parents[2] / "prompts"
@@ -46,7 +47,7 @@ def load_tools(version: str = "v1") -> list[dict]:
         {
             "name": name,
             "description": spec["tools"][name]["description"],
-            "input_schema": TOOL_CONTRACTS[name][0].model_json_schema(),
+            "input_schema": inline_refs(TOOL_CONTRACTS[name][0].model_json_schema()),
         }
         for name in TOOL_CONTRACTS
     ]

@@ -5,6 +5,7 @@ from fastapi.testclient import TestClient
 from assistant.api import create_app
 from assistant.insights import InsightCardsWire, generate_insights
 from assistant.providers.fake import FakeProvider, FakeTurn
+from assistant.schema import inline_refs
 from storage.sqlite import SQLiteStorage
 
 GOOD = {
@@ -32,7 +33,7 @@ def test_valid_cards_first_try():
         "get_utilization",
         "get_score_history",
     ]
-    assert fake.requests[0].output_schema == InsightCardsWire.model_json_schema()
+    assert fake.requests[0].output_schema == inline_refs(InsightCardsWire.model_json_schema())
     assert "40.8" in fake.requests[0].messages[0]["content"]
 
 
@@ -50,9 +51,10 @@ def test_two_failures_give_no_cards():
 
 
 def test_schema_forbids_extra_fields():
-    schema = InsightCardsWire.model_json_schema()
+    schema = inline_refs(InsightCardsWire.model_json_schema())
     assert schema["additionalProperties"] is False
-    assert schema["$defs"]["InsightCard"]["additionalProperties"] is False
+    assert schema["properties"]["cards"]["items"]["additionalProperties"] is False
+    assert "$defs" not in json.dumps(schema) and "$ref" not in json.dumps(schema)
 
 
 def test_insights_endpoint():

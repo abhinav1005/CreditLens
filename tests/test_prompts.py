@@ -57,3 +57,13 @@ def test_lint_catches_edit_and_allows_new_version(tmp_path):
     assert any("was edited" in p for p in lint.check(tmp_path))
     lint.lock_new(tmp_path)  # --lock must not paper over the edit
     assert any("was edited" in p for p in lint.check(tmp_path))
+
+
+def test_tool_schemas_have_no_refs():
+    import json
+
+    for tool in load_bundle().tools:
+        text = json.dumps(tool["input_schema"])
+        assert "$ref" not in text and "$defs" not in text, tool["name"]
+    explain = next(t for t in load_bundle().tools if t["name"] == "explain_factor")
+    assert "UTILIZATION" in explain["input_schema"]["properties"]["factor_code"]["enum"]

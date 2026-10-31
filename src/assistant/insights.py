@@ -17,6 +17,7 @@ from pydantic import BaseModel, ConfigDict, Field, ValidationError
 from assistant.config import Config, Usage, load_config, load_pricing, request_cost
 from assistant.prompts import PROMPTS_DIR
 from assistant.providers import Provider, ProviderRequest, get_provider
+from assistant.schema import inline_refs
 from credit.factors import FactorCode
 from credit.tools.impl import call_tool
 
@@ -113,7 +114,7 @@ def generate_insights(
             + "\n</tool_data>",
         }
     ]
-    schema = InsightCardsWire.model_json_schema()
+    schema = inline_refs(InsightCardsWire.model_json_schema())
 
     usage, cost, served, errors = Usage(), 0.0, [], []
     cards = None

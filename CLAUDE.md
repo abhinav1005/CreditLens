@@ -4,7 +4,33 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project status
 
-Pre-implementation. The only source of truth so far is `PRD.md`, so read it before starting any milestone. **PRD §14 (design decisions) takes precedence over earlier PRD sections where they conflict.** When code lands, update this file with the real commands and architecture, and remove anything below that turned out differently.
+M1 is code-complete; its live exit check (M1.22) waits on an API key. Read `PRD.md` before starting any milestone. **PRD §14 (design decisions, including "API constraints found during the build") takes precedence over earlier PRD sections.** Keep this file in sync with the code as milestones land.
+
+## Commands (working now)
+
+Python 3.12 via uv (`~/.local/bin/uv`). Run everything with `uv run`.
+
+```bash
+uv sync                                            # install deps
+uv run pytest -q                                   # unit tests (live API tests skipped)
+uv run pytest -m live                              # live API smoke tests (needs ANTHROPIC_API_KEY in .env)
+uv run ruff check . && uv run black --check .      # lint / format
+uv run python data/generate_profiles.py            # regenerate data/profiles/v1.json (must be byte-identical)
+uv run python scripts/export_contracts.py --check  # tool JSON Schemas in sync with Pydantic
+uv run python scripts/make_fixtures.py --check     # shared tool fixtures in sync
+uv run python scripts/check_prompt_immutability.py # committed prompt files unchanged (--lock adds NEW files)
+uv run python -m evals validate                    # validate golden.jsonl, print counts
+uv run python -m evals run --suite golden --model claude-sonnet-5-5 --prompt-version v1
+uv run uvicorn assistant.api:app --reload          # /chat (SSE), /insights/{id}, /health
+```
+
+## Code map
+
+- `src/credit/`: domain. `factors.py` (FactorCode enum), `profile.py` (schema), `scoring.py` (toy formula, `docs/scoring.md`), `generate.py` + `stories.py` (seeded data), `dataset.py` (loads committed v1.json), `tools/` (contracts, impl, static factor content).
+- `src/assistant/`: `config.py` (config + pricing + `request_cost`), `prompts.py` (versioned bundle + content hash), `providers/` (neutral types, Fake, Anthropic), `loop.py` (`run_turn`, the one code path for API and evals), `output_filters.py` (sentence buffer + filter chain), `insights.py`, `api.py`.
+- `src/storage/`: `Transcript` + `Storage` protocol, `SQLiteStorage`.
+- `evals/`: `cases.py` (schema/loader), `runner.py`, `cache.py`, `report.py`, `scorers/` (deterministic, grounding, insights).
+- Gotcha: black reformats code, so string-replace edits in Python heredocs can silently miss. Use the Edit tool or assert that the replacement happened.
 
 ## Build workflow (every session)
 
