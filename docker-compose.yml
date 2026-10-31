@@ -4,6 +4,8 @@
 #   transcripts and labeling views work without it)
 # - web: the built React app on :8080, with /api/* forwarded to the api service
 #
+# Ports bind to localhost only: the API has no auth and spends your API key.
+#
 # Mounted from the repo so nothing is lost when containers are removed, and so the CLI
 # sees the same data: .cache (transcripts SQLite + response/guardrail caches) and
 # evals/datasets (labels.jsonl from the labeling view, golden.jsonl from promote).
@@ -17,7 +19,7 @@ services:
       - ./.cache:/app/.cache
       - ./evals/datasets:/app/evals/datasets
     ports:
-      - "8000:8000"
+      - "127.0.0.1:8000:8000"
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
       interval: 10s
@@ -30,4 +32,4 @@ services:
       api:
         condition: service_healthy
     ports:
-      - "8080:80"
+      - "127.0.0.1:8080:80"

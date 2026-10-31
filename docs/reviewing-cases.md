@@ -15,6 +15,8 @@ For each case:
    `uv run python -c "from credit.tools.impl import call_tool; print(call_tool('get_utilization', {'profile_id': 'story_001'}))"`
 4. **Edit the line in place**, then set `"authored_by": "llm_drafted_human_reviewed"`.
 5. Run `uv run python -m evals validate`. It must pass, and the warning count should drop.
+6. When you're done for the session, run `uv run python -m evals dashboard` and
+   `uv run python -m evals readme` so the reviewed-case count is current (CI checks both).
 
 After the first case is reviewed, `scripts/draft_golden_v1.py` refuses to overwrite the file.
 Edit `golden.jsonl` directly from then on.

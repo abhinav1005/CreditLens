@@ -49,13 +49,26 @@ def sse(event_type: str, data: dict) -> str:
     return f"event: {event_type}\ndata: {json.dumps(data)}\n\n"
 
 
-def guardrail_flags(decisions: list[dict]) -> list[dict]:
-    """The guardrail decisions that did something (not a plain pass), for UI badges."""
-    return [
+def guardrail_flags(decisions: list[dict], filter_decisions: list[dict] = ()) -> list[dict]:
+    """The guardrail decisions that did something (not a plain pass), for UI badges.
+
+    Input, tool-result and final checks are in `decisions`. Output guardrails run as
+    sentence filters, so their actions are in `filter_decisions`; the filter chain calls a
+    PII redaction a "rewrite", so it's mapped back to "redact" here.
+    """
+    flags = [
         {k: d[k] for k in ("stage", "name", "action", "reasons")}
         for d in decisions
         if d["action"] != "pass"
     ]
+    for d in filter_decisions:
+        if d["action"] == "pass":
+            continue
+        action = "redact" if d["filter_name"] == "pii" and d["action"] == "rewrite" else d["action"]
+        flags.append(
+            {"stage": "output", "name": d["filter_name"], "action": action, "reasons": d["reasons"]}
+        )
+    return flags
 
 
 def transcript_summary(t) -> dict:
@@ -74,7 +87,7 @@ def transcript_summary(t) -> dict:
         "latency_ms": round(t.latency_ms, 1),
         "question": last_user[:200],
         "tools": [c["name"] for c in t.tool_calls],
-        "guardrails": guardrail_flags(t.guardrail_decisions),
+        "guardrails": guardrail_flags(t.guardrail_decisions, t.filter_decisions),
     }
 
 
@@ -116,7 +129,7 @@ def create_app(
     @app.get("/transcripts")
     def transcripts(limit: int = 200) -> list[dict]:
         # Newest first. Filtering happens in the UI (demo scale; see storage.transcripts).
-        return [transcript_summary(t) for t in store.list(limit=min(limit, 1000))]
+        return [transcript_summary(t) for t in store.list(limit=max(1, min(limit, 1000)))]
 
     @app.get("/transcripts/{transcript_id}")
     def transcript(transcript_id: str) -> dict:
@@ -164,7 +177,9 @@ def create_app(
                         "model": result.model,
                         "prompt_version": result.prompt_version,
                         "latency_ms": round(result.latency_ms, 1),
-                        "guardrails": guardrail_flags(result.guardrail_decisions),
+                        "guardrails": guardrail_flags(
+                            result.guardrail_decisions, result.filter_decisions
+                        ),
                     }
                 )
             except Exception as exc:  # surface failures to the client instead of hanging

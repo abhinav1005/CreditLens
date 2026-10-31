@@ -87,7 +87,10 @@ export function flagLabel(flag: GuardrailFlag): string {
   const where =
     flag.stage === "input" ? "your message" : flag.stage === "tool_result" ? "tool data" : "reply";
   if (flag.action === "redact") return `PII redacted from ${where}`;
-  if (flag.action === "block") return `Blocked by ${flag.name} check`;
+  if (flag.action === "block")
+    return flag.stage === "output"
+      ? `Sentence removed by ${flag.name} check`
+      : `Blocked by ${flag.name} check`;
   if (flag.action === "rewrite") return `Injected text removed from ${where}`;
   if (flag.action === "retract") return `Reply replaced by ${flag.name} check`;
   return `${flag.name}: ${flag.action}`;

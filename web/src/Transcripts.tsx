@@ -141,7 +141,9 @@ function TranscriptList() {
                 >
                   <td className="nowrap">{r.created_at.replace("T", " ").slice(0, 16)}</td>
                   <td>{r.profile_id}</td>
-                  <td>{r.question}</td>
+                  <td>
+                    <a href={`#transcripts/${r.transcript_id}`}>{r.question || "(empty)"}</a>
+                  </td>
                   <td className="nowrap">
                     {r.model}
                     {r.variant ? ` (${r.variant})` : ""}

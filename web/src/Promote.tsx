@@ -29,7 +29,9 @@ export default function Promote({ transcriptId }: { transcriptId: string }) {
     return (
       <p className="notice">
         Added case <code>{result}</code> to <code>evals/datasets/golden.jsonl</code>. Review it in{" "}
-        <code>git diff</code>, then run <code>uv run python -m evals validate</code>.
+        <code>git diff</code>, then run <code>uv run python -m evals validate</code> and regenerate
+        the dashboard and README (<code>uv run python -m evals dashboard</code>,{" "}
+        <code>uv run python -m evals readme</code>).
       </p>
     );
   }

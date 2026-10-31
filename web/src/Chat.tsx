@@ -78,7 +78,7 @@ export default function Chat() {
       <div className="toolbar">
         <label>
           Profile{" "}
-          <select value={profileId} onChange={(e) => switchProfile(e.target.value)}>
+          <select value={profileId} onChange={(e) => switchProfile(e.target.value)} disabled={busy}>
             {profiles.map((p) => (
               <option key={p.profile_id} value={p.profile_id}>
                 {p.profile_id} · score {p.score}

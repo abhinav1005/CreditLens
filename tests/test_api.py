@@ -133,3 +133,30 @@ def test_transcripts_list_and_detail():
     detail = client.get(f"/transcripts/{rows[0]['transcript_id']}").json()
     assert detail["final_text"].startswith("Utilization is")
     assert client.get("/transcripts/nope").status_code == 404
+
+
+def test_guardrail_flags_include_output_filter_actions():
+    from assistant.api import guardrail_flags
+
+    filters = [
+        {"filter_name": "pii", "action": "pass", "reasons": [], "text": "ok"},
+        {"filter_name": "pii", "action": "rewrite", "reasons": ["EMAIL"], "text": "x"},
+        {"filter_name": "compliance", "action": "block", "reasons": ["no_score_promises"]},
+    ]
+    assert guardrail_flags([], filters) == [
+        {"stage": "output", "name": "pii", "action": "redact", "reasons": ["EMAIL"]},
+        {
+            "stage": "output",
+            "name": "compliance",
+            "action": "block",
+            "reasons": ["no_score_promises"],
+        },
+    ]
+
+
+def test_transcripts_limit_is_clamped():
+    client, _ = make_client([FakeTurn(text="General answer.")])
+    client.post(
+        "/chat", json={"profile_id": "story_001", "messages": [{"role": "user", "content": "q"}]}
+    )
+    assert len(client.get("/transcripts", params={"limit": -1}).json()) == 1
