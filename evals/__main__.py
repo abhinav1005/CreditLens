@@ -44,6 +44,7 @@ def main(argv: list[str] | None = None) -> int:
         help="LLM judge: off, report (shown only), gate (counts toward pass/fail)",
     )
     run.add_argument("--judge-version", default="v1")
+    run.add_argument("--run-id", default=None, help="fixed run id (CI uses this to find the run)")
 
     pool = sub.add_parser(
         "build-pool", help="build the labeling pool from several model/prompt runs"
@@ -205,6 +206,7 @@ def main(argv: list[str] | None = None) -> int:
                 judge_mode=args.judge,
                 judge_version=args.judge_version,
                 tags=sorted(args.tags.split(",")) if args.tags else None,
+                run_id=args.run_id,
             )
         except BudgetExceeded as exc:
             print(f"refusing to run: {exc}")

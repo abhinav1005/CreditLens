@@ -1,0 +1,31 @@
+# Lint, consistency checks and unit tests on every PR and on pushes to main.
+# No API key needed: live tests are skipped and evals use the fake provider in unit tests.
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - run: uv sync --locked
+      - name: Lint and format
+        run: |
+          uv run ruff check .
+          uv run black --check .
+      - name: Consistency checks
+        run: |
+          uv run python scripts/export_contracts.py --check
+          uv run python scripts/make_fixtures.py --check
+          uv run python scripts/check_prompt_immutability.py
+          uv run python -m evals validate
+      - name: Unit tests
+        run: uv run pytest -q

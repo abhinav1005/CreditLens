@@ -1,0 +1,72 @@
+# Eval smoke gate: on PRs that can change the assistant's answers, run the smoke suite
+# against the real model and fail the PR if it regressed vs reports/baseline/smoke/.
+# The summary is posted (and updated) as a PR comment.
+name: Eval gate
+
+on:
+  pull_request:
+    paths:
+      - "prompts/**"
+      - "src/assistant/**"
+      - "src/guardrails/**"
+      - "src/credit/**"
+      - "config.yaml"
+      - "config/**"
+      - "policy/**"
+      - "evals/**"
+      - "reports/baseline/**"
+  # Runs on main too, so PR branches can restore a warm response cache from main.
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: eval-gate-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      CI: "true"  # evals use the CI spending limit (config.yaml evals.max_cost_usd_ci)
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - run: uv sync --locked
+
+      # Responses are cached by content hash, so unchanged cases cost nothing. A unique key
+      # per run saves new entries; restore-keys picks up the most recent cache.
+      - uses: actions/cache@v4
+        with:
+          path: .cache
+          key: eval-cache-${{ github.run_id }}
+          restore-keys: eval-cache-
+
+      - name: Smoke run
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: uv run python -m evals run --suite golden --tags smoke --run-id pr-smoke
+
+      - name: Gate
+        id: gate
+        run: uv run python -m evals gate pr-smoke --comment-file gate.md
+
+      - name: Post PR comment
+        if: always() && github.event_name == 'pull_request' && hashFiles('gate.md') != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh pr comment "${{ github.event.pull_request.number }}" --edit-last --body-file gate.md \
+            || gh pr comment "${{ github.event.pull_request.number }}" --body-file gate.md
+
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: smoke-report
+          path: reports/pr-smoke/
