@@ -24,12 +24,13 @@ Entry format:
 - M1.4: `src/credit/stories.py`. 4 story profiles (new card + high utilization, 60-day late, collection, paydown rise) with `change_cause` computed from the formula; 3 `inj_*` profiles (payloads in creditor_name, notes, inquiry creditor). `Story` schema now has `direction`/`change_month`/`change_cause`. Dataset is 57 profiles.
 - M1.5: committed `data/profiles/v1.json` (57 profiles), `src/credit/dataset.py` loader, and the byte-for-byte reproducibility test.
 - M1.6: `src/credit/tools/contracts.py` (inputs, outputs, `ToolError`, `TOOL_CONTRACTS` registry), exported to `contracts/tools/*.json` by `scripts/export_contracts.py` (`--check` mode for CI). `simulate_payoff` output carries a fixed no-score-promise note.
+- M1.7: `src/credit/tools/impl.py` (5 tools + `call_tool(name, args)`, which never raises and returns `{"error": ...}` on failure), `factor_content.py` (static education text), 21 shared fixtures in `contracts/tools/fixtures/v1.json` (`scripts/make_fixtures.py --check`), hand-checked numbers in `tests/test_tools.py`.
 **Decisions:**
 - Domain code lives in `src/credit/` (factors, profile schema, scoring, months, generator, tools). `data/generate_profiles.py` will be a thin CLI wrapper.
 - Profiles have no person names at all, only ids (`p_001`, `story_001`, `inj_001`). Data window is the 12 months ending 2026-06, fixed so output doesn't depend on today's date.
 - `scripts/mark_task.sh <done_id> <next_id>` updates BUILD_STATUS.md.
 **Blockers:** M0.2 (API key) is with the owner. Not needed until M1.10's live smoke call. M0.4 (GitHub repo) is deferred to M2.14.
-**Next:** M1.7: Python tool implementations in `src/credit/tools/impl.py`, static `explain_factor` content, and shared fixtures in `contracts/tools/fixtures/`.
+**Next:** M1.8: `prompts/system/v1.md`, `prompts/tools/v1.yaml`, prompt loader with content hash in `src/assistant/prompts.py`, and the immutability lint `scripts/check_prompt_immutability.py`.
 
 ## 2026-10-31 — Session 1 (planning)
 **Done:** Read PRD. Grilling session settled 46 design decisions, written to PRD.md §14 (v2) and CLAUDE.md. Created BUILD_STATUS.md and BUILD_LOG.md.
