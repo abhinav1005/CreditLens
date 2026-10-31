@@ -24,6 +24,7 @@ from pydantic import BaseModel, ConfigDict
 
 from assistant.prompts import PROMPTS_DIR
 from assistant.schema import inline_refs
+from credit.generate import CARD_ISSUERS, LOAN_LENDERS
 from guardrails.base import GuardrailResult, passed
 
 BLOCK_SCORE = 0.8
@@ -31,6 +32,9 @@ CLASSIFIER_MODEL = "claude-haiku-5-5"
 PROMPT_FILE = PROMPTS_DIR / "guardrails" / "injection_v1.md"
 FREE_TEXT_FIELDS = {"creditor_name", "notes"}
 REMOVED = "[removed: text that looked like instructions to the assistant]"
+
+
+KNOWN_CREDITORS = set(CARD_ISSUERS) | {n for names in LOAN_LENDERS.values() for n in names}
 
 # (pattern, weight). High weights are near-unambiguous; low weights only add suspicion.
 RULES = [
@@ -121,7 +125,15 @@ def is_injection(
         return True, {"layer": "rules", "rule_score": score, "rules": hits}
     if not use_llm:
         return False, {"layer": "rules", "rule_score": score, "rules": hits}
-    label, rationale, cost = classify_llm(text, provider, cache_dir)
+    try:
+        label, rationale, cost = classify_llm(text, provider, cache_dir)
+    except Exception as exc:  # API outage etc.: fail closed, since this is a security check
+        return True, {
+            "layer": "llm_error",
+            "rule_score": score,
+            "rules": hits,
+            "error": type(exc).__name__,
+        }
     return label == "injection", {
         "layer": "llm",
         "rule_score": score,
@@ -164,7 +176,14 @@ class InjectionGuard:
         def walk(node):
             if isinstance(node, dict):
                 for k, v in node.items():
-                    if k in FREE_TEXT_FIELDS and isinstance(v, str) and v.strip():
+                    # Exact names from the creditor directory can't carry an injection, so
+                    # they skip the classifier (saves several sequential calls per profile).
+                    if (
+                        k in FREE_TEXT_FIELDS
+                        and isinstance(v, str)
+                        and v.strip()
+                        and v not in KNOWN_CREDITORS
+                    ):
                         bad, _ = is_injection(
                             v,
                             use_llm=self.use_llm,

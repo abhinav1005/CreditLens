@@ -76,3 +76,36 @@ def test_end_to_end_injected_profile_is_sanitized_before_model(tmp_path):
     assert any(
         d["stage"] == "tool_result" and d["action"] == "rewrite" for d in r.guardrail_decisions
     )
+
+
+class Boom:
+    name = "boom"
+
+    def complete(self, request, on_text=None):
+        raise RuntimeError("API down")
+
+
+def test_classifier_error_fails_closed(tmp_path):
+    g = InjectionGuard(provider=Boom(), cache_dir=tmp_path)
+    r = g.check("a question with no rule hits", {"stage": "input"})
+    assert r.action == "block"
+
+
+def test_known_creditor_names_skip_classifier(tmp_path):
+    fake = classifier("injection")  # would flag anything it saw
+    g = InjectionGuard(provider=fake, cache_dir=tmp_path)
+    r = g.check(
+        json.dumps({"accounts": [{"creditor_name": "Northwind Bank"}]}), {"stage": "tool_result"}
+    )
+    assert r.action == "pass" and fake.requests == []
+
+
+def test_compliance_classifier_error_falls_back_to_rules(tmp_path):
+    from guardrails.compliance import ComplianceGuard
+
+    g = ComplianceGuard(provider=Boom(), cache_dir=tmp_path)
+    assert g.final_check("Lower utilization generally helps.") == (
+        [],
+        {"layer": "llm_error", "error": "RuntimeError"},
+    )
+    assert g.final_check("This will raise your score by 40 points.")[0] == ["no_score_promises"]

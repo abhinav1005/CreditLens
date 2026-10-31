@@ -142,5 +142,8 @@ class ComplianceGuard:
             return rules, {"layer": "rules"}
         if not self.use_llm or not text.strip():
             return [], {"layer": "rules"}
-        violated, rationale, cost = classify_reply(text, self.provider, self.cache_dir)
+        try:
+            violated, rationale, cost = classify_reply(text, self.provider, self.cache_dir)
+        except Exception as exc:  # API outage: keep the rules-only verdict and say so in the log
+            return [], {"layer": "llm_error", "error": type(exc).__name__}
         return violated, {"layer": "llm", "rationale": rationale, "cost": cost}

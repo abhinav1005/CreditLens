@@ -77,3 +77,16 @@ def test_originals_never_reach_model_or_sqlite(tmp_path):
     raw = (tmp_path / "t.sqlite").read_bytes()
     assert b"123-45-6789" not in raw and b"jamie.example@example.com" not in raw
     assert any(d["name"] == "pii" and d["action"] == "redact" for d in t.guardrail_decisions)
+
+
+def test_numbering_is_shared_across_messages_in_run_turn():
+    """Regression: guardrails get shallow context copies, so the map must be shared up front."""
+    fake = FakeProvider([FakeTurn(text="ok")])
+    conv = [
+        {"role": "user", "content": "My SSN is 912-34-5678."},
+        {"role": "assistant", "content": "Noted."},
+        {"role": "user", "content": "Sorry, it's actually 955-12-3456, not 912-34-5678."},
+    ]
+    run_turn(conv, "p_001", provider=fake, guardrails=GuardrailSet(input=[G]))
+    users = [m["content"] for m in fake.requests[0].messages if m["role"] == "user"]
+    assert users == ["My SSN is <SSN_1>.", "Sorry, it's actually <SSN_2>, not <SSN_1>."]

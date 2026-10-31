@@ -123,7 +123,9 @@ def run_turn(
     # Output guardrails run as sentence filters, ahead of any extra filters passed in.
     filters = [GuardrailOutputFilter(g) for g in guards.output] + (output_filters or [])
     pricing = load_pricing()
-    context = {"profile_id": profile_id}
+    # Guardrails receive shallow copies of this dict, so per-conversation state they share
+    # (the PII value→placeholder map) must be created here, as mutable objects, up front.
+    context = {"profile_id": profile_id, "pii_map": {}, "pii_counts": {}}
 
     events: list[dict] = []
     emitted: list[str] = []
