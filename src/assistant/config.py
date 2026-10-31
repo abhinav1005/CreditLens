@@ -51,6 +51,11 @@ class EvalsConfig(BaseModel):
     max_cost_usd_ci: float
 
 
+class GateConfig(BaseModel):
+    max_overall_drop_points: float
+    max_lost_per_category: int
+
+
 class Config(BaseModel):
     assistant: AssistantConfig
     routing: RoutingConfig
@@ -58,6 +63,7 @@ class Config(BaseModel):
     models: dict[str, ModelConfig]
     storage: StorageConfig
     evals: EvalsConfig
+    gate: GateConfig
 
     def model_config_for(self, model: str) -> ModelConfig:
         if model not in self.models:

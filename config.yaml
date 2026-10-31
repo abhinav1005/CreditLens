@@ -31,3 +31,8 @@ evals:
   concurrency: 4
   max_cost_usd_local: 5.0
   max_cost_usd_ci: 1.0
+
+# CI regression gate (PRD §14): compare a smoke run with reports/baseline/smoke/.
+gate:
+  max_overall_drop_points: 5   # fail if overall pass rate drops by more than this
+  max_lost_per_category: 2     # fail if any category loses this many baseline-passing cases

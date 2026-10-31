@@ -66,6 +66,24 @@ class BudgetExceeded(Exception):
     pass
 
 
+ESTIMATE_MARGIN = 1.5
+
+
+def estimated_cost_per_case(model: str, pricing) -> float:
+    """Pre-run estimate per uncached case.
+
+    If the committed baseline was measured on this model, use its real mean cost per case
+    with a 1.5x margin. Otherwise fall back to a deliberately pessimistic token profile.
+    """
+    baseline_summary = REPORTS_DIR / "baseline" / "smoke" / "summary.json"
+    if baseline_summary.exists():
+        s = json.loads(baseline_summary.read_text())
+        mean = s.get("cost", {}).get("mean_per_case_usd")
+        if s.get("model") == model and mean:
+            return mean * ESTIMATE_MARGIN
+    return request_cost(pricing, model, ESTIMATE_USAGE)
+
+
 def score_case(case: Case, out: CaseOutput) -> list[Check]:
     checks: list[Check] = []
     for scorer in SCORERS:
@@ -179,7 +197,7 @@ def run_suite(
         prompt_hash = insights_hash if case.kind == "insights" else bundle.content_hash
         keys[case.id] = cache_key(payload, model, settings, prompt_hash)
     uncached = [c for c in cases if cache.get(keys[c.id]) is None]
-    estimate = len(uncached) * request_cost(pricing, model, ESTIMATE_USAGE)
+    estimate = len(uncached) * estimated_cost_per_case(model, pricing)
     if estimate > max_cost_usd:
         raise BudgetExceeded(
             f"estimated cost ${estimate:.2f} for {len(uncached)} uncached cases exceeds "

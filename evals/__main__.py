@@ -75,7 +75,21 @@ def main(argv: list[str] | None = None) -> int:
     base = sub.add_parser("baseline", help="make a smoke run the committed CI baseline")
     base.add_argument("run_id")
 
+    gate = sub.add_parser("gate", help="fail (exit 1) if a smoke run regressed vs the baseline")
+    gate.add_argument("run_id")
+    gate.add_argument("--comment-file", type=Path, default=None, help="write the PR comment here")
+
     args = parser.parse_args(argv)
+
+    if args.command == "gate":
+        from evals.compare import find_run
+        from evals.gate import gate_run
+
+        result = gate_run(find_run(args.run_id))
+        print(result.markdown)
+        if args.comment_file:
+            args.comment_file.write_text(result.markdown)
+        return 0 if result.passed else 1
 
     if args.command == "baseline":
         from evals.baseline import BASELINE_DIR, set_baseline

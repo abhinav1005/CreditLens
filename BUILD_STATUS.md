@@ -6,7 +6,7 @@ Specs: `PRD.md` (§14 takes precedence). History and notes: `BUILD_LOG.md`.
 **Legend:** `[ ]` todo · `[~]` in progress · `[x]` done · `[!]` blocked (reason in log) · 👤 = needs the owner (Abhinav)
 
 **Current milestone:** M2 (M1 done-when passed 2026-10-31; owner still to review cases, M1.16)
-**Next task:** M2.13 (gate logic)
+**Next task:** M2.14 (GitHub Actions). Needs a GitHub repo (M0.4)
 
 Each task is one small, reviewable commit. "Check" is how we know it's done.
 
@@ -85,7 +85,7 @@ Each task is one small, reviewable commit. "Check" is how we know it's done.
 | M2.10 | [x] | Grow golden set to ≥150 (drafts + 👤 review) | ≥150 valid cases, target category counts |
 | M2.11 | [x] | `evals compare` + `evals promote` | Tests |
 | M2.12 | [x] | `smoke` tags (≥5/category) + `evals baseline` + `reports/baseline/` | Baseline committed |
-| M2.13 | [ ] | Gate logic (overall drop > X, or ≥2 lost cases in a category) + test that `v1-degraded` is blocked | Test passes |
+| M2.13 | [x] | Gate logic (overall drop > X, or ≥2 lost cases in a category) + test that `v1-degraded` is blocked | Test passes |
 | M2.14 | [ ] | GitHub Actions: lint + tests on every PR; smoke gate on relevant paths, `actions/cache`, PR comment. 👤 adds `ANTHROPIC_API_KEY` repo secret | Workflow green on a no-op PR. **Known issue:** a cold-cache smoke run estimates ~$1.44 (40 × $0.036) vs the $1 CI limit, so restore the cache first and/or set the CI limit from a measured smoke-run cost |
 | M2.15 | [ ] | **M2 exit:** demo PR switching to the degraded prompt is blocked | Done-when passes |
 
