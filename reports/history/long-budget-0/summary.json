@@ -1,0 +1,66 @@
+{
+  "run_id": "long-budget-0",
+  "suite": "long",
+  "model": "claude-sonnet-5-5",
+  "prompt_version": "v1",
+  "prompt_hash": "b83927f5d3e2c723",
+  "pricing_as_of": "2026-10-06",
+  "created_at": "2026-10-31T19:04:05+00:00",
+  "git": {
+    "commit": "9302a1c",
+    "dirty": true
+  },
+  "n_cases": 5,
+  "n_passed": 5,
+  "overall_pass_rate": 1.0,
+  "categories": {
+    "tool_use": {
+      "n": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    }
+  },
+  "status_counts": {
+    "ok": 5
+  },
+  "failed_checks_by_scorer": {},
+  "unreviewed_cases": 5,
+  "cost": {
+    "api_spend_this_run_usd": 0.184676,
+    "pre_run_estimate_usd": 0.0836,
+    "measured_total_usd": 0.184676,
+    "mean_per_case_usd": 0.036935
+  },
+  "latency_ms": {
+    "note": "measured under parallel load; M4.2 adds a clean sequential run",
+    "p50": 17089.67862499412,
+    "p95": 17394.325000001118
+  },
+  "cache_hits": 0,
+  "wall_seconds": 23.1,
+  "guardrails": {
+    "config": {
+      "enabled": true,
+      "input": [
+        "pii",
+        "injection"
+      ],
+      "tool_results": [
+        "injection"
+      ],
+      "output": [
+        "pii",
+        "compliance"
+      ]
+    },
+    "decision_counts": {},
+    "blocked_turns": 0,
+    "compliance_checked": 5,
+    "compliance_regenerated": 0,
+    "compliance_fallbacks": 0
+  },
+  "tags": [],
+  "judge": {
+    "mode": "off"
+  }
+}

@@ -1,0 +1,105 @@
+{
+  "run_id": "latency-claude-haiku-4-5-20251001",
+  "suite": "latency",
+  "model": "claude-haiku-4-5-20251001",
+  "prompt_version": "v1",
+  "prompt_hash": "b83927f5d3e2c723",
+  "pricing_as_of": "2026-10-06",
+  "created_at": "2026-10-31T16:50:24+00:00",
+  "git": {
+    "commit": "5dc2c6c",
+    "dirty": true
+  },
+  "n_cases": 41,
+  "n_passed": 27,
+  "overall_pass_rate": 0.6585,
+  "categories": {
+    "compliance": {
+      "n": 6,
+      "passed": 5,
+      "pass_rate": 0.8333
+    },
+    "factual": {
+      "n": 6,
+      "passed": 2,
+      "pass_rate": 0.3333
+    },
+    "injection": {
+      "n": 6,
+      "passed": 6,
+      "pass_rate": 1.0
+    },
+    "insight_grounding": {
+      "n": 5,
+      "passed": 1,
+      "pass_rate": 0.2
+    },
+    "pii": {
+      "n": 5,
+      "passed": 4,
+      "pass_rate": 0.8
+    },
+    "refusal": {
+      "n": 5,
+      "passed": 2,
+      "pass_rate": 0.4
+    },
+    "tool_use": {
+      "n": 8,
+      "passed": 7,
+      "pass_rate": 0.875
+    }
+  },
+  "status_counts": {
+    "ok": 41
+  },
+  "failed_checks_by_scorer": {
+    "grounding": 7,
+    "insights": 4,
+    "refusal": 3
+  },
+  "unreviewed_cases": 41,
+  "cost": {
+    "api_spend_this_run_usd": 0.189264,
+    "pre_run_estimate_usd": 0.738,
+    "measured_total_usd": 0.189264,
+    "mean_per_case_usd": 0.004616
+  },
+  "latency_ms": {
+    "note": "measured under parallel load; M4.2 adds a clean sequential run",
+    "p50": 4202.631499967538,
+    "p95": 7621.559582999907
+  },
+  "cache_hits": 0,
+  "wall_seconds": 177.5,
+  "guardrails": {
+    "config": {
+      "enabled": true,
+      "input": [
+        "pii",
+        "injection"
+      ],
+      "tool_results": [
+        "injection"
+      ],
+      "output": [
+        "pii",
+        "compliance"
+      ]
+    },
+    "decision_counts": {
+      "compliance:final:retract": 1,
+      "injection:input:block": 4,
+      "injection:tool_result:rewrite": 3,
+      "pii:input:redact": 5
+    },
+    "blocked_turns": 4,
+    "compliance_checked": 32,
+    "compliance_regenerated": 1,
+    "compliance_fallbacks": 0
+  },
+  "tags": [],
+  "judge": {
+    "mode": "off"
+  }
+}

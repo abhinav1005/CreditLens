@@ -114,7 +114,15 @@ def main(argv: list[str] | None = None) -> int:
 
     sub.add_parser("route-check", help="router misroute rate vs golden labels (no API calls)")
 
+    sub.add_parser("variants", help="write reports/cost-variants.md from saved runs")
+
     args = parser.parse_args(argv)
+
+    if args.command == "variants":
+        from evals.variants import write
+
+        print(write().read_text())
+        return 0
 
     if args.command == "route-check":
         from evals.routing import route_check

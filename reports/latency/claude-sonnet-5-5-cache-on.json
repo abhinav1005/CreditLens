@@ -1,0 +1,19 @@
+{
+  "model": "claude-sonnet-5-5",
+  "label": "-cache-on",
+  "n": 41,
+  "total_ms": {
+    "p50": 4543.69416704867,
+    "p95": 7380.974332918413
+  },
+  "ttft_ms": {
+    "p50": 1611.0516670159996,
+    "p95": 5337.97583298292
+  },
+  "cost_usd": 0.385857,
+  "run_id": "latency-claude-sonnet-5-5-cache-on",
+  "settings": {
+    "prompt_caching": true,
+    "guardrails": null
+  }
+}

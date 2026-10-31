@@ -64,4 +64,5 @@ en-core-web-sm = { url = "https://github.com/explosion/spacy-models/releases/dow
 "evals/guardrail_eval.py" = ["E501"]
 "evals/guardrail_e2e.py" = ["E501"]
 "evals/matrix.py" = ["E501"]
+"evals/variants.py" = ["E501"]
 "scripts/build_long_suite.py" = ["E501"]

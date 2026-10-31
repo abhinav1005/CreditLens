@@ -5,8 +5,8 @@ Specs: `PRD.md` (§14 takes precedence). History and notes: `BUILD_LOG.md`.
 
 **Legend:** `[ ]` todo · `[~]` in progress · `[x]` done · `[!]` blocked (reason in log) · 👤 = needs the owner (Abhinav)
 
-**Current milestone:** M3 done-when PASSED 2026-10-31 (report.md has a Guardrails section with per-guardrail test P/R). Open from M2: owner labels → calibration. Next: M4
-**Next task:** M4: fix the refusal markers + card-total grounding (see BUILD_LOG Session 6), then M4.4 caching, M4.5 routed run, M4.6 long suite
+**Current milestone:** M4 done-when PASSED 2026-10-31 (model-comparison.md + cost-variants.md). M4.1 OpenAI deferred by owner. Open: owner labels → judge calibration (M2.7/M2.8); case review (M1.16). Next build milestone: M5
+**Next task:** M5.0 👤 (does the owner want the Java service?) and M5.1 👤 (install Docker); Claude can start M5.2 (React UI) meanwhile
 
 Each task is one small, reviewable commit. "Check" is how we know it's done.
 
@@ -111,12 +111,12 @@ Each task is one small, reviewable commit. "Check" is how we know it's done.
 | ID | Status | Task | Check |
 |---|---|---|---|
 | M4.1 | [!] | DEFERRED by owner (Anthropic-only comparison for now). OpenAI provider. 👤 provides `OPENAI_API_KEY` | Live smoke call |
-| M4.2 | [ ] | Sequential latency run (TTFT + total) | p50/p95 in report |
-| M4.3 | [ ] | `evals matrix` (Sonnet 5.5, Haiku 5.5, Haiku 4.5, OpenAI) → `reports/model-comparison.md` | Table generated |
-| M4.4 | [ ] | Prompt caching: verify cached tokens, measure before/after | Honest result in report |
-| M4.5 | [ ] | Router rule + misroute rate + always-big / always-small / routed comparison | In comparison report |
-| M4.6 | [ ] | Context trimming + long-conversation suite | Quality holds (reported) |
-| M4.7 | [ ] | A/B flag (hash of conversation id, `variant` tagged) + `docs/model-upgrade.md` | **M4 exit** |
+| M4.2 | [x] | Sequential latency run (TTFT + total) | p50/p95 in report |
+| M4.3 | [x] | `evals matrix` (Sonnet 5.5, Haiku 5.5, Haiku 4.5, OpenAI) → `reports/model-comparison.md` | Table generated |
+| M4.4 | [x] | Prompt caching: verify cached tokens, measure before/after | Honest result in report |
+| M4.5 | [x] | Router rule + misroute rate + always-big / always-small / routed comparison | In comparison report |
+| M4.6 | [x] | Context trimming + long-conversation suite | Quality holds (reported) |
+| M4.7 | [x] | A/B flag (hash of conversation id, `variant` tagged) + `docs/model-upgrade.md` | **M4 exit** |
 
 ## M5 — Analyst UI (+ Java if needed)
 

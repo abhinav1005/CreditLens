@@ -26,7 +26,7 @@ Entry format:
 3. Then regenerate the matrix markdown (rerun `evals matrix ...`; fully cached, judge cached → ~$0).
 **Left in M4:** M4.4 caching before/after (`evals latency --prompt-caching on --label -cache-on` vs off, check usage cache_read tokens); M4.5 routed run (`evals run --routed`) vs always-big/small; M4.6 long suite with `--context-budget 2000` vs `0`; write results into reports/model-comparison.md + PRD §14; mark M4 tasks in BUILD_STATUS.md. Budget left ≈ $9.
 **Blockers:** owner labels (M2.5) → calibration; owner review of 150+5 drafted cases.
-**Next:** fix items 1–2 above.
+**Next:** M5: ask the owner about Java (M5.0) and Docker (M5.1); meanwhile M5.2 React UI scaffold + chat view.
 
 ## 2026-10-31 — Session 5 (M3 guardrails)
 **Done:**
