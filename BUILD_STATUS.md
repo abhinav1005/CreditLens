@@ -6,7 +6,7 @@ Specs: `PRD.md` (§14 takes precedence). History and notes: `BUILD_LOG.md`.
 **Legend:** `[ ]` todo · `[~]` in progress · `[x]` done · `[!]` blocked (reason in log) · 👤 = needs the owner (Abhinav)
 
 **Current milestone:** M1 (M0.2 and M0.4 pending, owner)
-**Next task:** M1.2
+**Next task:** M1.3
 
 Each task is one small, reviewable commit. "Check" is how we know it's done.
 
@@ -29,7 +29,7 @@ Each task is one small, reviewable commit. "Check" is how we know it's done.
 | ID | Status | Task | Check |
 |---|---|---|---|
 | M1.1 | [x] | `FactorCode` enum + Pydantic profile schema (accounts with masked numbers, payments, inquiries, `creditor_name`, `notes`) | Schema unit tests |
-| M1.2 | [ ] | Toy scoring formula + `docs/scoring.md` | Tests: higher utilization / more lates / more inquiries → lower score; range 300–850 |
+| M1.2 | [x] | Toy scoring formula + `docs/scoring.md` | Tests: higher utilization / more lates / more inquiries → lower score; range 300–850 |
 | M1.3 | [ ] | `data/generate_profiles.py`: seeded, 50 profiles, monthly events → 12-month score history via the formula | Same seed → identical output |
 | M1.4 | [ ] | ≥3 story profiles with stored true causes; `inj_*` profiles with payloads in free-text fields | Story causes match what the formula produces |
 | M1.5 | [ ] | Commit `data/profiles/v1.json` + byte-for-byte reproducibility test | Test passes |
