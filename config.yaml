@@ -40,6 +40,6 @@ gate:
 # Guardrail pipeline (M3). Set enabled: false for "guardrails off" comparison runs.
 guardrails:
   enabled: true
-  input: []         # run on every user message, before the model or the logs see it
+  input: [pii]      # run on every user message, before the model or the logs see it
   tool_results: []  # run on tool output before it goes back to the model (indirect injection)
-  output: []        # run on the reply, sentence by sentence, before it's streamed
+  output: [pii]     # run on the reply, sentence by sentence, before it's streamed

@@ -5,8 +5,15 @@ from collections.abc import Callable
 from guardrails.base import Guardrail
 from guardrails.pipeline import EMPTY, GuardrailSet
 
-# name → factory. Filled in as guardrails land (M3.2 pii, M3.4 injection, M3.6 compliance).
-REGISTRY: dict[str, Callable[[], Guardrail]] = {}
+
+def _pii() -> Guardrail:
+    from guardrails.pii import PIIRedactor  # imported lazily: loading spaCy takes ~1s
+
+    return PIIRedactor()
+
+
+# name → factory. Filled in as guardrails land (M3.4 injection, M3.6 compliance).
+REGISTRY: dict[str, Callable[[], Guardrail]] = {"pii": _pii}
 
 
 def build_guardrails(config) -> GuardrailSet:

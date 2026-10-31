@@ -17,9 +17,10 @@ Entry format:
 ## 2026-10-31 — Session 5 (M3 guardrails)
 **Done:**
 - M3.1: `src/guardrails/base.py` (`GuardrailResult` {name, allowed, action pass|redact|block|rewrite, text, reasons, scores}; logged without the text), `pipeline.py` (`run_pipeline`: redact passes modified text on, block stops; `GuardrailSet` input/tool_results/output), `registry.py` (`build_guardrails(config)` from config.yaml `guardrails:` lists, with `enabled: false` for off runs). `run_turn` redacts EVERY user message before the model or logs see it, can block the newest (no model call, stop="blocked"), guards each tool result (block gives a WITHHELD error to the model; the original stays in tool_calls for scoring), and runs output guardrails as sentence filters. Decisions go to TurnResult/Transcript/eval records.
+- M3.2: `src/guardrails/pii.py` (Presidio + spaCy en_core_web_sm, pinned wheel; custom recognizers for fake SSNs, 555 phones, card-like numbers, account/routing numbers with context, street addresses; DOB = date within 25 chars after a birth keyword (plain regex, because spaCy lemmatizes 'born' to 'bear'); PERSON only for 2+ capitalized words and never the synthetic creditor names; masked ****NNNN never touched; numbered placeholders consistent per conversation; mapping kept in request memory only). Enabled in config for input + output. Test proves originals never reach the model requests or the SQLite file bytes.
 **Decisions:**
 **Blockers:** owner labels (M2.5) for calibration; M1.16 case review.
-**Next:** M3.2
+**Next:** M3.3: `evals/datasets/pii.jsonl` (fake-but-realistic PII examples + hard negatives, dev/test split), `evals/guardrail_eval.py` + `python -m evals guardrail pii` reporting span recall/precision per entity type on test.
 
 ## 2026-10-31 — Session 4 (M2)
 **Done:**
