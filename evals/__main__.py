@@ -9,7 +9,7 @@ import os
 import sys
 from pathlib import Path
 
-from evals.cases import DATASETS_DIR, GOLDEN_PATH, load_cases, summarize
+from evals.cases import DATASETS_DIR, GOLDEN_PATH, Category, load_cases, summarize
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -61,7 +61,34 @@ def main(argv: list[str] | None = None) -> int:
     cal.add_argument("--labeler", default=None, help="use only this labeler's labels")
     cal.add_argument("--max-cost-usd", type=float, default=3.0)
 
+    cmp_ = sub.add_parser("compare", help="newly failing / newly passing cases between two runs")
+    cmp_.add_argument("run_a")
+    cmp_.add_argument("run_b")
+
+    prom = sub.add_parser("promote", help="turn a logged transcript into a golden case")
+    prom.add_argument("transcript_id")
+    prom.add_argument("--category", required=True, choices=[c.value for c in Category])
+    prom.add_argument("--note", required=True, help="what was wrong (becomes rubric_notes)")
+    prom.add_argument("--must-not-contain", action="append", default=[])
+    prom.add_argument("--must-contain", action="append", default=[])
+
     args = parser.parse_args(argv)
+
+    if args.command == "compare":
+        from evals.compare import compare_results, find_run, load_results, render_comparison
+
+        a, b = find_run(args.run_a), find_run(args.run_b)
+        print(render_comparison(compare_results(load_results(a), load_results(b)), a.name, b.name))
+        return 0
+
+    if args.command == "promote":
+        from evals.promote import promote
+
+        case = promote(
+            args.transcript_id, args.category, args.note, args.must_not_contain, args.must_contain
+        )
+        print(f"added {case['id']} to golden.jsonl (validate with: python -m evals validate)")
+        return 0
 
     if args.command == "calibrate-judge":
         from evals.calibrate import MAIN_DIMENSION, calibrate, write_report
