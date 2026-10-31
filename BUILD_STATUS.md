@@ -6,7 +6,7 @@ Specs: `PRD.md` (§14 takes precedence). History and notes: `BUILD_LOG.md`.
 **Legend:** `[ ]` todo · `[~]` in progress · `[x]` done · `[!]` blocked (reason in log) · 👤 = needs the owner (Abhinav)
 
 **Current milestone:** M1 (M0.2 and M0.4 pending, owner)
-**Next task:** M1.15
+**Next task:** M1.16 👤 (owner writes 15 seed cases). Claude continues with M1.18–M1.21 while that's pending
 
 Each task is one small, reviewable commit. "Check" is how we know it's done.
 
@@ -58,7 +58,7 @@ Each task is one small, reviewable commit. "Check" is how we know it's done.
 ### Evals
 | ID | Status | Task | Check |
 |---|---|---|---|
-| M1.15 | [ ] | Golden case schema + loader + validator (`authored_by`, `tags`, categories) | Invalid cases are rejected with a clear error |
+| M1.15 | [x] | Golden case schema + loader + validator (`authored_by`, `tags`, categories) | Invalid cases are rejected with a clear error |
 | M1.16 👤 | [ ] | Owner writes ~15 seed golden cases (Claude provides a template + examples per category) | 15 valid cases in `golden.jsonl` |
 | M1.17 | [ ] | Drafting script: LLM drafts ~35 cases from stories + category specs → owner reviews (👤) | 50 valid cases |
 | M1.18 | [ ] | Deterministic scorers: tool-call correctness, must/must-not contain, expected refusal, schema validity | Unit tests per scorer |
