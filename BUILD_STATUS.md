@@ -6,7 +6,7 @@ Specs: `PRD.md` (§14 takes precedence). History and notes: `BUILD_LOG.md`.
 **Legend:** `[ ]` todo · `[~]` in progress · `[x]` done · `[!]` blocked (reason in log) · 👤 = needs the owner (Abhinav)
 
 **Current milestone:** M1 (M0.2 and M0.4 pending, owner)
-**Next task:** M1.16 👤 (owner writes 15 seed cases). Claude continues with M1.18–M1.21 while that's pending
+**Next task:** M1.19. Claude drafts M1.16/M1.17 cases as llm_drafted after M1.21; owner reviews.
 
 Each task is one small, reviewable commit. "Check" is how we know it's done.
 
