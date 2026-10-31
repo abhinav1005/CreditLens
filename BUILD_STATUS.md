@@ -6,7 +6,7 @@ Specs: `PRD.md` (§14 takes precedence). History and notes: `BUILD_LOG.md`.
 **Legend:** `[ ]` todo · `[~]` in progress · `[x]` done · `[!]` blocked (reason in log) · 👤 = needs the owner (Abhinav)
 
 **Current milestone:** M1 (M0.2 and M0.4 pending, owner)
-**Next task:** M1.14
+**Next task:** M1.15
 
 Each task is one small, reviewable commit. "Check" is how we know it's done.
 
@@ -53,7 +53,7 @@ Each task is one small, reviewable commit. "Check" is how we know it's done.
 | ID | Status | Task | Check |
 |---|---|---|---|
 | M1.13 | [x] | FastAPI `/chat` over SSE: tool events live, text buffered by sentence through the filter chain | Test client receives ordered events |
-| M1.14 | [ ] | `/insights/{profile_id}`: forced structured output, Pydantic validation, 1 retry, retry count logged | Tests with fake provider; 1 live call |
+| M1.14 | [x] | `/insights/{profile_id}`: forced structured output, Pydantic validation, 1 retry, retry count logged | Tests with fake provider; 1 live call |
 
 ### Evals
 | ID | Status | Task | Check |

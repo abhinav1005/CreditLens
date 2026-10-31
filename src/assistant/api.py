@@ -21,6 +21,7 @@ from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
 from assistant.config import load_config
+from assistant.insights import generate_insights
 from assistant.loop import run_turn
 from assistant.providers import Provider, get_provider
 from credit.dataset import load_profiles
@@ -99,6 +100,26 @@ def create_app(
                 yield sse(event["type"], {k: v for k, v in event.items() if k != "type"})
 
         return StreamingResponse(stream(), media_type="text/event-stream")
+
+    @app.get("/insights/{profile_id}")
+    def insights(profile_id: str) -> dict:
+        if profile_id not in load_profiles():
+            raise HTTPException(status_code=404, detail="unknown profile_id")
+        result = generate_insights(
+            profile_id, config=config, provider=provider_factory(config.assistant.model)
+        )
+        meta = {
+            "model": result.model,
+            "served_models": result.served_models,
+            "prompt_version": result.prompt_version,
+            "prompt_hash": result.prompt_hash,
+            "retries": result.retries,
+            "cost_usd": round(result.cost_usd, 6),
+            "latency_ms": round(result.latency_ms, 1),
+        }
+        if result.cards is None:
+            raise HTTPException(status_code=502, detail={"error": "invalid model output", **meta})
+        return {"cards": [c.model_dump(mode="json") for c in result.cards], "meta": meta}
 
     return app
 
