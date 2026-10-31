@@ -1,9 +1,13 @@
 import { useEffect, useState } from "react";
 
 import Chat from "./Chat";
+import Transcripts from "./Transcripts";
 
 // Views are picked by the URL hash (#chat, #transcripts/<id>, ...), so no router library.
-const VIEWS = [{ id: "chat", label: "Chat" }] as const;
+const VIEWS = [
+  { id: "chat", label: "Chat" },
+  { id: "transcripts", label: "Transcripts" },
+] as const;
 
 function currentHash(): string {
   return window.location.hash.slice(1) || "chat";
@@ -18,7 +22,7 @@ export default function App() {
     return () => window.removeEventListener("hashchange", onChange);
   }, []);
 
-  const view = hash.split("/")[0];
+  const [view, param] = hash.split("/");
 
   return (
     <div className="app">
@@ -36,7 +40,11 @@ export default function App() {
         Educational demo on synthetic data. Not financial advice. The compliance policy is a demo
         policy, not legal compliance.
       </p>
-      <main>{view === "chat" ? <Chat /> : <p>Unknown view.</p>}</main>
+      <main>
+        {view === "chat" && <Chat />}
+        {view === "transcripts" && <Transcripts selectedId={param ?? null} />}
+        {!VIEWS.some((v) => v.id === view) && <p>Unknown view.</p>}
+      </main>
     </div>
   );
 }

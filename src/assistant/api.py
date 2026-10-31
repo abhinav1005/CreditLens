@@ -58,6 +58,26 @@ def guardrail_flags(decisions: list[dict]) -> list[dict]:
     ]
 
 
+def transcript_summary(t) -> dict:
+    """One row of the transcript list: enough to filter and pick, not the whole record."""
+    last_user = next((m["content"] for m in reversed(t.messages) if m["role"] == "user"), "")
+    return {
+        "transcript_id": t.transcript_id,
+        "created_at": t.created_at,
+        "conversation_id": t.conversation_id,
+        "profile_id": t.profile_id,
+        "model": t.model,
+        "prompt_version": t.prompt_version,
+        "variant": t.variant,
+        "stop": t.stop,
+        "cost_usd": round(t.cost_usd, 6),
+        "latency_ms": round(t.latency_ms, 1),
+        "question": last_user[:200],
+        "tools": [c["name"] for c in t.tool_calls],
+        "guardrails": guardrail_flags(t.guardrail_decisions),
+    }
+
+
 def profile_summary(profile) -> dict:
     """A short description of a synthetic profile for the profile picker."""
     return {
@@ -86,6 +106,18 @@ def create_app(
     @app.get("/profiles")
     def profiles() -> list[dict]:
         return [profile_summary(p) for p in load_profiles().values()]
+
+    @app.get("/transcripts")
+    def transcripts(limit: int = 200) -> list[dict]:
+        # Newest first. Filtering happens in the UI (demo scale; see storage.transcripts).
+        return [transcript_summary(t) for t in store.list(limit=min(limit, 1000))]
+
+    @app.get("/transcripts/{transcript_id}")
+    def transcript(transcript_id: str) -> dict:
+        t = store.get(transcript_id)
+        if t is None:
+            raise HTTPException(status_code=404, detail="unknown transcript_id")
+        return t.model_dump(mode="json")
 
     @app.post("/chat")
     def chat(request: ChatRequest) -> StreamingResponse:

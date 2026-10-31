@@ -119,3 +119,17 @@ def test_transcript_event_carries_model_and_guardrails():
     event = parse_sse(resp.text)[-1]
     assert event[0] == "transcript"
     assert event[1]["guardrails"] == [] and event[1]["prompt_version"]
+
+
+def test_transcripts_list_and_detail():
+    client, _ = make_client([FakeTurn(text="Utilization is the share of your limits in use.")])
+    client.post(
+        "/chat",
+        json={"profile_id": "story_001", "messages": [{"role": "user", "content": "what is it?"}]},
+    )
+    rows = client.get("/transcripts").json()
+    assert len(rows) == 1 and rows[0]["question"] == "what is it?"
+    assert rows[0]["profile_id"] == "story_001" and rows[0]["tools"] == []
+    detail = client.get(f"/transcripts/{rows[0]['transcript_id']}").json()
+    assert detail["final_text"].startswith("Utilization is")
+    assert client.get("/transcripts/nope").status_code == 404
