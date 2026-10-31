@@ -6,7 +6,7 @@ Specs: `PRD.md` (§14 takes precedence). History and notes: `BUILD_LOG.md`.
 **Legend:** `[ ]` todo · `[~]` in progress · `[x]` done · `[!]` blocked (reason in log) · 👤 = needs the owner (Abhinav)
 
 **Current milestone:** M1 (M0.2 and M0.4 pending, owner)
-**Next task:** M1.11
+**Next task:** M1.12
 
 Each task is one small, reviewable commit. "Check" is how we know it's done.
 
@@ -46,7 +46,7 @@ Each task is one small, reviewable commit. "Check" is how we know it's done.
 | M1.8 | [x] | `prompts/system/v1.md`, `prompts/tools/v1.yaml`, prompt loader with content hash, immutability lint script | Lint fails when a committed `vN` file changes |
 | M1.9 | [x] | `config.yaml`, `config/pricing.yaml` (with `as_of`), config loader | Loader tests |
 | M1.10 | [x] | `Provider` protocol + `FakeProvider` (tests) + `AnthropicProvider` | Unit tests use fake; one live smoke call (needs M0.2) |
-| M1.11 | [ ] | Tool loop + `run_turn()` → `TurnResult` (events, tool calls, tokens, cost, latency), max-iterations cap, empty `OutputFilter` chain | Tests with `FakeProvider` |
+| M1.11 | [x] | Tool loop + `run_turn()` → `TurnResult` (events, tool calls, tokens, cost, latency), max-iterations cap, empty `OutputFilter` chain | Tests with `FakeProvider` |
 | M1.12 | [ ] | `Storage` interface (`put/get/list`) + SQLite transcripts; `run_turn` logs prompt version + model id | Round-trip test |
 
 ### API
