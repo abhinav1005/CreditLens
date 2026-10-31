@@ -1,0 +1,33 @@
+# Full local stack: `docker compose up --build`, then open http://localhost:8080
+#
+# - api: FastAPI on :8000 (needs ANTHROPIC_API_KEY in .env for chat; the dashboard,
+#   transcripts and labeling views work without it)
+# - web: the built React app on :8080, with /api/* forwarded to the api service
+#
+# Mounted from the repo so nothing is lost when containers are removed, and so the CLI
+# sees the same data: .cache (transcripts SQLite + response/guardrail caches) and
+# evals/datasets (labels.jsonl from the labeling view, golden.jsonl from promote).
+services:
+  api:
+    build: .
+    env_file:
+      - path: .env
+        required: false
+    volumes:
+      - ./.cache:/app/.cache
+      - ./evals/datasets:/app/evals/datasets
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  web:
+    build: ./web
+    depends_on:
+      api:
+        condition: service_healthy
+    ports:
+      - "8080:80"

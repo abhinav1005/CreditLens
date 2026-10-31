@@ -25,6 +25,7 @@ uv run python -m evals run --suite golden --model claude-sonnet-5-5 --prompt-ver
 uv run uvicorn assistant.api:app --reload          # /chat (SSE), /insights/{id}, /health
 cd web && npm install && npm run dev              # React UI on :5173 (proxies /api to uvicorn on :8000)
 cd web && npm run lint && npm run build           # eslint + prettier, type-check + build
+docker compose up --build                          # full stack: UI on :8080, API on :8000 (key from .env)
 ```
 
 ## Code map
