@@ -37,6 +37,9 @@ def main(argv: list[str] | None = None) -> int:
     run.add_argument(
         "--context-budget", type=int, default=None, help="override context_budget_tokens (0 = off)"
     )
+    run.add_argument(
+        "--effort", choices=["low", "medium", "high"], default=None, help="override chat effort"
+    )
     run.add_argument("--max-cost-usd", type=float, default=None)
     run.add_argument("--concurrency", type=int, default=None)
     run.add_argument(
@@ -116,6 +119,12 @@ def main(argv: list[str] | None = None) -> int:
 
     sub.add_parser("variants", help="write reports/cost-variants.md from saved runs")
 
+    sub.add_parser("experiments", help="write reports/experiments.{md,json} from saved runs")
+
+    rs = sub.add_parser("rescore", help="recompute string checks in saved runs (no API calls)")
+    rs.add_argument("runs", nargs="*")
+    rs.add_argument("--all", action="store_true", help="every run in reports/ and reports/history/")
+
     dash = sub.add_parser("dashboard", help="write web/public/dashboard.json from reports/")
     dash.add_argument("--check", action="store_true", help="exit 1 if the file is out of date")
 
@@ -150,6 +159,26 @@ def main(argv: list[str] | None = None) -> int:
             )
             return 0 if ok else 1
         print(f"wrote {write()}")
+        return 0
+
+    if args.command == "rescore":
+        from evals.compare import find_run
+        from evals.rescore import all_runs, rescore_run
+
+        targets = all_runs() if args.all else [find_run(r) for r in args.runs]
+        for run_dir in targets:
+            n, changed, flipped = rescore_run(run_dir)
+            if changed:
+                print(
+                    f"{run_dir.relative_to(run_dir.parents[1])}: checks changed in {changed}"
+                    f" of {n} cases, pass/fail flipped in {flipped}"
+                )
+        return 0
+
+    if args.command == "experiments":
+        from evals.experiments import write as write_experiments
+
+        print(write_experiments().read_text())
         return 0
 
     if args.command == "variants":
@@ -343,6 +372,7 @@ def main(argv: list[str] | None = None) -> int:
                 guardrails_enabled=None if args.guardrails is None else args.guardrails == "on",
                 routing=args.routed,
                 context_budget_tokens=args.context_budget,
+                effort=args.effort,
                 run_id=args.run_id,
             )
         except BudgetExceeded as exc:

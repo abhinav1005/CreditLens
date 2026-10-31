@@ -1,0 +1,107 @@
+{
+  "run_id": "exp-effort-high",
+  "suite": "golden",
+  "model": "claude-haiku-5-5",
+  "prompt_version": "v1",
+  "prompt_hash": "b83927f5d3e2c723",
+  "pricing_as_of": "2026-10-06",
+  "created_at": "2026-10-31T22:49:48+00:00",
+  "git": {
+    "commit": "33a127d",
+    "dirty": true
+  },
+  "n_cases": 150,
+  "n_passed": 144,
+  "overall_pass_rate": 0.96,
+  "categories": {
+    "compliance": {
+      "n": 20,
+      "passed": 20,
+      "pass_rate": 1.0
+    },
+    "factual": {
+      "n": 30,
+      "passed": 27,
+      "pass_rate": 0.9
+    },
+    "injection": {
+      "n": 20,
+      "passed": 20,
+      "pass_rate": 1.0
+    },
+    "insight_grounding": {
+      "n": 20,
+      "passed": 20,
+      "pass_rate": 1.0
+    },
+    "pii": {
+      "n": 15,
+      "passed": 14,
+      "pass_rate": 0.9333
+    },
+    "refusal": {
+      "n": 15,
+      "passed": 14,
+      "pass_rate": 0.9333
+    },
+    "tool_use": {
+      "n": 30,
+      "passed": 29,
+      "pass_rate": 0.9667
+    }
+  },
+  "status_counts": {
+    "ok": 150
+  },
+  "failed_checks_by_scorer": {
+    "grounding": 5,
+    "refusal": 1
+  },
+  "unreviewed_cases": 150,
+  "cost": {
+    "api_spend_this_run_usd": 0.080997,
+    "pre_run_estimate_usd": 0.27,
+    "measured_total_usd": 0.080997,
+    "mean_per_case_usd": 0.00054
+  },
+  "latency_ms": {
+    "note": "measured under parallel load; M4.2 adds a clean sequential run",
+    "p50": 5824.927874957211,
+    "p95": 9687.395583023317
+  },
+  "cache_hits": 0,
+  "wall_seconds": 216.4,
+  "guardrails": {
+    "config": {
+      "enabled": true,
+      "input": [
+        "pii",
+        "injection"
+      ],
+      "tool_results": [
+        "injection"
+      ],
+      "output": [
+        "pii",
+        "compliance"
+      ]
+    },
+    "decision_counts": {
+      "injection:input:block": 10,
+      "injection:tool_result:rewrite": 12,
+      "pii:input:redact": 12
+    },
+    "blocked_turns": 10,
+    "compliance_checked": 120,
+    "compliance_regenerated": 0,
+    "compliance_fallbacks": 0
+  },
+  "tags": [],
+  "judge": {
+    "mode": "off"
+  },
+  "rescored": {
+    "at": "2026-10-31T23:05:25+00:00",
+    "what": "string checks recomputed from saved answers (evals/rescore.py)"
+  }
+}

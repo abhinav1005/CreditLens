@@ -72,6 +72,49 @@ interface DashboardData {
       test_n: number;
     }[];
   };
+  experiments: Experiments | null;
+}
+
+interface Experiments {
+  source: string;
+  model: string;
+  reliability: {
+    runs: string[];
+    n_cases: number;
+    pass_rates: number[];
+    mean: number;
+    min: number;
+    max: number;
+    stdev: number;
+    always_pass: number;
+    always_fail: number;
+    flaky: string[];
+    flaky_by_category: Record<string, number>;
+    smoke_n: number;
+    smoke_passed: number[];
+    smoke_swing: number;
+    gate_limit_cases: number;
+  };
+  ablation: {
+    prompt: string;
+    what: string;
+    pass_rate: number;
+    n_passed: number;
+    n_cases: number;
+    harm: number;
+    harm_n: number;
+    grounding_failures: number;
+    output_tokens_per_case: number;
+  }[];
+  defense: { prompt: string; guardrails: string; harm: number; n: number }[];
+  effort: {
+    effort: string;
+    runs: number;
+    pass_rate: number;
+    pass_rate_range: [number, number] | null;
+    cost_per_case_usd: number;
+    output_tokens_per_case: number;
+  }[];
 }
 
 const pct = (x: number | null | undefined, digits = 1) =>
@@ -305,6 +348,8 @@ export default function Dashboard() {
         </p>
       </Section>
 
+      {data.experiments && <ExperimentsSection x={data.experiments} />}
+
       <Section title="Cost and latency variants" source={variants.source}>
         <RunTable
           caption="Model routing (golden suite)"
@@ -383,5 +428,151 @@ function RunTable({
         </tbody>
       </table>
     </div>
+  );
+}
+
+function ExperimentsSection({ x }: { x: Experiments }) {
+  const rel = x.reliability;
+  const cell = (prompt: string, guards: string) => {
+    const c = x.defense.find((d) => d.prompt === prompt && d.guardrails === guards);
+    return c ? `${c.harm}/${c.n}` : "n/a";
+  };
+  return (
+    <Section title={`Experiments (${x.model}, golden suite, judge off)`} source={x.source}>
+      <h3>E1 · Reliability: the same config, 5 fresh runs</h3>
+      <p>
+        Pass rate {pct(rel.min)}–{pct(rel.max)} (mean {pct(rel.mean)}).{" "}
+        <strong>{rel.flaky.length}</strong> of {rel.n_cases} cases were flaky; on the {rel.smoke_n}
+        -case smoke subset the count swung by <strong>{rel.smoke_swing}</strong> with nothing
+        changed (gate limit: {rel.gate_limit_cases}).
+      </p>
+      <div className="table-wrap">
+        <table className="static">
+          <thead>
+            <tr>
+              <th>Run</th>
+              {rel.runs.map((r) => (
+                <th key={r} className="num">
+                  {r.replace("exp-repeat-", "#")}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Pass rate</td>
+              {rel.pass_rates.map((p, i) => (
+                <td key={i} className="num">
+                  {pct(p)}
+                </td>
+              ))}
+            </tr>
+            <tr>
+              <td>Smoke passed (of {rel.smoke_n})</td>
+              {rel.smoke_passed.map((p, i) => (
+                <td key={i} className="num">
+                  {p}
+                </td>
+              ))}
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>E2 · Prompt ablation (guardrails off)</h3>
+      <div className="table-wrap">
+        <table className="static">
+          <thead>
+            <tr>
+              <th>Prompt</th>
+              <th>Pass rate</th>
+              <th className="num">Attack harm</th>
+              <th className="num">Grounding failures</th>
+              <th className="num">Output tokens / case</th>
+            </tr>
+          </thead>
+          <tbody>
+            {x.ablation.map((r) => (
+              <tr key={r.prompt}>
+                <td>
+                  <code>{r.prompt}</code> <span className="muted">{r.what}</span>
+                </td>
+                <td>
+                  <Meter value={r.pass_rate} label={`${pct(r.pass_rate)}`} />
+                </td>
+                <td className="num">
+                  {r.harm}/{r.harm_n}
+                </td>
+                <td className="num">{r.grounding_failures}</td>
+                <td className="num">{r.output_tokens_per_case}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <h3>E3 · Defense in depth: attack cases where harm got through</h3>
+      <div className="table-wrap">
+        <table className="static">
+          <thead>
+            <tr>
+              <th>Prompt</th>
+              <th className="num">Guardrails off</th>
+              <th className="num">Guardrails on</th>
+            </tr>
+          </thead>
+          <tbody>
+            {["v1", "v1-minimal"].map((p) => (
+              <tr key={p}>
+                <td>
+                  <code>{p}</code>
+                </td>
+                <td className="num">{cell(p, "off")}</td>
+                <td className="num">{cell(p, "on")}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <h3>E4 · Thinking effort</h3>
+      <div className="table-wrap">
+        <table className="static">
+          <thead>
+            <tr>
+              <th>Effort</th>
+              <th>Pass rate</th>
+              <th className="num">Output tokens / case</th>
+            </tr>
+          </thead>
+          <tbody>
+            {x.effort.map((r) => (
+              <tr key={r.effort}>
+                <td>
+                  {r.effort}
+                  {r.runs > 1 && <span className="muted"> (mean of {r.runs})</span>}
+                </td>
+                <td>
+                  <Meter
+                    value={r.pass_rate}
+                    label={
+                      pct(r.pass_rate) +
+                      (r.pass_rate_range
+                        ? ` (${pct(r.pass_rate_range[0])}–${pct(r.pass_rate_range[1])})`
+                        : "")
+                    }
+                  />
+                </td>
+                <td className="num">{r.output_tokens_per_case}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p className="muted">
+        Output tokens, not cost: measured cost depends on whether the prompt cache was warm, which
+        depends on run order.
+      </p>
+    </Section>
   );
 }

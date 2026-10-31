@@ -87,6 +87,39 @@ def render_results(data: dict) -> str:
                 f"| {group}: {r['name']} | {pct(r['pass_rate'])} ({r['n_passed']}/{r['n_cases']})"
                 f" | ${r['cost_usd']:.3f} |"
             )
+    x = data.get("experiments")
+    if x:
+        rel = x["reliability"]
+        lines += [
+            "",
+            f"**Experiments** (`{x['model']}`, judge off; full write-up in `reports/experiments.md`). Source: `{x['source']}`",
+            "",
+            f"- *Reliability:* the same config run 5 times scored {pct(rel['min'])}–{pct(rel['max'])};"
+            f" {len(rel['flaky'])} of {rel['n_cases']} cases flipped between runs, and the smoke subset swung by"
+            f" {rel['smoke_swing']} cases (gate limit {rel['gate_limit_cases']}).",
+            "",
+            "| Prompt (guardrails off) | Pass rate | Attack harm | Grounding failures |",
+            "|---|---:|---:|---:|",
+        ]
+        for r in x["ablation"]:
+            lines.append(
+                f"| `{r['prompt']}`: {r['what']} | {pct(r['pass_rate'])} | {r['harm']}/{r['harm_n']} | {r['grounding_failures']} |"
+            )
+        cell = {(d["prompt"], d["guardrails"]): f"{d['harm']}/{d['n']}" for d in x["defense"]}
+        lines += [
+            "",
+            "| Attack harm | Guardrails off | Guardrails on |",
+            "|---|---:|---:|",
+            f"| full prompt (`v1`) | {cell[('v1', 'off')]} | {cell[('v1', 'on')]} |",
+            f"| minimal prompt | {cell[('v1-minimal', 'off')]} | {cell[('v1-minimal', 'on')]} |",
+            "",
+            "| Effort | Pass rate | Output tokens / case |",
+            "|---|---:|---:|",
+        ]
+        for r in x["effort"]:
+            lines.append(
+                f"| {r['effort']}{' (mean of ' + str(r['runs']) + ')' if r['runs'] > 1 else ''} | {pct(r['pass_rate'])} | {r['output_tokens_per_case']} |"
+            )
     lines += [
         "",
         f"**CI gate baseline:** {pct(gate['pass_rate'])} of {gate['n_cases']} smoke cases "

@@ -185,6 +185,7 @@ def run_suite(
     prompt_caching: bool | None = None,
     routing: bool = False,
     context_budget_tokens: int | None = None,
+    effort: str | None = None,
 ) -> dict:
     if judge_mode not in JUDGE_MODES:
         raise ValueError(f"judge_mode must be one of {JUDGE_MODES}")
@@ -199,6 +200,8 @@ def run_suite(
     config.routing.enabled = routing
     if context_budget_tokens is not None:
         config.assistant.context_budget_tokens = context_budget_tokens
+    if effort is not None:  # chat and insight cards both use assistant.effort
+        config.assistant.effort = effort
     pricing = load_pricing()
     bundle = load_bundle(prompt_version, config.assistant.tools_prompt_version)
     _, insights_hash = load_insight_prompt(config.assistant.insights_prompt_version)

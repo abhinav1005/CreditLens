@@ -100,5 +100,9 @@
   "tags": [],
   "judge": {
     "mode": "off"
+  },
+  "rescored": {
+    "at": "2026-10-31T23:05:25+00:00",
+    "what": "string checks recomputed from saved answers (evals/rescore.py)"
   }
 }

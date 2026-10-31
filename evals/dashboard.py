@@ -152,6 +152,14 @@ def variants_section() -> dict:
     }
 
 
+def experiments_section() -> dict | None:
+    path = REPORTS / "experiments.json"
+    if not path.exists():
+        return None
+    data = _read(path)
+    return {"source": "uv run python -m evals experiments", **data}
+
+
 def gate_section() -> dict:
     base = _read(REPORTS / "baseline" / "smoke" / "baseline.json")
     return {
@@ -208,6 +216,7 @@ def build() -> dict:
         "end_to_end": end_to_end_section(),
         "variants": variants_section(),
         "gate": gate_section(),
+        "experiments": experiments_section(),
         "calibration": calibration_section(),
     }
 

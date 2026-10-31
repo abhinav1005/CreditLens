@@ -36,7 +36,7 @@
   "failed_checks_by_scorer": {
     "disclaimer": 6,
     "grounding": 5,
-    "strings": 4
+    "strings": 3
   },
   "unreviewed_cases": 55,
   "cost": {
@@ -106,5 +106,9 @@
       "compliance",
       "groundedness"
     ]
+  },
+  "rescored": {
+    "at": "2026-10-31T23:05:25+00:00",
+    "what": "string checks recomputed from saved answers (evals/rescore.py)"
   }
 }

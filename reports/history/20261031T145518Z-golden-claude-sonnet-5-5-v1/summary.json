@@ -70,5 +70,9 @@
     "p95": 5788.21962501388
   },
   "cache_hits": 50,
-  "wall_seconds": 0.0
+  "wall_seconds": 0.0,
+  "rescored": {
+    "at": "2026-10-31T23:05:25+00:00",
+    "what": "string checks recomputed from saved answers (evals/rescore.py)"
+  }
 }

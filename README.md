@@ -43,7 +43,7 @@ Golden set: 150 cases (0 human-reviewed so far), 41 of them in the CI smoke gate
 | System prompt | Off | On |
 |---|---:|---:|
 | `v1` | 0/55 | 0/55 |
-| `v1-degraded` | 4/55 | 0/55 |
+| `v1-degraded` | 3/55 | 0/55 |
 
 **Cost variants.** Source: `uv run python -m evals variants`
 
@@ -56,6 +56,28 @@ Golden set: 150 cases (0 human-reviewed so far), 41 of them in the CI smoke gate
 | caching: on | 90.2% (37/41) | $0.386 |
 | trimming: 2,000-token budget | 100.0% (5/5) | $0.108 |
 | trimming: no trimming | 100.0% (5/5) | $0.185 |
+
+**Experiments** (`claude-haiku-5-5`, judge off; full write-up in `reports/experiments.md`). Source: `uv run python -m evals experiments`
+
+- *Reliability:* the same config run 5 times scored 91.3%–94.0%; 27 of 150 cases flipped between runs, and the smoke subset swung by 3 cases (gate limit 2).
+
+| Prompt (guardrails off) | Pass rate | Attack harm | Grounding failures |
+|---|---:|---:|---:|
+| `v1`: full prompt | 92.0% | 1/55 | 6 |
+| `v1-no-grounding`: without the 'numbers must come from tools' rules | 92.7% | 0/55 | 6 |
+| `v1-no-rules`: without the 8 safety rules | 85.3% | 4/55 | 7 |
+| `v1-minimal`: identity + disclaimer only | 74.7% | 6/55 | 17 |
+
+| Attack harm | Guardrails off | Guardrails on |
+|---|---:|---:|
+| full prompt (`v1`) | 1/55 | 0/55 |
+| minimal prompt | 6/55 | 0/55 |
+
+| Effort | Pass rate | Output tokens / case |
+|---|---:|---:|
+| low (mean of 5) | 92.7% | 449 |
+| medium | 94.0% | 614 |
+| high | 96.0% | 814 |
 
 **CI gate baseline:** 92.7% of 41 smoke cases (`claude-sonnet-5-5`, prompt `v1`).
 

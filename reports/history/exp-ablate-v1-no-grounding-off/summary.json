@@ -1,0 +1,104 @@
+{
+  "run_id": "exp-ablate-v1-no-grounding-off",
+  "suite": "golden",
+  "model": "claude-haiku-5-5",
+  "prompt_version": "v1-no-grounding",
+  "prompt_hash": "8ea9a751d46d207b",
+  "pricing_as_of": "2026-10-06",
+  "created_at": "2026-10-31T22:36:47+00:00",
+  "git": {
+    "commit": "33a127d",
+    "dirty": true
+  },
+  "n_cases": 150,
+  "n_passed": 139,
+  "overall_pass_rate": 0.9267,
+  "categories": {
+    "compliance": {
+      "n": 20,
+      "passed": 19,
+      "pass_rate": 0.95
+    },
+    "factual": {
+      "n": 30,
+      "passed": 26,
+      "pass_rate": 0.8667
+    },
+    "injection": {
+      "n": 20,
+      "passed": 20,
+      "pass_rate": 1.0
+    },
+    "insight_grounding": {
+      "n": 20,
+      "passed": 16,
+      "pass_rate": 0.8
+    },
+    "pii": {
+      "n": 15,
+      "passed": 15,
+      "pass_rate": 1.0
+    },
+    "refusal": {
+      "n": 15,
+      "passed": 15,
+      "pass_rate": 1.0
+    },
+    "tool_use": {
+      "n": 30,
+      "passed": 28,
+      "pass_rate": 0.9333
+    }
+  },
+  "status_counts": {
+    "ok": 150
+  },
+  "failed_checks_by_scorer": {
+    "grounding": 6,
+    "insights": 4,
+    "factors": 1
+  },
+  "unreviewed_cases": 150,
+  "cost": {
+    "api_spend_this_run_usd": 0.071799,
+    "pre_run_estimate_usd": 0.234,
+    "measured_total_usd": 0.082797,
+    "mean_per_case_usd": 0.000552
+  },
+  "latency_ms": {
+    "note": "measured under parallel load; M4.2 adds a clean sequential run",
+    "p50": 2829.006416955963,
+    "p95": 5373.310459079221
+  },
+  "cache_hits": 20,
+  "wall_seconds": 93.9,
+  "guardrails": {
+    "config": {
+      "enabled": false,
+      "input": [
+        "pii",
+        "injection"
+      ],
+      "tool_results": [
+        "injection"
+      ],
+      "output": [
+        "pii",
+        "compliance"
+      ]
+    },
+    "decision_counts": {},
+    "blocked_turns": 0,
+    "compliance_checked": 0,
+    "compliance_regenerated": 0,
+    "compliance_fallbacks": 0
+  },
+  "tags": [],
+  "judge": {
+    "mode": "off"
+  },
+  "rescored": {
+    "at": "2026-10-31T23:05:06+00:00",
+    "what": "string checks recomputed from saved answers (evals/rescore.py)"
+  }
+}

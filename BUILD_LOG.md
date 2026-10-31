@@ -27,7 +27,7 @@ Entry format:
 **Finding (owner decision needed): the smoke gate is noisier than its threshold.** The same answer-producing code scored 34/41 (gate failed, run 41240258027: ins_001, ins_008 card evidence, fact_001 grounding) and 38/41 (passed, run 41240634206). Earlier runs: 37–40/41. A 5-point limit on 41 cases is 2 cases, inside the noise, mostly from insight_grounding. Options: (a) re-baseline from a fresh post-guardrails run in a reviewed PR (planned anyway); (b) majority-of-3 samples per case in the gate (≈3× smoke cost, ~$1.2/run); (c) exclude or loosen insight_grounding in the gate until the insights prompt improves; (d) widen the threshold. Recommendation: (a) + (c) now, (b) if budget allows. Not changed without the owner, since it changes what counts as passing.
 **Spend this session:** ≈ $1.5 (one live chat check + four CI smoke runs). Remaining credit ≈ $4.5–5.
 **Blockers:** M5.0 Java decision; M5.1 Docker (then run `docker compose up --build` on a fresh clone to close M5.7); M2.5 labels (now easiest in the UI's Label tab) → M2.7/M2.8; M1.16 case review; demo GIF; gate-noise decision above.
-**Next:** Owner: label in the UI's Label tab (M2.5); answer Java (M5.0), gate-noise fix, install Docker (M5.1)
+**Next:** Owner: label (Label tab), gate-noise decision (E1 is the evidence), Java?, Docker
 
 ---
 
