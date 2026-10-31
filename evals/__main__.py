@@ -72,7 +72,20 @@ def main(argv: list[str] | None = None) -> int:
     prom.add_argument("--must-not-contain", action="append", default=[])
     prom.add_argument("--must-contain", action="append", default=[])
 
+    base = sub.add_parser("baseline", help="make a smoke run the committed CI baseline")
+    base.add_argument("run_id")
+
     args = parser.parse_args(argv)
+
+    if args.command == "baseline":
+        from evals.baseline import BASELINE_DIR, set_baseline
+
+        meta = set_baseline(args.run_id)
+        print(
+            f"baseline = {meta['run_id']} "
+            f"({meta['overall_pass_rate']:.1%} of {meta['n_cases']}) in {BASELINE_DIR}"
+        )
+        return 0
 
     if args.command == "compare":
         from evals.compare import compare_results, find_run, load_results, render_comparison
@@ -177,6 +190,7 @@ def main(argv: list[str] | None = None) -> int:
                 use_cache=not args.no_cache,
                 judge_mode=args.judge,
                 judge_version=args.judge_version,
+                tags=sorted(args.tags.split(",")) if args.tags else None,
             )
         except BudgetExceeded as exc:
             print(f"refusing to run: {exc}")

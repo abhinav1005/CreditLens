@@ -154,6 +154,7 @@ def run_suite(
     judge_version: str = "v1",
     judge_fn: Callable | None = None,
     judge_cache_dir: Path | None = None,
+    tags: list[str] | None = None,
 ) -> dict:
     if judge_mode not in JUDGE_MODES:
         raise ValueError(f"judge_mode must be one of {JUDGE_MODES}")
@@ -314,6 +315,7 @@ def run_suite(
         estimate=estimate,
         wall_seconds=wall,
     )
+    summary["tags"] = sorted(tags or [])  # the tag filter this run used (smoke runs: ["smoke"])
     summary["judge"] = judge_summary(
         results, judge_mode, judge_version, judge_hash, judge_spend, config.judge.model
     )
