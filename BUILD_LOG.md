@@ -20,9 +20,10 @@ Entry format:
 - M2.2: `prompts/system/v1-degraded.md` (v1 minus the score-promise rule and the disclaimer, plus an instruction to estimate point gains), locked, with a test.
 - M2.3: `evals/labeling.py` + `python -m evals build-pool`. Pool = 186 deduplicated items (Sonnet 5.5 and Haiku 5.5 × v1 and v1-degraded), fixed-seed shuffle, in `evals/datasets/labeling_pool.jsonl`. Spent $0.54. Deterministic results: Sonnet v1 44/50, Sonnet degraded 29/50, Haiku v1 39/50, Haiku degraded 31/50.
 - M2.4: `evals/labeler.py` + `python -m evals label --labeler NAME [--batch 25]`. Blind to the judge verdict and to model/prompt; p/f per dimension, s skip, q quit, optional note; appends each label to `evals/datasets/labels.jsonl` immediately; resumes.
+- M2.6: `evals/split.py` freezes the split by item-id hash (30% target), giving `label_split.json` = dev 135 / test 51, written BEFORE any labels or judge runs. Refuses to change once written.
 **Decisions:**
 **Blockers:** M2.5 (≥100 hand labels) must be done by the owner.
-**Next:** M2.6: freeze the dev/test split over pool item ids by hash (about 30% test), committed as `evals/datasets/label_split.json` before any labels or judge iteration exist.
+**Next:** M2.7: `python -m evals calibrate-judge` in `evals/calibrate.py`. Judge every labeled item (cached), then per dimension and split: precision/recall/F1 (fail = positive class), accuracy, Cohen's kappa via sklearn, a bootstrap 95% CI, and a confusion matrix; Sonnet-written vs Haiku-written kappa; writes `reports/calibration/judge-<version>.{json,md}`.
 
 ## 2026-10-31 — Session 3 (first live run, M1 exit)
 **Done:**
