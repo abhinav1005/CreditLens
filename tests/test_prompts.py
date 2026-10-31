@@ -67,3 +67,11 @@ def test_tool_schemas_have_no_refs():
         assert "$ref" not in text and "$defs" not in text, tool["name"]
     explain = next(t for t in load_bundle().tools if t["name"] == "explain_factor")
     assert "UTILIZATION" in explain["input_schema"]["properties"]["factor_code"]["enum"]
+
+
+def test_degraded_prompt_loads_and_lacks_safety_rules():
+    bundle = load_bundle("v1-degraded")
+    assert "estimate how many points" in bundle.system_template
+    assert "Never promise" not in bundle.system_template
+    assert "Educational information only" not in bundle.system_template
+    assert bundle.content_hash != load_bundle("v1").content_hash
