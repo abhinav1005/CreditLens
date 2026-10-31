@@ -38,7 +38,30 @@ def main(argv: list[str] | None = None) -> int:
         "--no-cache", action="store_true", help="ignore and don't write the response cache"
     )
 
+    pool = sub.add_parser(
+        "build-pool", help="build the labeling pool from several model/prompt runs"
+    )
+    pool.add_argument("--models", default="claude-sonnet-5-5,claude-haiku-5-5")
+    pool.add_argument("--prompts", default="v1,v1-degraded")
+    pool.add_argument("--max-cost-usd", type=float, default=3.0)
+
     args = parser.parse_args(argv)
+
+    if args.command == "build-pool":
+        from collections import Counter
+
+        from evals.labeling import POOL_PATH, build_pool, write_pool
+
+        items = build_pool(
+            args.models.split(","), args.prompts.split(","), max_cost_usd=args.max_cost_usd
+        )
+        write_pool(items)
+        print(f"wrote {len(items)} items to {POOL_PATH}")
+        for (model, prompt), n in sorted(
+            Counter((i["model"], i["prompt_version"]) for i in items).items()
+        ):
+            print(f"  {model:<22} {prompt:<12} {n}")
+        return 0
 
     if args.command == "validate":
         try:

@@ -18,9 +18,10 @@ Entry format:
 **Done:**
 - M2.1: `prompts/judge/v1.md` (4 dimensions: helpfulness, clarity, compliance [main], groundedness; the disclaimer is excluded since rules check it) + `evals/judge.py` (`judge_response(case, out)` → per-dimension {verdict, rationale}; schema puts rationale before verdict; pinned `config.judge.model` at effort medium; 1 retry). Live check on comp_001: all pass, $0.009 per call.
 - M2.2: `prompts/system/v1-degraded.md` (v1 minus the score-promise rule and the disclaimer, plus an instruction to estimate point gains), locked, with a test.
+- M2.3: `evals/labeling.py` + `python -m evals build-pool`. Pool = 186 deduplicated items (Sonnet 5.5 and Haiku 5.5 × v1 and v1-degraded), fixed-seed shuffle, in `evals/datasets/labeling_pool.jsonl`. Spent $0.54. Deterministic results: Sonnet v1 44/50, Sonnet degraded 29/50, Haiku v1 39/50, Haiku degraded 31/50.
 **Decisions:**
 **Blockers:** M2.5 (≥100 hand labels) must be done by the owner.
-**Next:** M2.3: labeling-pool builder `evals/labeling.py` (`python -m evals build-pool`): run the golden set over {Sonnet 5.5, Haiku 5.5} × {v1, v1-degraded}, sample ≥130 responses with sampling recorded.
+**Next:** M2.4: CLI labeler `python -m evals label`. Shows one item at a time (conversation, tool results, reply), never the judge's verdict; keys p/f per dimension, n for a note, s to skip, q to quit; appends to `evals/datasets/labels.jsonl`; resumes where it left off.
 
 ## 2026-10-31 — Session 3 (first live run, M1 exit)
 **Done:**
