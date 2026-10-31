@@ -46,6 +46,16 @@ WITHHELD_TOOL_RESULT = json.dumps(
         }
     }
 )
+COMPLIANCE_RETRY = (
+    "[Automated compliance check] Your previous reply broke these rules: {rules}. "
+    "Write the reply again so it follows every rule in your instructions. Don't call tools; "
+    "use the information you already have."
+)
+COMPLIANCE_FALLBACK = (
+    "I can explain how credit factors work and what your data shows, but I can't predict score "
+    "changes, recommend specific products, or give legal advice. What would you like to know "
+    "about your credit?\n\n_Educational information only, not financial advice._"
+)
 INCOMPLETE_MESSAGE = (
     "Sorry, I couldn't finish looking that up. Could you try asking in a simpler way?"
 )
@@ -225,7 +235,66 @@ def run_turn(
 
     final_text = "".join(emitted).strip()
     retracted = False
-    for f in filters:
+
+    # Compliance final check (policy/compliance.md). On a violation the reply already shown
+    # is retracted: regenerate once with the broken rules named; if that also fails, use a
+    # fixed safe reply. The retry exchange is recorded in `extra`, not in `messages`, so the
+    # transcript's last user message is still the person's own.
+    final_guards = [g for g in guards.output if hasattr(g, "final_check")]
+    compliance = None
+    if final_guards and stop == "complete":
+        compliance = {"violations": [], "regenerated": False, "fallback": False}
+
+        def violations_of(text: str) -> list[str]:
+            found = []
+            for g in final_guards:
+                rules, info = g.final_check(text)
+                guard_decisions.append(
+                    {
+                        "stage": "final",
+                        "name": g.name,
+                        "allowed": not rules,
+                        "action": "retract" if rules else "pass",
+                        "reasons": rules,
+                        "scores": {"llm": 1.0 if info.get("layer") == "llm" else 0.0},
+                    }
+                )
+                found += rules
+            return sorted(set(found))
+
+        first = violations_of(final_text)
+        if first:
+            compliance["violations"].append(first)
+            compliance["regenerated"] = True
+            retry = provider.complete(
+                ProviderRequest(
+                    model=model,
+                    system=bundle.render_system(profile_id),
+                    messages=list(messages)
+                    + [
+                        {"role": "user", "content": COMPLIANCE_RETRY.format(rules=", ".join(first))}
+                    ],
+                    tools=bundle.tools,
+                    max_tokens=config.assistant.max_tokens,
+                    effort=config.assistant.effort,
+                )
+            )
+            usage = usage + retry.usage
+            served.append(retry.served_model)
+            priced = retry.served_model if retry.served_model in pricing.models else model
+            cost += request_cost(pricing, priced, retry.usage)
+            new_text = (
+                "" if retry.tool_calls else filter_text(retry.text, filters, context, decisions)
+            )
+            second = violations_of(new_text) if new_text else ["no_usable_text"]
+            if second:
+                compliance["violations"].append(second)
+                compliance["fallback"] = True
+                new_text = COMPLIANCE_FALLBACK
+            retracted = True
+            emit({"type": "retract", "reason": first, "replacement": new_text})
+            final_text = new_text
+    for f in filters if not retracted else []:
         decision = f.check_final(final_text, context)
         decisions.append(decision)
         if decision.action == "retract":
@@ -256,6 +325,7 @@ def run_turn(
         pricing_as_of=pricing.as_of,
         retracted=retracted,
         model_requests=len(served),
+        extra={"compliance": compliance} if compliance else {},
     )
 
 
@@ -275,3 +345,14 @@ class GuardrailOutputFilter:
 
     def check_final(self, full_text: str, context: dict) -> FilterDecision:
         return FilterDecision("pass", filter_name=self.name)
+
+
+def filter_text(text: str, filters, context: dict, decisions: list) -> str:
+    """Run a complete (non-streamed) text through the sentence filters."""
+    buffer, kept = SentenceBuffer(), []
+    for sentence in buffer.feed(text) + buffer.flush():
+        out, ds = apply_sentence_filters(sentence, filters, context)
+        decisions.extend(ds)
+        if out:
+            kept.append(out)
+    return "".join(kept).strip()

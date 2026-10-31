@@ -18,8 +18,18 @@ def _injection() -> Guardrail:
     return InjectionGuard()
 
 
-# name → factory. Filled in as guardrails land (M3.6 compliance).
-REGISTRY: dict[str, Callable[[], Guardrail]] = {"pii": _pii, "injection": _injection}
+def _compliance() -> Guardrail:
+    from guardrails.compliance import ComplianceGuard
+
+    return ComplianceGuard()
+
+
+# name → factory
+REGISTRY: dict[str, Callable[[], Guardrail]] = {
+    "pii": _pii,
+    "injection": _injection,
+    "compliance": _compliance,
+}
 
 
 def build_guardrails(config) -> GuardrailSet:

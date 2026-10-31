@@ -106,6 +106,10 @@ def run_guardrail_eval(name: str, split: str) -> tuple[dict, Path]:
         rules_only, combined = evaluate_injection(items, use_llm=False), evaluate_injection(items)
         report = {"guardrail": name, "split": split, "rules_only": rules_only, **combined}
         markdown = render_injection(rules_only, combined, split)
+    elif name == "compliance":
+        rules_only, combined = evaluate_compliance(items, use_llm=False), evaluate_compliance(items)
+        report = {"guardrail": name, "split": split, "rules_only": rules_only, **combined}
+        markdown = render_compliance(rules_only, combined, split)
     else:
         raise ValueError(f"no evaluator for guardrail {name!r}")
     GUARDRAIL_REPORTS.mkdir(parents=True, exist_ok=True)
@@ -176,6 +180,76 @@ def render_injection(rules_only: dict, combined: dict, split: str) -> str:
     ]
     lines += [
         f"- `{e['id']}` {e['kind']} {'flagged' if e['flagged'] else 'missed'} ({e['layer']}): {e['text']}"
+        for e in combined["errors"]
+    ] or ["- none"]
+    return "\n".join(lines) + "\n"
+
+
+def evaluate_compliance(items: list[dict], use_llm: bool = True) -> dict:
+    """Detection of policy violations in replies: recall on violations, FP rate on compliant."""
+    from guardrails.compliance import ComplianceGuard
+
+    guard = ComplianceGuard(use_llm=use_llm)
+    by_kind: dict[str, list[bool]] = defaultdict(list)
+    per_rule: dict[str, list[bool]] = defaultdict(list)
+    errors, cost, layers = [], 0.0, defaultdict(int)
+    for item in items:
+        rules, info = guard.final_check(item["text"])
+        cost += info.get("cost", 0.0)
+        layers[info["layer"]] += 1
+        flagged = bool(rules)
+        by_kind[item["kind"]].append(flagged)
+        for r in item["violations"]:
+            per_rule[r].append(flagged)
+        if flagged != bool(item["violations"]):
+            errors.append(
+                {
+                    "id": item["id"],
+                    "kind": item["kind"],
+                    "flagged": flagged,
+                    "rules": rules,
+                    "layer": info["layer"],
+                    "text": item["text"][:120],
+                }
+            )
+    rate = lambda xs: round(sum(xs) / len(xs), 4) if xs else None  # noqa: E731
+    compliant = by_kind.get("compliant_hard", []) + by_kind.get("compliant", [])
+    return {
+        "use_llm": use_llm,
+        "n_violations": len(by_kind.get("violation", [])),
+        "n_compliant": len(compliant),
+        "recall": rate(by_kind.get("violation", [])),
+        "false_positive_rate": rate(compliant),
+        "recall_by_rule": {r: rate(v) for r, v in sorted(per_rule.items())},
+        "flag_rate_by_kind": {k: rate(v) for k, v in sorted(by_kind.items())},
+        "decided_by_layer": dict(layers),
+        "classifier_cost_usd": round(cost, 5),
+        "errors": errors,
+    }
+
+
+def render_compliance(rules_only: dict, combined: dict, split: str) -> str:
+    pct = lambda x: "n/a" if x is None else f"{100 * x:.1f}%"  # noqa: E731
+    lines = [
+        f"# Compliance guardrail ({split} split)",
+        "",
+        f"Violating replies: {combined['n_violations']} · compliant: {combined['n_compliant']} (most are hard negatives)",
+        "",
+        "| Layers | Recall | False-positive rate |",
+        "|---|---:|---:|",
+        f"| rules only | {pct(rules_only['recall'])} | {pct(rules_only['false_positive_rate'])} |",
+        f"| rules + LLM classifier | {pct(combined['recall'])} | {pct(combined['false_positive_rate'])} |",
+        "",
+        "Recall by rule (rules + LLM): "
+        + ", ".join(f"{k} {pct(v)}" for k, v in combined["recall_by_rule"].items()),
+        "",
+        f"Classifier spend this run: ${combined['classifier_cost_usd']:.4f}",
+        "",
+        f"## Errors, rules + LLM ({len(combined['errors'])})",
+        "",
+    ]
+    lines += [
+        f"- `{e['id']}` {e['kind']} {'flagged ' + str(e['rules']) if e['flagged'] else 'missed'} ({e['layer']}): {e['text']}"
         for e in combined["errors"]
     ] or ["- none"]
     return "\n".join(lines) + "\n"

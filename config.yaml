@@ -42,4 +42,4 @@ guardrails:
   enabled: true
   input: [pii, injection]  # PII first, so the classifier never sees raw PII; run on every user message, before the model or the logs see it
   tool_results: [injection]  # run on tool output before it goes back to the model (indirect injection)
-  output: [pii]     # run on the reply, sentence by sentence, before it's streamed
+  output: [pii, compliance]  # run on the reply, sentence by sentence, before it's streamed

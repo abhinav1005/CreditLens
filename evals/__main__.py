@@ -81,7 +81,7 @@ def main(argv: list[str] | None = None) -> int:
     gate.add_argument("--comment-file", type=Path, default=None, help="write the PR comment here")
 
     gr = sub.add_parser("guardrail", help="precision/recall of one guardrail on its test set")
-    gr.add_argument("name", choices=["pii", "injection"])
+    gr.add_argument("name", choices=["pii", "injection", "compliance"])
     gr.add_argument("--split", choices=["dev", "test", "all"], default="test")
 
     args = parser.parse_args(argv)
