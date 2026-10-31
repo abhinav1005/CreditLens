@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
 import Chat from "./Chat";
+import Dashboard from "./Dashboard";
 import Label from "./Label";
 import Transcripts from "./Transcripts";
 
@@ -9,6 +10,7 @@ const VIEWS = [
   { id: "chat", label: "Chat" },
   { id: "transcripts", label: "Transcripts" },
   { id: "label", label: "Label" },
+  { id: "dashboard", label: "Dashboard" },
 ] as const;
 
 function currentHash(): string {
@@ -46,6 +48,7 @@ export default function App() {
         {view === "chat" && <Chat />}
         {view === "transcripts" && <Transcripts selectedId={param ?? null} />}
         {view === "label" && <Label />}
+        {view === "dashboard" && <Dashboard />}
         {!VIEWS.some((v) => v.id === view) && <p>Unknown view.</p>}
       </main>
     </div>

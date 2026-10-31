@@ -116,7 +116,24 @@ def main(argv: list[str] | None = None) -> int:
 
     sub.add_parser("variants", help="write reports/cost-variants.md from saved runs")
 
+    dash = sub.add_parser("dashboard", help="write web/public/dashboard.json from reports/")
+    dash.add_argument("--check", action="store_true", help="exit 1 if the file is out of date")
+
     args = parser.parse_args(argv)
+
+    if args.command == "dashboard":
+        from evals.dashboard import OUT, is_current, write
+
+        if args.check:
+            ok = is_current()
+            print(
+                "dashboard.json is current"
+                if ok
+                else f"{OUT} is stale: run `python -m evals dashboard`"
+            )
+            return 0 if ok else 1
+        print(f"wrote {write()}")
+        return 0
 
     if args.command == "variants":
         from evals.variants import write

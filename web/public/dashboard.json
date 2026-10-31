@@ -1,0 +1,270 @@
+{
+  "calibration": {
+    "rows": [],
+    "source": "uv run python -m evals calibrate-judge --judge-version <v>",
+    "status": "waiting for human labels (M2.5)"
+  },
+  "end_to_end": {
+    "scenarios": [
+      {
+        "by_category": {
+          "compliance": {
+            "n": 20,
+            "off": 0,
+            "on": 0
+          },
+          "injection": {
+            "n": 20,
+            "off": 0,
+            "on": 0
+          },
+          "pii": {
+            "n": 15,
+            "off": 0,
+            "on": 0
+          }
+        },
+        "harm_off": 0,
+        "harm_on": 0,
+        "n": 55,
+        "prompt": "v1"
+      },
+      {
+        "by_category": {
+          "compliance": {
+            "n": 20,
+            "off": 1,
+            "on": 0
+          },
+          "injection": {
+            "n": 20,
+            "off": 1,
+            "on": 0
+          },
+          "pii": {
+            "n": 15,
+            "off": 2,
+            "on": 0
+          }
+        },
+        "harm_off": 4,
+        "harm_on": 0,
+        "n": 55,
+        "prompt": "v1-degraded"
+      }
+    ],
+    "source": "uv run python -m evals guardrail-e2e <run_on> <run_off> --label <prompt>"
+  },
+  "gate": {
+    "baseline_run": "20261031T151537Z-golden-claude-sonnet-5-5-v1",
+    "model": "claude-sonnet-5-5",
+    "n_cases": 41,
+    "pass_rate": 0.9268,
+    "prompt_version": "v1",
+    "source": "uv run python -m evals baseline <run_id>"
+  },
+  "golden": {
+    "by_category": {
+      "compliance": 20,
+      "factual": 30,
+      "injection": 20,
+      "insight_grounding": 20,
+      "pii": 15,
+      "refusal": 15,
+      "tool_use": 30
+    },
+    "human_reviewed": 0,
+    "n_cases": 150,
+    "smoke": 41,
+    "source": "uv run python -m evals validate"
+  },
+  "guardrails": {
+    "rows": [
+      {
+        "by_type": {
+          "ACCOUNT_NUMBER": 1.0,
+          "ADDRESS": 0.75,
+          "CARD_NUMBER": 1.0,
+          "DOB": 0.8333,
+          "EMAIL": 1.0,
+          "NAME": 0.7778,
+          "PHONE": 1.0,
+          "SSN": 0.9167
+        },
+        "false_positive_rate": 0.0,
+        "guardrail": "pii",
+        "n_negative": 12,
+        "n_positive": 58,
+        "recall": 0.9138,
+        "rules_only_recall": null
+      },
+      {
+        "by_type": {
+          "benign": 0.0,
+          "benign_hard": 0.0,
+          "direct": 1.0,
+          "indirect": 1.0
+        },
+        "false_positive_rate": 0.0,
+        "guardrail": "injection",
+        "n_negative": 36,
+        "n_positive": 16,
+        "recall": 1.0,
+        "rules_only_recall": 0.4375
+      },
+      {
+        "by_type": {
+          "no_legal_advice": 1.0,
+          "no_product_recommendations": 1.0,
+          "no_protected_characteristics": 1.0,
+          "no_score_promises": 1.0
+        },
+        "false_positive_rate": 0.0,
+        "guardrail": "compliance",
+        "n_negative": 16,
+        "n_positive": 19,
+        "recall": 1.0,
+        "rules_only_recall": 0.3684
+      }
+    ],
+    "source": "uv run python -m evals guardrail <name> --split test"
+  },
+  "models": {
+    "n_cases": 150,
+    "pricing_as_of": "2026-10-06",
+    "rows": [
+      {
+        "categories": {
+          "compliance": 1.0,
+          "factual": 1.0,
+          "injection": 1.0,
+          "insight_grounding": 0.3,
+          "pii": 1.0,
+          "refusal": 1.0,
+          "tool_use": 1.0
+        },
+        "cost_per_case_usd": 0.010594,
+        "judge": {
+          "compliance": 0.9867,
+          "groundedness": 0.9533,
+          "helpfulness": 0.9733
+        },
+        "latency_p50_ms": 5869.008000008762,
+        "latency_p95_ms": 8066.97762501426,
+        "model": "claude-sonnet-5-5",
+        "pass_rate": 0.9067,
+        "ttft_p50_ms": 2404.6992920339108
+      },
+      {
+        "categories": {
+          "compliance": 1.0,
+          "factual": 0.9333,
+          "injection": 1.0,
+          "insight_grounding": 0.7,
+          "pii": 1.0,
+          "refusal": 1.0,
+          "tool_use": 1.0
+        },
+        "cost_per_case_usd": 0.00062,
+        "judge": {
+          "compliance": 1.0,
+          "groundedness": 0.9467,
+          "helpfulness": 0.96
+        },
+        "latency_p50_ms": 4031.669875024818,
+        "latency_p95_ms": 6689.097499940544,
+        "model": "claude-haiku-5-5",
+        "pass_rate": 0.9467,
+        "ttft_p50_ms": 1937.2052079997957
+      },
+      {
+        "categories": {
+          "compliance": 1.0,
+          "factual": 0.6667,
+          "injection": 0.95,
+          "insight_grounding": 0.25,
+          "pii": 1.0,
+          "refusal": 0.7333,
+          "tool_use": 0.9333
+        },
+        "cost_per_case_usd": 0.004185,
+        "judge": {
+          "compliance": 0.9867,
+          "groundedness": 0.8333,
+          "helpfulness": 0.96
+        },
+        "latency_p50_ms": 4202.631499967538,
+        "latency_p95_ms": 7621.559582999907,
+        "model": "claude-haiku-4-5-20251001",
+        "pass_rate": 0.7867,
+        "ttft_p50_ms": 747.2182089695707
+      }
+    ],
+    "source": "uv run python -m evals matrix --models <ids>"
+  },
+  "note": "Generated by `uv run python -m evals dashboard` from committed reports.",
+  "variants": {
+    "caching": [
+      {
+        "cost_usd": 0.419134,
+        "latency_p50_ms": 5869.008000008762,
+        "n_cases": 41,
+        "n_passed": 38,
+        "name": "off",
+        "pass_rate": 0.9268,
+        "ttft_p50_ms": 2404.6992920339108
+      },
+      {
+        "cost_usd": 0.385857,
+        "latency_p50_ms": 4543.69416704867,
+        "n_cases": 41,
+        "n_passed": 37,
+        "name": "on",
+        "pass_rate": 0.9024,
+        "ttft_p50_ms": 1611.0516670159996
+      }
+    ],
+    "routing": [
+      {
+        "cost_usd": 1.589122,
+        "n_cases": 150,
+        "n_passed": 136,
+        "name": "always Sonnet 5.5",
+        "pass_rate": 0.9067
+      },
+      {
+        "cost_usd": 1.430065,
+        "n_cases": 150,
+        "n_passed": 133,
+        "name": "rule router",
+        "pass_rate": 0.8867
+      },
+      {
+        "cost_usd": 0.093047,
+        "n_cases": 150,
+        "n_passed": 142,
+        "name": "always Haiku 5.5",
+        "pass_rate": 0.9467
+      }
+    ],
+    "source": "uv run python -m evals variants",
+    "trimming": [
+      {
+        "cost_usd": 0.107876,
+        "input_tokens": 44423,
+        "n_cases": 5,
+        "n_passed": 5,
+        "name": "2,000-token budget",
+        "pass_rate": 1.0
+      },
+      {
+        "cost_usd": 0.184676,
+        "input_tokens": 82883,
+        "n_cases": 5,
+        "n_passed": 5,
+        "name": "no trimming",
+        "pass_rate": 1.0
+      }
+    ]
+  }
+}
