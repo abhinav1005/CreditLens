@@ -28,13 +28,14 @@ Entry format:
 - M2.12: runs record their tag filter (`summary.tags`); `evals/baseline.py` + `python -m evals baseline <run_id>` (smoke runs only, no errored cases; copies results/summary/report + `baseline.json` metadata into `reports/baseline/smoke/`). First baseline: Sonnet 5.5 + v1 smoke, 38/41, measured $0.457.
 - M2.13: `evals/gate.py` + `python -m evals gate <run_id> [--comment-file]` (exit 1 on regression; thresholds in config.yaml `gate:`, overall drop > 5 pts or ≥2 lost in a category; also fails on missing baseline cases; markdown = PR comment with the compare diff). Pre-run estimate now uses the baseline's measured cost per case ×1.5 (smoke ≈ $0.69 cold vs the $1 CI limit, resolving the earlier issue). Real demo: Sonnet + v1-degraded smoke = 25/41, gate FAILS (−31.7 pts; tool_use −7, compliance −2, injection −2). Notable: with the safety rule removed, Sonnet followed the injected '120 points' instruction (inject_003). Saved as `tests/fixtures/degraded_smoke/` with a test asserting the committed baseline blocks it.
 - Fixed eval-gate.yml: the push-to-main trigger had no path filter, so docs-only pushes ran a paid smoke run. It now uses the same paths as the PR trigger. GitHub failure emails so far are all the out-of-credit error (gate correctly says 'could not run').
+- M2.15 done (see above).
 **Decisions:**
 **Blockers:** M2.5 (≥100 hand labels) must be done by the owner.
 - M2.14 (in progress): wrote `.github/workflows/ci.yml` (ruff, black, contract/fixture/prompt-lock checks, `evals validate`, pytest) and `eval-gate.yml` (PRs touching prompts/src/config/policy/evals/baseline + pushes to main: restore `.cache` with actions/cache, `evals run --tags smoke --run-id pr-smoke`, `evals gate pr-smoke`, post/update PR comment, upload report). Added `evals run --run-id`. Not yet run on GitHub.
 - M0.4: with the owner's OK, created the **private** repo `abhinav1005/CreditLens`, pushed main, and set the `ANTHROPIC_API_KEY` repo secret from .env (never printed). A pre-push scan found no key/.env/DB/cache tracked.
 - First GitHub runs: **CI passed** (38s). **Eval gate failed** because every case errored: `400 Your credit balance is too low`. Confirmed locally: the account is out of credit after about $3.85 total this session ($2.67 assistant + $1.15 judge + live tests). The gate now reports errored runs as "could not run (not a quality result)" instead of as lost cases.
 **Blockers:** (1) Owner must add API credit (console.anthropic.com → Billing). (2) M2.5: ≥100 hand labels. (3) M1.16: case review.
-**Next:** After the owner adds credit: `gh workflow run "Eval gate" --repo abhinav1005/CreditLens`, confirm it passes, then M2.15 (demo PR with v1-degraded).
+**Next:** Owner: M2.5 labels (`uv run python -m evals label --labeler abhinav`, about 120 for ~30 test items). Claude: then `calibrate-judge` (M2.7 run) and judge v2 tuned on dev (M2.8). M3 (guardrails) can start now; M2's done-when has passed.
 
 ## 2026-10-31 — Session 3 (first live run, M1 exit)
 **Done:**

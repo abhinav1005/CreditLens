@@ -1,5 +1,6 @@
 from assistant.loop import INCOMPLETE_MESSAGE, REFUSAL_MESSAGE, run_turn
 from assistant.output_filters import FilterDecision, SentenceBuffer
+from assistant.prompts import load_bundle
 from assistant.providers import ToolCall
 from assistant.providers.fake import FakeProvider, FakeTurn
 
@@ -13,7 +14,8 @@ def test_tool_then_answer():
             FakeTurn(text="Your overall utilization is 40.8%. That's above 30%."),
         ]
     )
-    result = run_turn(USER, "story_001", provider=fake)
+    # Explicit prompt bundle: unit tests check the code, not whichever prompt config.yaml selects.
+    result = run_turn(USER, "story_001", provider=fake, bundle=load_bundle("v1"))
     assert result.stop == "complete"
     assert result.final_text == "Your overall utilization is 40.8%. That's above 30%."
     assert result.tool_calls[0]["output"]["overall_utilization_pct"] == 40.8

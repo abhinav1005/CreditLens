@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project status
 
-M1 is done (first live run: `reports/history/`). M2 is next. Read `PRD.md` before starting any milestone. **PRD §14 (design decisions, including "API constraints found during the build") takes precedence over earlier PRD sections.** Keep this file in sync with the code as milestones land.
+M1 and M2 are done (M2 done-when: PR #1 blocked by the eval gate). Judge calibration waits on owner labels. M3 is next. Read `PRD.md` before starting any milestone. **PRD §14 (design decisions, including "API constraints found during the build") takes precedence over earlier PRD sections.** Keep this file in sync with the code as milestones land.
 
 ## Commands (working now)
 

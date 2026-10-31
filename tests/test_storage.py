@@ -1,4 +1,5 @@
 from assistant.loop import run_turn
+from assistant.prompts import load_bundle
 from assistant.providers import ToolCall
 from assistant.providers.fake import FakeProvider, FakeTurn
 from storage.sqlite import SQLiteStorage
@@ -12,7 +13,12 @@ def _turn():
             FakeTurn(text="Your utilization is 40.8%."),
         ]
     )
-    return run_turn([{"role": "user", "content": "utilization?"}], "story_001", provider=fake)
+    return run_turn(
+        [{"role": "user", "content": "utilization?"}],
+        "story_001",
+        provider=fake,
+        bundle=load_bundle("v1"),
+    )
 
 
 def test_round_trip(tmp_path):
