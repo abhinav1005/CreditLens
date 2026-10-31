@@ -21,6 +21,7 @@ uv run python scripts/make_fixtures.py --check     # shared tool fixtures in syn
 uv run python scripts/check_prompt_immutability.py # committed prompt files unchanged (--lock adds NEW files)
 uv run python -m evals validate                    # validate golden.jsonl, print counts
 uv run python -m evals dashboard                   # web/public/dashboard.json from reports/ (--check in CI)
+uv run python -m evals readme                      # README results tables from the same data (--check in CI)
 uv run python -m evals run --suite golden --model claude-sonnet-5-5 --prompt-version v1
 uv run uvicorn assistant.api:app --reload          # /chat (SSE), /insights/{id}, /health
 cd web && npm install && npm run dev              # React UI on :5173 (proxies /api to uvicorn on :8000)

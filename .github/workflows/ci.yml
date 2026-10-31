@@ -28,6 +28,7 @@ jobs:
           uv run python scripts/check_prompt_immutability.py
           uv run python -m evals validate
           uv run python -m evals dashboard --check
+          uv run python -m evals readme --check
       - name: Unit tests
         run: uv run pytest -q
 

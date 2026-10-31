@@ -119,7 +119,24 @@ def main(argv: list[str] | None = None) -> int:
     dash = sub.add_parser("dashboard", help="write web/public/dashboard.json from reports/")
     dash.add_argument("--check", action="store_true", help="exit 1 if the file is out of date")
 
+    rd = sub.add_parser("readme", help="regenerate the results tables in README.md")
+    rd.add_argument("--check", action="store_true", help="exit 1 if README.md is out of date")
+
     args = parser.parse_args(argv)
+
+    if args.command == "readme":
+        from evals.readme import README, is_current, write
+
+        if args.check:
+            ok = is_current()
+            print(
+                "README results are current"
+                if ok
+                else f"{README} is stale: run `python -m evals readme`"
+            )
+            return 0 if ok else 1
+        print(f"wrote {write()}")
+        return 0
 
     if args.command == "dashboard":
         from evals.dashboard import OUT, is_current, write
