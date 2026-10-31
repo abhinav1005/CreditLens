@@ -27,13 +27,15 @@ Entry format:
 - M1.7: `src/credit/tools/impl.py` (5 tools + `call_tool(name, args)`, which never raises and returns `{"error": ...}` on failure), `factor_content.py` (static education text), 21 shared fixtures in `contracts/tools/fixtures/v1.json` (`scripts/make_fixtures.py --check`), hand-checked numbers in `tests/test_tools.py`.
 - M1.8: `prompts/system/v1.md` (rules + fixed disclaimer line `_Educational information only, not financial advice._`, `{{profile_id}}` placeholder), `prompts/tools/v1.yaml` (descriptions only; schemas come from the contracts), `src/assistant/prompts.py` (`load_bundle()`, `content_hash`), `scripts/check_prompt_immutability.py` with `prompts/prompts.lock.json`. **v1 files are now locked: any prompt change means v2.**
 - M1.9: `config.yaml` (models, effort per route, eval limits), `config/pricing.yaml` (as_of 2026-10-06; Sonnet 5.5 $2/$10, Haiku 5.5 $0.10/$0.50, Haiku 4.5 $1/$5; cache write 1.25×, read 0.1×), `src/assistant/config.py` (`load_config`, `load_pricing`, `Usage`, `request_cost`).
+- M1.10: `src/assistant/providers/`: `base.py` (neutral `ProviderRequest`/`ProviderResponse`/`ToolCall`, `Provider` protocol; thinking blocks replayed via `provider_blocks`), `fake.py` (scripted `FakeProvider`), `anthropic_provider.py` (streams via SDK 2.3.0, effort per model, structured output via `output_config.format`, optional refusal fallback), `get_provider(model)`. Live smoke test written but **not yet run** (needs key).
 **Decisions:**
 - Domain code lives in `src/credit/` (factors, profile schema, scoring, months, generator, tools). `data/generate_profiles.py` will be a thin CLI wrapper.
 - Profiles have no person names at all, only ids (`p_001`, `story_001`, `inj_001`). Data window is the 12 months ending 2026-06, fixed so output doesn't depend on today's date.
 - `scripts/mark_task.sh <done_id> <next_id>` updates BUILD_STATUS.md.
 - **API constraints** (in PRD §14): there's no temperature 0 (sampling params return a 400), so reproducibility comes from the cache; no forced `tool_choice` on Sonnet 5.5, so insight cards use `output_config.format`; set `effort` per route; Haiku 4.5 has no effort param.
-**Blockers:** M0.2 (API key) is with the owner. Not needed until M1.10's live smoke call. M0.4 (GitHub repo) is deferred to M2.14.
-**Next:** M1.10: `Provider` protocol + `FakeProvider` + `AnthropicProvider` in `src/assistant/providers/`. Read the claude-api skill's `python/claude-api/tool-use.md` (manual loop) and `streaming.md` first. The live smoke call waits on M0.2.
+- Sonnet 5.5 has `refusal_fallback: true` (server-side `fallbacks: "default"`, beta `server-side-fallback-2026-07-01`), so a refused request is re-run on a fallback model. `served_model` is recorded on every response so evals can see when this happened.
+**Blockers:** M0.2 (API key) is with the owner. Live tests (`@pytest.mark.live`) are skipped until then. Run them with `uv run pytest -m live` once `.env` has the key. M0.4 (GitHub repo) is deferred to M2.14.
+**Next:** M1.11: tool loop + `run_turn()` in `src/assistant/loop.py` (TurnResult with events, tool calls, usage, cost, latency; max-iterations cap; empty OutputFilter chain with sentence buffering).
 
 ## 2026-10-31 — Session 1 (planning)
 **Done:** Read PRD. Grilling session settled 46 design decisions, written to PRD.md §14 (v2) and CLAUDE.md. Created BUILD_STATUS.md and BUILD_LOG.md.

@@ -30,6 +30,7 @@ packages = ["src/assistant", "src/guardrails", "src/storage", "src/credit", "eva
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src", "."]
+markers = ["live: calls a real model API (skipped without an API key)"]
 
 [tool.ruff]
 line-length = 100

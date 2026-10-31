@@ -36,6 +36,7 @@ class JudgeConfig(BaseModel):
 class ModelConfig(BaseModel):
     provider: str
     supports_effort: bool
+    refusal_fallback: bool = False  # server-side fallback on refusal (Anthropic, Sonnet 5.5)
 
 
 class StorageConfig(BaseModel):

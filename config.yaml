@@ -15,8 +15,10 @@ judge:
   effort: medium
 
 # Per-model request capabilities. Haiku 4.5 predates the effort parameter.
+# refusal_fallback: on a safety refusal the API re-runs the request on a fallback model
+# inside the same call; the served model is recorded on every response.
 models:
-  claude-sonnet-5-5: {provider: anthropic, supports_effort: true}
+  claude-sonnet-5-5: {provider: anthropic, supports_effort: true, refusal_fallback: true}
   claude-haiku-5-5: {provider: anthropic, supports_effort: true}
   claude-haiku-4-5-20251001: {provider: anthropic, supports_effort: false}
 
