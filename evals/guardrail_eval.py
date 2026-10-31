@@ -78,9 +78,11 @@ def render_pii(report: dict, split: str) -> str:
     lines = [
         f"# PII guardrail ({split} split)",
         "",
-        f"- Items: {report['n_items']} · PII values: {report['n_pii_values']} · negatives: {report['n_negatives']}",
-        f"- **Recall: {pct(report['recall'])}** (target ≥ 95%) · Precision: {pct(report['precision'])}"
-        f" · False-positive rate on negatives: {pct(report['negative_false_positive_rate'])}",
+        f"- Items: {report['n_items']} · PII values: {report['n_pii_values']}"
+        f" · negatives: {report['n_negatives']}",
+        f"- **Recall: {pct(report['recall'])}** (target ≥ 95%)",
+        f"- Precision: {pct(report['precision'])}",
+        f"- False-positive rate on negatives: {pct(report['negative_false_positive_rate'])}",
         "",
         "| Type | Recall |",
         "|---|---:|",

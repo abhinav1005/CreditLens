@@ -1,7 +1,9 @@
 # PII guardrail (test split)
 
 - Items: 64 · PII values: 58 · negatives: 12
-- **Recall: 91.4%** (target ≥ 95%) · Precision: 100.0% · False-positive rate on negatives: 0.0%
+- **Recall: 91.4%** (target ≥ 95%)
+- Precision: 100.0%
+- False-positive rate on negatives: 0.0%
 
 | Type | Recall |
 |---|---:|
