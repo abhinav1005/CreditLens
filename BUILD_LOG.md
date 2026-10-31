@@ -14,6 +14,13 @@ Entry format:
 
 ---
 
+## 2026-10-31 — Session 4 (M2)
+**Done:**
+- M2.1: `prompts/judge/v1.md` (4 dimensions: helpfulness, clarity, compliance [main], groundedness; the disclaimer is excluded since rules check it) + `evals/judge.py` (`judge_response(case, out)` → per-dimension {verdict, rationale}; schema puts rationale before verdict; pinned `config.judge.model` at effort medium; 1 retry). Live check on comp_001: all pass, $0.009 per call.
+**Decisions:**
+**Blockers:** M2.5 (≥100 hand labels) must be done by the owner.
+**Next:** M2.2
+
 ## 2026-10-31 — Session 3 (first live run, M1 exit)
 **Done:**
 - M0.2: owner added the key. It was pasted into the tracked `.env.example`; Claude moved it to gitignored `.env` (chmod 600) and restored the template. Verified the key is not in git history.
