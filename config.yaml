@@ -36,3 +36,10 @@ evals:
 gate:
   max_overall_drop_points: 5   # fail if overall pass rate drops by more than this
   max_lost_per_category: 2     # fail if any category loses this many baseline-passing cases
+
+# Guardrail pipeline (M3). Set enabled: false for "guardrails off" comparison runs.
+guardrails:
+  enabled: true
+  input: []         # run on every user message, before the model or the logs see it
+  tool_results: []  # run on tool output before it goes back to the model (indirect injection)
+  output: []        # run on the reply, sentence by sentence, before it's streamed

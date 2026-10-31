@@ -137,4 +137,6 @@ def score_completed(case: Case, out: CaseOutput) -> list[Check]:
     """A chat turn must finish normally (not hit the iteration cap or max_tokens)."""
     if case.kind != "chat":
         return []
-    return [Check("completed", "completed", out.stop in {"complete", "refusal"}, out.stop)]
+    return [
+        Check("completed", "completed", out.stop in {"complete", "refusal", "blocked"}, out.stop)
+    ]

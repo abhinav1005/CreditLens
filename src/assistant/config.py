@@ -51,6 +51,13 @@ class EvalsConfig(BaseModel):
     max_cost_usd_ci: float
 
 
+class GuardrailsConfig(BaseModel):
+    enabled: bool = True
+    input: list[str] = []
+    tool_results: list[str] = []
+    output: list[str] = []
+
+
 class GateConfig(BaseModel):
     max_overall_drop_points: float
     max_lost_per_category: int
@@ -64,6 +71,7 @@ class Config(BaseModel):
     storage: StorageConfig
     evals: EvalsConfig
     gate: GateConfig
+    guardrails: GuardrailsConfig = GuardrailsConfig()
 
     def model_config_for(self, model: str) -> ModelConfig:
         if model not in self.models:

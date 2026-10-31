@@ -60,6 +60,7 @@ def transcript_from_turn(
         events=result.events,
         tool_calls=result.tool_calls,
         filter_decisions=result.filter_decisions,
+        guardrail_decisions=result.guardrail_decisions,
         final_text=result.final_text,
         stop=result.stop,
         usage=result.usage,

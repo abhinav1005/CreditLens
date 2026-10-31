@@ -107,6 +107,7 @@ def _execute(case: Case, model: str, config: Config, provider: Provider) -> dict
             "latency_ms": r.latency_ms,
             "ttft_ms": r.ttft_ms,
             "served_models": r.served_models,
+            "guardrail_decisions": r.guardrail_decisions,
         }
     r = generate_insights(
         case.profile_id,
@@ -309,6 +310,7 @@ def run_suite(
             "latency_ms": record["latency_ms"],
             "ttft_ms": record["ttft_ms"],
             "served_models": record["served_models"],
+            "guardrail_decisions": record.get("guardrail_decisions", []),
             "cache_hit": hit,
             "cache_key": key,
             "judge": judge_record["verdicts"] if judge_record else None,

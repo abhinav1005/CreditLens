@@ -24,8 +24,23 @@ from assistant.prompts import PromptBundle, load_bundle
 from assistant.providers import Provider, ProviderRequest, get_provider
 from credit.tools.contracts import ToolError, ToolErrorCode
 from credit.tools.impl import call_tool
+from guardrails.pipeline import GuardrailSet, run_pipeline
+from guardrails.registry import build_guardrails
 
 REFUSAL_MESSAGE = "Sorry, I can't help with that. I'm happy to answer questions about your credit."
+DEFAULT_BLOCK_MESSAGE = (
+    "Sorry, I can't help with that request. I'm happy to answer questions about your credit."
+)
+# Per-guardrail replies when an input is blocked (filled in as guardrails land).
+BLOCK_MESSAGES: dict[str, str] = {}
+WITHHELD_TOOL_RESULT = json.dumps(
+    {
+        "error": {
+            "error_code": "WITHHELD",
+            "message": "This tool result was withheld by a safety check.",
+        }
+    }
+)
 INCOMPLETE_MESSAGE = (
     "Sorry, I couldn't finish looking that up. Could you try asking in a simpler way?"
 )
@@ -54,6 +69,7 @@ class TurnResult:
     pricing_as_of: str
     retracted: bool = False
     model_requests: int = 0
+    guardrail_decisions: list[dict] = field(default_factory=list)
     extra: dict = field(default_factory=dict)
 
 
@@ -78,6 +94,7 @@ def run_turn(
     output_filters: list[OutputFilter] | None = None,
     on_event: EventCallback | None = None,
     model: str | None = None,
+    guardrails: GuardrailSet | None = None,
 ) -> TurnResult:
     if not conversation or conversation[-1]["role"] != "user":
         raise ValueError("conversation must end with a user message")
@@ -87,11 +104,12 @@ def run_turn(
     bundle = bundle or load_bundle(
         config.assistant.system_prompt_version, config.assistant.tools_prompt_version
     )
-    filters = output_filters or []
+    guards = guardrails if guardrails is not None else build_guardrails(config)
+    # Output guardrails run as sentence filters, ahead of any extra filters passed in.
+    filters = [GuardrailOutputFilter(g) for g in guards.output] + (output_filters or [])
     pricing = load_pricing()
     context = {"profile_id": profile_id}
 
-    messages = list(conversation)
     events: list[dict] = []
     emitted: list[str] = []
     decisions: list[FilterDecision] = []
@@ -127,9 +145,27 @@ def run_turn(
             chunk = "\n\n" + chunk.lstrip()
         send_sentences(buffer.feed(chunk))
 
+    # Input guardrails. Every user message is redacted before the model or the logs see it
+    # (earlier turns too, so history sent from a client is covered). Only the newest message
+    # can be blocked, and only its decisions are logged (earlier ones were logged then).
+    guard_decisions: list[dict] = []
+    blocked_by = None
+    messages = []
+    for i, m in enumerate(conversation):
+        if m["role"] == "user":
+            outcome = run_pipeline(guards.input, m["content"], context, "input")
+            if i == len(conversation) - 1:
+                guard_decisions += outcome.decisions
+                blocked_by = outcome.blocked_by
+            m = {**m, "content": outcome.text}
+        messages.append(m)
+
     stop = "max_iterations"
     iterations = 0
-    while iterations < config.assistant.max_tool_iterations:
+    if blocked_by is not None:
+        stop = "blocked"
+        send_sentences([BLOCK_MESSAGES.get(blocked_by.name, DEFAULT_BLOCK_MESSAGE)])
+    while stop != "blocked" and iterations < config.assistant.max_tool_iterations:
         iterations += 1
         request = ProviderRequest(
             model=model,
@@ -164,9 +200,17 @@ def run_turn(
             is_error = "error" in output
             tool_calls.append({**call.to_dict(), "output": output, "is_error": is_error})
             emit({"type": "tool_result", "id": call.id, "name": call.name, "is_error": is_error})
-            results.append(
-                {"tool_call_id": call.id, "content": json.dumps(output), "is_error": is_error}
+            # Tool results are untrusted input (indirect injection): guard them before the
+            # model reads them. The original output stays in tool_calls for scoring.
+            outcome = run_pipeline(
+                guards.tool_results,
+                json.dumps(output),
+                {**context, "tool": call.name},
+                "tool_result",
             )
+            guard_decisions += [{**d, "tool": call.name} for d in outcome.decisions]
+            content = WITHHELD_TOOL_RESULT if outcome.blocked else outcome.text
+            results.append({"tool_call_id": call.id, "content": content, "is_error": is_error})
         messages.append({"role": "tool", "results": results})
 
     if stop == "refusal" and not emitted:
@@ -194,6 +238,7 @@ def run_turn(
         events=events,
         tool_calls=tool_calls,
         filter_decisions=[d.__dict__ for d in decisions],
+        guardrail_decisions=guard_decisions,
         usage=usage,
         cost_usd=cost,
         latency_ms=(time.perf_counter() - start) * 1000,
@@ -207,3 +252,21 @@ def run_turn(
         retracted=retracted,
         model_requests=len(served),
     )
+
+
+class GuardrailOutputFilter:
+    """Adapts an output guardrail to the sentence filter chain."""
+
+    def __init__(self, guard):
+        self.guard = guard
+        self.name = guard.name
+
+    def check_sentence(self, sentence: str, context: dict) -> FilterDecision:
+        r = self.guard.check(sentence, {**context, "stage": "output"})
+        action = {"pass": "pass", "redact": "rewrite", "rewrite": "rewrite", "block": "block"}[
+            r.action
+        ]
+        return FilterDecision(action, r.text, self.name, r.reasons)
+
+    def check_final(self, full_text: str, context: dict) -> FilterDecision:
+        return FilterDecision("pass", filter_name=self.name)

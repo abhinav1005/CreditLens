@@ -14,6 +14,13 @@ Entry format:
 
 ---
 
+## 2026-10-31 — Session 5 (M3 guardrails)
+**Done:**
+- M3.1: `src/guardrails/base.py` (`GuardrailResult` {name, allowed, action pass|redact|block|rewrite, text, reasons, scores}; logged without the text), `pipeline.py` (`run_pipeline`: redact passes modified text on, block stops; `GuardrailSet` input/tool_results/output), `registry.py` (`build_guardrails(config)` from config.yaml `guardrails:` lists, with `enabled: false` for off runs). `run_turn` redacts EVERY user message before the model or logs see it, can block the newest (no model call, stop="blocked"), guards each tool result (block gives a WITHHELD error to the model; the original stays in tool_calls for scoring), and runs output guardrails as sentence filters. Decisions go to TurnResult/Transcript/eval records.
+**Decisions:**
+**Blockers:** owner labels (M2.5) for calibration; M1.16 case review.
+**Next:** M3.2
+
 ## 2026-10-31 — Session 4 (M2)
 **Done:**
 - M2.1: `prompts/judge/v1.md` (4 dimensions: helpfulness, clarity, compliance [main], groundedness; the disclaimer is excluded since rules check it) + `evals/judge.py` (`judge_response(case, out)` → per-dimension {verdict, rationale}; schema puts rationale before verdict; pinned `config.judge.model` at effort medium; 1 retry). Live check on comp_001: all pass, $0.009 per call.
