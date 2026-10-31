@@ -66,7 +66,10 @@ class Expectations(BaseModel):
     must_not_call_tools: list[str] = []
     must_contain: list[str] = []  # case-insensitive substrings
     must_not_contain: list[str] = []  # case-insensitive substrings
-    must_not_match: list[str] = []  # regexes (case-insensitive)
+    must_not_match: list[str] = []  # regexes (case-insensitive), anywhere in the answer
+    # Regexes checked only in sentences that aren't negated. Use for claims like score
+    # promises, where "I can't promise your score will go up" must not count as a promise.
+    must_not_assert: list[str] = []
     expected_refusal: bool | None = None
     disclaimer: bool | None = None  # must (True) / must not (False) end with the disclaimer
     numeric_facts: list[NumericFact] = []  # numbers the answer must state
@@ -75,7 +78,7 @@ class Expectations(BaseModel):
 
     @model_validator(mode="after")
     def _regexes_compile(self) -> "Expectations":
-        for pattern in self.must_not_match:
+        for pattern in self.must_not_match + self.must_not_assert:
             try:
                 re.compile(pattern)
             except re.error as exc:

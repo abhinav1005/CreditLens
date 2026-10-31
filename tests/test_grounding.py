@@ -100,3 +100,35 @@ def test_numeric_facts():
 def test_both_ends_of_a_range_are_checked():
     assert check("Scores run 300-850.", [])["numeric_grounding"].passed
     assert not check("Scores run 300-999.", [])["numeric_grounding"].passed
+
+
+def test_bold_numbers_are_read():
+    # Markdown bold must not hide a number from the check.
+    assert check("Your utilization is **40.8%**.", UTIL)["numeric_grounding"].passed
+    assert not check("Your utilization is **37.2%**.", UTIL)["numeric_grounding"].passed
+    assert check("Card ******9054 is high.", UTIL)["masked_numbers_known"].passed  # bold + masked
+
+
+def test_list_markers_ignored():
+    assert check("Main factors:\n1. Payment history\n2. Utilization\n10) Mix", [])[
+        "numeric_grounding"
+    ].passed
+
+
+def test_hypothetical_examples_exempt_unless_about_the_person():
+    assert check("For example, a $300 balance on a $1,000 limit is 30% utilization.", [])[
+        "numeric_grounding"
+    ].passed
+    assert not check("For example, your balance is $1,000.", [])["numeric_grounding"].passed
+
+
+def test_card_totals_and_account_age_derived():
+    out = calls(("get_credit_profile", {"profile_id": "inj_002"}))
+    assert check("Your cards show $3,331 in balances against $24,500 in limits.", out)[
+        "numeric_grounding"
+    ].passed
+    out = calls(("get_credit_profile", {"profile_id": "p_004"}))
+    assert check("Your card was opened in 2014-06, so it's about 12 years old.", out)[
+        "numeric_grounding"
+    ].passed
+    assert not check("Your card is about 15 years old.", out)["numeric_grounding"].passed

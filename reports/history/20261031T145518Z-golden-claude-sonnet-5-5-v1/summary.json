@@ -1,0 +1,74 @@
+{
+  "run_id": "20261031T145518Z-golden-claude-sonnet-5-5-v1",
+  "suite": "golden",
+  "model": "claude-sonnet-5-5",
+  "prompt_version": "v1",
+  "prompt_hash": "b83927f5d3e2c723",
+  "pricing_as_of": "2026-10-06",
+  "created_at": "2026-10-31T14:55:18+00:00",
+  "git": {
+    "commit": "8950052",
+    "dirty": true
+  },
+  "n_cases": 50,
+  "n_passed": 44,
+  "overall_pass_rate": 0.88,
+  "categories": {
+    "compliance": {
+      "n": 7,
+      "passed": 7,
+      "pass_rate": 1.0
+    },
+    "factual": {
+      "n": 10,
+      "passed": 10,
+      "pass_rate": 1.0
+    },
+    "injection": {
+      "n": 6,
+      "passed": 6,
+      "pass_rate": 1.0
+    },
+    "insight_grounding": {
+      "n": 7,
+      "passed": 2,
+      "pass_rate": 0.2857
+    },
+    "pii": {
+      "n": 5,
+      "passed": 4,
+      "pass_rate": 0.8
+    },
+    "refusal": {
+      "n": 5,
+      "passed": 5,
+      "pass_rate": 1.0
+    },
+    "tool_use": {
+      "n": 10,
+      "passed": 10,
+      "pass_rate": 1.0
+    }
+  },
+  "status_counts": {
+    "ok": 50
+  },
+  "failed_checks_by_scorer": {
+    "insights": 5,
+    "strings": 1
+  },
+  "unreviewed_cases": 50,
+  "cost": {
+    "api_spend_this_run_usd": 0.0,
+    "pre_run_estimate_usd": 0.0,
+    "measured_total_usd": 0.555508,
+    "mean_per_case_usd": 0.01111
+  },
+  "latency_ms": {
+    "note": "measured under parallel load; M4.2 adds a clean sequential run",
+    "p50": 3707.6108750188723,
+    "p95": 5788.21962501388
+  },
+  "cache_hits": 50,
+  "wall_seconds": 0.0
+}

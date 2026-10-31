@@ -6,13 +6,17 @@ policy/constants.yaml) any of:
 2. a month string from a tool result ("2026-04" grounds 2026 and 4)
 3. the length of a list in a tool result (e.g. number of accounts)
 4. a difference between two values of the same field across items of one list
-   (e.g. two months of score history), or a *_before / *_after pair
+   (e.g. two months of score history), or a *_before / *_after pair; the total of a field
+   across a list, overall or per account type (e.g. all credit-card balances); an account's
+   age as of the data month (months, or years rounded either way)
 5. utilization recomputed as balance ÷ limit (as a percentage)
 6. a number the user wrote in the conversation
 7. an allowed educational constant from policy/constants.yaml, written with the same
    unit (a "12 months" constant does not ground "12%")
 
-Anything else counts as ungrounded and fails the check.
+Not checked: markdown list numbering ("1. "), and sentences that are explicitly hypothetical
+examples ("For example, a $300 balance on a $1,000 limit is 30%") as long as they don't
+mention "your"/"you have". Anything else counts as ungrounded and fails the check.
 """
 
 import json
@@ -23,6 +27,7 @@ from pathlib import Path
 
 import yaml
 
+from credit.months import months_between
 from evals.cases import Case
 from evals.scorers.base import CaseOutput, Check
 
@@ -38,9 +43,31 @@ FREE_TEXT_FIELDS = {
 }
 MONTH = re.compile(r"\b(\d{4})-(\d{2})\b")
 MASKED = re.compile(r"\*{4}\d{4}")
-# A number not glued to a word, underscore, asterisk or hyphen (skips acc_03, ****4821, p_001).
-# Hyphens are NOT excluded, so both ends of a range like "300-999" get checked.
-NUMBER = re.compile(r"(?<![\w*.])(\d{1,3}(?:,\d{3})+|\d+)(\.\d+)?(?![\w])")
+# A number not glued to a word or underscore (skips acc_03, p_001). Masked account numbers
+# are removed before this runs, so markdown bold like **40.8%** is still read. Hyphens are
+# not excluded, so both ends of a range like "300-999" get checked.
+NUMBER = re.compile(r"(?<![\w.])(\d{1,3}(?:,\d{3})+|\d+)(\.\d+)?(?![\w])")
+# Markdown numbered-list markers ("1. ", "2) ") at the start of a line are not claims.
+LIST_MARKER = re.compile(r"^(\s*)\d+[.)](?=\s)", re.M)
+# A sentence that is explicitly a hypothetical example ("For example, a $300 balance on a
+# $1,000 limit...") makes no claim about the person, so it is exempt UNLESS it also talks
+# about "your"/"you have", which would make it a claim about them.
+EXAMPLE_MARKERS = re.compile(
+    r"\b(for example|for instance|e\.g\.|say you|imagine|suppose|if you had)\b", re.I
+)
+ABOUT_THE_PERSON = re.compile(r"\b(your|you have|you've|you owe)\b", re.I)
+SENTENCE_SPLIT = re.compile(r"(?<=[.!?])\s+|\n+")
+
+
+def strip_hypotheticals(text: str) -> str:
+    kept = [
+        s
+        for s in SENTENCE_SPLIT.split(text)
+        if not (EXAMPLE_MARKERS.search(s) and not ABOUT_THE_PERSON.search(s))
+    ]
+    return "\n".join(kept)
+
+
 UNIT_AFTER = [
     ("percent", re.compile(r"\s?(%|percent)", re.I)),
     ("years", re.compile(r"[\s-]?years?\b", re.I)),
@@ -73,6 +100,7 @@ def extract_numbers(text: str) -> list[tuple[float, int, str]]:
 
 def extract_numbers_with_units(text: str) -> list[tuple[float, int, str, str]]:
     text = MASKED.sub(" ", text)
+    text = LIST_MARKER.sub(r"\1", text)
     found = []
     for year, month in MONTH.findall(text):
         found.append((float(year), 0, f"{year}-{month}", "none"))
@@ -122,6 +150,28 @@ def _walk(node, key: str | None, values: set[float]) -> None:
             series = [i[field] for i in dict_items if isinstance(i.get(field), int | float)]
             for a, b in combinations(series, 2):
                 values.add(abs(float(a) - float(b)))
+            # Totals: across all items, and per account type (e.g. all credit-card balances).
+            values.add(float(sum(series)))
+            for t in {i.get("type") for i in dict_items if i.get("type")}:
+                values.add(
+                    float(
+                        sum(
+                            i[field]
+                            for i in dict_items
+                            if i.get("type") == t and isinstance(i.get(field), int | float)
+                        )
+                    )
+                )
+
+
+def _account_ages(output: dict, values: set[float]) -> None:
+    """Age of each account as of the data month, in months and in whole/rounded years."""
+    as_of = output.get("as_of") if isinstance(output, dict) else None
+    if not as_of:
+        return
+    for account in output.get("accounts", []):
+        months = months_between(account["opened"], as_of)
+        values.update({float(months), float(months // 12), float(round(months / 12))})
 
 
 def grounded_values(case: Case, out: CaseOutput) -> set[float]:
@@ -129,6 +179,7 @@ def grounded_values(case: Case, out: CaseOutput) -> set[float]:
     values: set[float] = set()
     for call in out.tool_calls:
         _walk(call.get("output", {}), None, values)
+        _account_ages(call.get("output", {}), values)
     # Tool results inside the case's fixed earlier turns count too.
     for m in case.conversation:
         if m.get("role") == "user":
@@ -162,7 +213,7 @@ def score_grounding(case: Case, out: CaseOutput) -> list[Check]:
     constants = allowed_constants()
     ungrounded = [
         raw
-        for value, dec, raw, unit in extract_numbers_with_units(text)
+        for value, dec, raw, unit in extract_numbers_with_units(strip_hypotheticals(text))
         if not is_grounded(value, dec, candidates)
         and not is_grounded(value, dec, constants.get(unit, set()))
     ]

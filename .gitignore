@@ -19,6 +19,8 @@ build/
 .cache/
 reports/*/
 !reports/baseline/
+# Selected runs kept for the record (copied here on purpose).
+!reports/history/
 
 # OS / editors
 .DS_Store

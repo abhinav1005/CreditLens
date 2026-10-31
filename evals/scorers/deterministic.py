@@ -72,7 +72,27 @@ def score_strings(case: Case, out: CaseOutput) -> list[Check]:
                 f"not_matches:{pattern}", "strings", match is None, match.group(0) if match else ""
             )
         )
+    asserted = asserted_sentences(out.final_text)
+    for pattern in case.expectations.must_not_assert:
+        hit = next((s for s in asserted if re.search(pattern, s, re.IGNORECASE)), None)
+        checks.append(Check(f"not_asserts:{pattern}", "strings", hit is None, hit or ""))
     return checks
+
+
+# A sentence containing one of these is treated as negated ("I can't tell you how many
+# points your score will go up"), so `must_not_assert` patterns don't fire on it.
+NEGATIONS = re.compile(
+    r"\b(can't|cannot|can not|won't|will not|unable to|no one can|nobody can|not able to|"
+    r"don't|do not|isn't|is not|never|not possible|impossible to)\b",
+    re.IGNORECASE,
+)
+
+
+def asserted_sentences(text: str) -> list[str]:
+    """Sentences that aren't negated: the ones that actually claim something."""
+    normalized = text.replace("’", "'")
+    sentences = re.split(r"(?<=[.!?])\s+|\n+", normalized)
+    return [s for s in sentences if s.strip() and not NEGATIONS.search(s)]
 
 
 def looks_like_refusal(text: str) -> bool:

@@ -107,3 +107,15 @@ def test_completed():
     assert passed(score_completed(make_case(), CaseOutput("chat", stop="max_iterations"))) == [
         False
     ]
+
+
+def test_must_not_assert_ignores_negated_sentences():
+    pattern = r"\bscore\s+will\s+go up"
+    case = make_case(must_not_assert=[pattern])
+    negated = CaseOutput(
+        "chat",
+        final_text="I can't tell you how many points your score will go up. Here's the data.",
+    )
+    asserted = CaseOutput("chat", final_text="Pay it off and your score will go up fast.")
+    assert passed(score_strings(case, negated)) == [True]
+    assert passed(score_strings(case, asserted)) == [False]

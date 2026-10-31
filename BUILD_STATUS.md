@@ -5,8 +5,8 @@ Specs: `PRD.md` (§14 takes precedence). History and notes: `BUILD_LOG.md`.
 
 **Legend:** `[ ]` todo · `[~]` in progress · `[x]` done · `[!]` blocked (reason in log) · 👤 = needs the owner (Abhinav)
 
-**Current milestone:** M1 (M0.2 and M0.4 pending, owner)
-**Next task:** M1.22 (BLOCKED on M0.2: API key). Owner: M1.16 review.
+**Current milestone:** M2 (M1 done-when passed 2026-10-31; owner still to review cases, M1.16)
+**Next task:** M2.1 (judge rubric + module). Owner: M1.16 case review.
 
 Each task is one small, reviewable commit. "Check" is how we know it's done.
 
@@ -17,7 +17,7 @@ Each task is one small, reviewable commit. "Check" is how we know it's done.
 | ID | Status | Task | Check |
 |---|---|---|---|
 | M0.1 👤 | [x] | Install `uv` (`curl -LsSf https://astral.sh/uv/install.sh \| sh`) | `uv --version` works |
-| M0.2 👤 | [ ] | Create Anthropic API key, put it in `.env` as `ANTHROPIC_API_KEY`, set a monthly spend limit in the console | Key in `.env` (never committed) |
+| M0.2 👤 | [x] | Create Anthropic API key, put it in `.env` as `ANTHROPIC_API_KEY`, set a monthly spend limit in the console | Key in `.env` (never committed) |
 | M0.3 | [x] | `git init`, `.gitignore`, `.env.example`, `pyproject.toml` (Python 3.12 via uv; fastapi, pydantic, anthropic, pyyaml, pytest, ruff, black), folder skeleton per PRD §9 | `uv run pytest` and `uv run ruff check .` pass |
 | M0.4 👤 | [ ] | Create a GitHub repo (private ok). Claude can run `gh repo create` once you approve | `git push` works. Needed by M2.14. |
 
@@ -65,7 +65,7 @@ Each task is one small, reviewable commit. "Check" is how we know it's done.
 | M1.19 | [x] | Numeric grounding scorer + `policy/constants.yaml` (tolerance, series differences, balance ÷ limit) | Unit tests incl. derived-number cases |
 | M1.20 | [x] | Insight-card evidence scorer (evidence must match actual tool calls; `factor_code` in top factors) | Unit tests |
 | M1.21 | [x] | `python -m evals run`: parallel, content-hash cache, `--max-cost-usd`, writes `results.jsonl` / `summary.json` / `report.md` | Second run hits cache at $0 |
-| M1.22 | [ ] | **M1 exit:** live run on `claude-sonnet-5-5`, commit report, update CLAUDE.md commands | Done-when passes |
+| M1.22 | [x] | **M1 exit:** live run on `claude-sonnet-5-5`, commit report, update CLAUDE.md commands | Done-when passes |
 
 ## M2 — Judge, calibration, CI gate
 

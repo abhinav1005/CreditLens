@@ -14,6 +14,15 @@ Entry format:
 
 ---
 
+## 2026-10-31 — Session 3 (first live run, M1 exit)
+**Done:**
+- M0.2: owner added the key. It was pasted into the tracked `.env.example`; Claude moved it to gitignored `.env` (chmod 600) and restored the template. Verified the key is not in git history.
+- Live tests pass (`uv run pytest -m live`): Haiku 5.5 tool call, insight cards validate.
+- M1.22: first full golden run on `claude-sonnet-5-5`, prompt v1, $0.5555 measured. First result 34/50. Inspecting the failing answers showed most were scorer bugs, all fixed with tests: bold markdown hid numbers (`**40.8%**`, also a loophole), month strings in card evidence weren't compared, list numbering read as claims, correct totals/ages not recognized, negated promise sentences flagged (new `must_not_assert`, negation-aware; promise patterns moved there), card summaries didn't use the constants allowlist. Judgment call: explicit hypothetical-example sentences without "your" are exempt from grounding; constants v3 adds 180 days (charge-off). Rescored from cache at $0: **44/50**. Committed at `reports/history/20261031T145518Z-golden-claude-sonnet-5-5-v1/`.
+**Remaining real failures (6):** pii_003 echoed the user's email (M3 PII redaction). ins_003-ins_007: card summaries cite numbers (months, counts) not listed in that card's evidence, which breaks the FR-1.3 rule. A likely fix is `prompts/insights/v2.md` telling the model to add the month/count fields as evidence, measured with a rerun.
+**Caveat:** all 50 cases are still `llm_drafted` (unreviewed), so 44/50 is not a reportable number yet.
+**Next:** M2.1, the judge rubric `prompts/judge/v1.md` and `evals/judge.py` (pinned Sonnet 5.5, pass/fail per dimension with rationale first, structured output).
+
 ## 2026-10-31 — Session 2 (build)
 **Done:**
 - M0.1: installed uv 0.13.6 + Python 3.12.16 (owner said to do everything).

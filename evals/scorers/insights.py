@@ -11,7 +11,12 @@ For each card:
 
 from evals.cases import Case
 from evals.scorers.base import CaseOutput, Check
-from evals.scorers.grounding import extract_numbers, is_grounded
+from evals.scorers.grounding import (
+    allowed_constants,
+    extract_numbers,
+    extract_numbers_with_units,
+    is_grounded,
+)
 
 _MISSING = object()
 
@@ -49,14 +54,18 @@ def score_insight_cards(case: Case, out: CaseOutput) -> list[Check]:
     for i, card in enumerate(out.cards):
         evidence_values = set()
         for e in card["evidence"]:
-            try:
+            if isinstance(e["value"], str):
+                # e.g. "2026-04" grounds the 2026 and 4 that extract_numbers finds in "2026-04"
+                evidence_values.update(v for v, _, _ in extract_numbers(e["value"]))
+            else:
                 evidence_values.add(float(e["value"]))
-            except (TypeError, ValueError):
-                pass
+        # Same unit-aware constant allowlist as chat answers ("12 months" is fine).
+        constants = allowed_constants()
         missing = [
             raw
-            for v, d, raw in extract_numbers(card["summary"])
+            for v, d, raw, unit in extract_numbers_with_units(card["summary"])
             if not is_grounded(v, d, evidence_values)
+            and not is_grounded(v, d, constants.get(unit, set()))
         ]
         checks.append(
             Check(

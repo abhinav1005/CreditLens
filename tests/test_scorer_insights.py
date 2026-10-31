@@ -98,3 +98,32 @@ def test_evidence_from_uncalled_tool():
 def test_factor_must_be_top_factor():
     ev = [{"tool": "get_utilization", "field": "overall_utilization_pct", "value": 40.8}]
     assert not run([card("40.8%", ev, factor="DEROGATORY")])["card0:factor_in_top_factors"].passed
+
+
+def test_month_evidence_grounds_month_in_summary():
+    r = run(
+        [
+            card(
+                "Your newest account was opened in 2026-04.",
+                [
+                    {
+                        "tool": "get_credit_profile",
+                        "field": "accounts.2.opened",
+                        "value": "2026-04",
+                    },
+                ],
+                factor="ACCOUNT_AGE",
+            )
+        ]
+    )
+    assert r["card0:summary_in_evidence"].passed and r["card0:evidence_matches_tools"].passed
+
+
+def test_constants_allowed_in_summaries_but_counts_need_evidence():
+    ev = [{"tool": "get_utilization", "field": "overall_utilization_pct", "value": 40.8}]
+    assert run([card("Utilization is 40.8%; inquiries count for 12 months.", ev)])[
+        "card0:summary_in_evidence"
+    ].passed
+    assert not run([card("Utilization is 40.8% across 2 cards.", ev)])[
+        "card0:summary_in_evidence"
+    ].passed

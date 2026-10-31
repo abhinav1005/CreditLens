@@ -6,7 +6,7 @@
 #   percent: "30%"    years: "7 years"    months: "12 months"    days: "60 days"
 #   none: a bare number ("between 300 and 850")
 # So "12 months" is allowed, but "12%" is not grounded by the 12-month constant.
-version: v2
+version: v3
 allowed_numbers:
   - {value: 30, unit: percent, why: "common guideline: keep utilization under 30%"}
   - {value: 10, unit: percent, why: "under 10% utilization is often cited as better"}
@@ -16,6 +16,7 @@ allowed_numbers:
   - {value: 30, unit: days, why: "30 days late (payment lateness bucket)"}
   - {value: 60, unit: days, why: "60 days late"}
   - {value: 90, unit: days, why: "90 days late"}
+  - {value: 180, unit: days, why: "accounts are typically charged off after about 180 days of missed payments"}
   - {value: 7, unit: years, why: "late payments and collections can stay on a report about 7 years"}
   - {value: 2, unit: years, why: "hard inquiries stay on a report about 2 years"}
   - {value: 12, unit: months, why: "12-month windows (inquiries, score history)"}
