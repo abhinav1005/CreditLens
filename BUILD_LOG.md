@@ -26,12 +26,14 @@ Entry format:
 - M1.6: `src/credit/tools/contracts.py` (inputs, outputs, `ToolError`, `TOOL_CONTRACTS` registry), exported to `contracts/tools/*.json` by `scripts/export_contracts.py` (`--check` mode for CI). `simulate_payoff` output carries a fixed no-score-promise note.
 - M1.7: `src/credit/tools/impl.py` (5 tools + `call_tool(name, args)`, which never raises and returns `{"error": ...}` on failure), `factor_content.py` (static education text), 21 shared fixtures in `contracts/tools/fixtures/v1.json` (`scripts/make_fixtures.py --check`), hand-checked numbers in `tests/test_tools.py`.
 - M1.8: `prompts/system/v1.md` (rules + fixed disclaimer line `_Educational information only, not financial advice._`, `{{profile_id}}` placeholder), `prompts/tools/v1.yaml` (descriptions only; schemas come from the contracts), `src/assistant/prompts.py` (`load_bundle()`, `content_hash`), `scripts/check_prompt_immutability.py` with `prompts/prompts.lock.json`. **v1 files are now locked: any prompt change means v2.**
+- M1.9: `config.yaml` (models, effort per route, eval limits), `config/pricing.yaml` (as_of 2026-10-06; Sonnet 5.5 $2/$10, Haiku 5.5 $0.10/$0.50, Haiku 4.5 $1/$5; cache write 1.25×, read 0.1×), `src/assistant/config.py` (`load_config`, `load_pricing`, `Usage`, `request_cost`).
 **Decisions:**
 - Domain code lives in `src/credit/` (factors, profile schema, scoring, months, generator, tools). `data/generate_profiles.py` will be a thin CLI wrapper.
 - Profiles have no person names at all, only ids (`p_001`, `story_001`, `inj_001`). Data window is the 12 months ending 2026-06, fixed so output doesn't depend on today's date.
 - `scripts/mark_task.sh <done_id> <next_id>` updates BUILD_STATUS.md.
+- **API constraints** (in PRD §14): there's no temperature 0 (sampling params return a 400), so reproducibility comes from the cache; no forced `tool_choice` on Sonnet 5.5, so insight cards use `output_config.format`; set `effort` per route; Haiku 4.5 has no effort param.
 **Blockers:** M0.2 (API key) is with the owner. Not needed until M1.10's live smoke call. M0.4 (GitHub repo) is deferred to M2.14.
-**Next:** M1.9: `config.yaml`, `config/pricing.yaml` (with `as_of`), and the loader in `src/assistant/config.py`.
+**Next:** M1.10: `Provider` protocol + `FakeProvider` + `AnthropicProvider` in `src/assistant/providers/`. Read the claude-api skill's `python/claude-api/tool-use.md` (manual loop) and `streaming.md` first. The live smoke call waits on M0.2.
 
 ## 2026-10-31 — Session 1 (planning)
 **Done:** Read PRD. Grilling session settled 46 design decisions, written to PRD.md §14 (v2) and CLAUDE.md. Created BUILD_STATUS.md and BUILD_LOG.md.

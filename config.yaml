@@ -1,0 +1,30 @@
+# CreditLens runtime config. Secrets come from env vars (.env), never from here.
+assistant:
+  model: claude-sonnet-5-5
+  system_prompt_version: v1
+  tools_prompt_version: v1
+  max_tokens: 16000
+  max_tool_iterations: 6
+  effort: low            # chat route; see PRD §14 (API notes)
+
+routing:
+  cheap_model: claude-haiku-5-5
+
+judge:
+  model: claude-sonnet-5-5   # pinned; the calibrated judge
+  effort: medium
+
+# Per-model request capabilities. Haiku 4.5 predates the effort parameter.
+models:
+  claude-sonnet-5-5: {provider: anthropic, supports_effort: true}
+  claude-haiku-5-5: {provider: anthropic, supports_effort: true}
+  claude-haiku-4-5-20251001: {provider: anthropic, supports_effort: false}
+
+storage:
+  sqlite_path: .cache/creditlens.sqlite
+
+evals:
+  response_cache_dir: .cache/responses
+  concurrency: 4
+  max_cost_usd_local: 5.0
+  max_cost_usd_ci: 1.0

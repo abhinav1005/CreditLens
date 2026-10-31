@@ -399,3 +399,10 @@ These take precedence over earlier sections where they conflict.
 
 ### Storage
 - `Storage` interface: `put`, `get(id)`, `list(date_range, limit)`; callers filter. SQLite only in the core plan.
+
+### API constraints found during the build (2026-10-31)
+These replace the matching decisions above. Source: Claude API reference, checked while writing config.
+- **No temperature 0.** Since API version 2026-10-21, `temperature`/`top_p`/`top_k` return a 400 on every model. Eval reproducibility comes from the content-hash response cache: an unchanged case is never re-sampled. Run-to-run noise on changed inputs is handled by the gate rule (a regression is ≥2 previously passing cases lost in a category), plus the overall-drop threshold.
+- **No forced tool calls on Sonnet 5.5** (`tool_choice` `any`/`tool` return a 400). Insight cards use structured outputs (`output_config.format`) validated by Pydantic, with one retry. The tool loop runs first to gather data, then one structured-output call writes the cards.
+- **Effort, not thinking budgets.** Sonnet 5.5 and Haiku 5.5 run adaptive thinking; depth is set with `output_config.effort` (chat route `low`, judge `medium`, both in `config.yaml`). Haiku 4.5 has no `effort` parameter, so the provider skips it via `supports_effort: false`. Thinking blocks returned during a tool loop are passed back unchanged.
+- **Prompt caching minimum** is 512 tokens on Sonnet 5.5 / Haiku 5.5 and 4096 on Haiku 4.5, so caching may not apply to Haiku 4.5 at all. M4.4 reports what actually happened.

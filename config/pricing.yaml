@@ -1,0 +1,27 @@
+# USD per million tokens. Every eval report records `as_of` so old reports can be repriced.
+# Source: Claude API model/pricing reference (claude-api skill, cached 2026-10-06).
+# Cache write = 1.25x input (5-minute TTL); cache read = 0.1x input.
+as_of: "2026-10-06"
+models:
+  claude-sonnet-5-5:
+    input: 2.00
+    output: 10.00
+    cache_write: 2.50
+    cache_read: 0.20
+  claude-haiku-5-5:
+    input: 0.10
+    output: 0.50
+    cache_write: 0.125
+    cache_read: 0.01
+    # Prompts over 100K input tokens are billed at these rates instead.
+    long_context_threshold: 100000
+    long_context:
+      input: 0.50
+      output: 2.50
+      cache_write: 0.625
+      cache_read: 0.05
+  claude-haiku-4-5-20251001:
+    input: 1.00
+    output: 5.00
+    cache_write: 1.25
+    cache_read: 0.10
