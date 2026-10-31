@@ -12,8 +12,14 @@ def _pii() -> Guardrail:
     return PIIRedactor()
 
 
-# name → factory. Filled in as guardrails land (M3.4 injection, M3.6 compliance).
-REGISTRY: dict[str, Callable[[], Guardrail]] = {"pii": _pii}
+def _injection() -> Guardrail:
+    from guardrails.injection import InjectionGuard
+
+    return InjectionGuard()
+
+
+# name → factory. Filled in as guardrails land (M3.6 compliance).
+REGISTRY: dict[str, Callable[[], Guardrail]] = {"pii": _pii, "injection": _injection}
 
 
 def build_guardrails(config) -> GuardrailSet:

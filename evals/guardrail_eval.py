@@ -99,11 +99,83 @@ def render_pii(report: dict, split: str) -> str:
 
 def run_guardrail_eval(name: str, split: str) -> tuple[dict, Path]:
     items = [i for i in load_set(name) if split == "all" or i["split"] == split]
-    if name != "pii":
-        raise ValueError(f"no evaluator for guardrail {name!r} yet")
-    report = {"guardrail": name, "split": split, **evaluate_pii(items)}
+    if name == "pii":
+        report = {"guardrail": name, "split": split, **evaluate_pii(items)}
+        markdown = render_pii(report, split)
+    elif name == "injection":
+        rules_only, combined = evaluate_injection(items, use_llm=False), evaluate_injection(items)
+        report = {"guardrail": name, "split": split, "rules_only": rules_only, **combined}
+        markdown = render_injection(rules_only, combined, split)
+    else:
+        raise ValueError(f"no evaluator for guardrail {name!r}")
     GUARDRAIL_REPORTS.mkdir(parents=True, exist_ok=True)
     (GUARDRAIL_REPORTS / f"{name}-{split}.json").write_text(json.dumps(report, indent=2) + "\n")
     md = GUARDRAIL_REPORTS / f"{name}-{split}.md"
-    md.write_text(render_pii(report, split))
+    md.write_text(markdown)
     return report, md
+
+
+def evaluate_injection(items: list[dict], use_llm: bool = True) -> dict:
+    """Recall on attacks and false-positive rate on benign texts, per kind and layer."""
+    from guardrails.injection import is_injection
+
+    by_kind: dict[str, list[bool]] = defaultdict(list)
+    layer_counts: dict[str, int] = defaultdict(int)
+    errors, cost = [], 0.0
+    for item in items:
+        flagged, info = is_injection(item["text"], use_llm=use_llm)
+        cost += info.get("cost", 0.0)
+        layer_counts[info["layer"]] += 1
+        correct = flagged == (item["label"] == "injection")
+        by_kind[item["kind"]].append(flagged)
+        if not correct:
+            errors.append(
+                {
+                    "id": item["id"],
+                    "kind": item["kind"],
+                    "flagged": flagged,
+                    "layer": info["layer"],
+                    "text": item["text"][:120],
+                }
+            )
+    attacks = [f for k in ("direct", "indirect") for f in by_kind.get(k, [])]
+    benign = [f for k in ("benign_hard", "benign") for f in by_kind.get(k, [])]
+    rate = lambda xs: round(sum(xs) / len(xs), 4) if xs else None  # noqa: E731
+    return {
+        "use_llm": use_llm,
+        "n_attacks": len(attacks),
+        "n_benign": len(benign),
+        "recall": rate(attacks),
+        "false_positive_rate": rate(benign),
+        "flag_rate_by_kind": {k: rate(v) for k, v in sorted(by_kind.items())},
+        "decided_by_layer": dict(layer_counts),
+        "classifier_cost_usd": round(cost, 5),
+        "errors": errors,
+    }
+
+
+def render_injection(rules_only: dict, combined: dict, split: str) -> str:
+    pct = lambda x: "n/a" if x is None else f"{100 * x:.1f}%"  # noqa: E731
+    lines = [
+        f"# Prompt-injection guardrail ({split} split)",
+        "",
+        f"Attacks: {combined['n_attacks']} · benign: {combined['n_benign']} (most are hard negatives)",
+        "",
+        "| Layers | Recall (target ≥ 90%) | False-positive rate (target ≤ 5%) |",
+        "|---|---:|---:|",
+        f"| rules only | {pct(rules_only['recall'])} | {pct(rules_only['false_positive_rate'])} |",
+        f"| rules + LLM classifier | {pct(combined['recall'])} | {pct(combined['false_positive_rate'])} |",
+        "",
+        "Flag rate by kind (rules + LLM): "
+        + ", ".join(f"{k} {pct(v)}" for k, v in combined["flag_rate_by_kind"].items()),
+        "",
+        f"Classifier spend this run: ${combined['classifier_cost_usd']:.4f} (cached verdicts cost $0)",
+        "",
+        f"## Errors, rules + LLM ({len(combined['errors'])})",
+        "",
+    ]
+    lines += [
+        f"- `{e['id']}` {e['kind']} {'flagged' if e['flagged'] else 'missed'} ({e['layer']}): {e['text']}"
+        for e in combined["errors"]
+    ] or ["- none"]
+    return "\n".join(lines) + "\n"

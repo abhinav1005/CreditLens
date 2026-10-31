@@ -55,4 +55,8 @@ en-core-web-sm = { url = "https://github.com/explosion/spacy-models/releases/dow
 "scripts/draft_golden_v2.py" = ["E501"]
 # Long regex patterns read better on one line.
 "src/guardrails/pii.py" = ["E501"]
+"src/guardrails/injection.py" = ["E501"]
 "scripts/build_pii_set.py" = ["E501"]
+"scripts/build_injection_set.py" = ["E501"]
+# Markdown report rendering: long table rows read better unwrapped.
+"evals/guardrail_eval.py" = ["E501"]

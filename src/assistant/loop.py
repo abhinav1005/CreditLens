@@ -32,7 +32,12 @@ DEFAULT_BLOCK_MESSAGE = (
     "Sorry, I can't help with that request. I'm happy to answer questions about your credit."
 )
 # Per-guardrail replies when an input is blocked (filled in as guardrails land).
-BLOCK_MESSAGES: dict[str, str] = {}
+BLOCK_MESSAGES: dict[str, str] = {
+    "injection": (
+        "Sorry, I can't help with requests to change how I work or to see my instructions. "
+        "I'm happy to answer questions about your credit."
+    ),
+}
 WITHHELD_TOOL_RESULT = json.dumps(
     {
         "error": {

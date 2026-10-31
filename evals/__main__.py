@@ -81,7 +81,7 @@ def main(argv: list[str] | None = None) -> int:
     gate.add_argument("--comment-file", type=Path, default=None, help="write the PR comment here")
 
     gr = sub.add_parser("guardrail", help="precision/recall of one guardrail on its test set")
-    gr.add_argument("name", choices=["pii"])
+    gr.add_argument("name", choices=["pii", "injection"])
     gr.add_argument("--split", choices=["dev", "test", "all"], default="test")
 
     args = parser.parse_args(argv)
@@ -90,10 +90,8 @@ def main(argv: list[str] | None = None) -> int:
         from evals.guardrail_eval import run_guardrail_eval
 
         report, path = run_guardrail_eval(args.name, args.split)
-        print(
-            f"{args.name} [{args.split}] recall {report['recall']} precision {report['precision']} "
-            f"negative FP rate {report['negative_false_positive_rate']} → {path}"
-        )
+        fp = report.get("negative_false_positive_rate", report.get("false_positive_rate"))
+        print(f"{args.name} [{args.split}] recall {report['recall']} FP rate {fp} → {path}")
         return 0
 
     if args.command == "gate":

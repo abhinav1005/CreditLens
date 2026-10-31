@@ -6,7 +6,7 @@ Specs: `PRD.md` (§14 takes precedence). History and notes: `BUILD_LOG.md`.
 **Legend:** `[ ]` todo · `[~]` in progress · `[x]` done · `[!]` blocked (reason in log) · 👤 = needs the owner (Abhinav)
 
 **Current milestone:** M2 done-when PASSED 2026-10-31 (PR #1 blocked by the gate). Open in M2: owner labels (M2.5), then calibration (M2.7 run) + judge iteration (M2.8). Next build milestone: M3
-**Next task:** M3.4 (injection guardrail)
+**Next task:** M3.5 (indirect injection eval cases) — mostly covered; then M3.6 compliance
 
 Each task is one small, reviewable commit. "Check" is how we know it's done.
 
@@ -98,7 +98,7 @@ Each task is one small, reviewable commit. "Check" is how we know it's done.
 | M3.1 | [x] | `GuardrailResult` interface + pipeline + decisions logged in transcripts | Tests |
 | M3.2 | [x] | PII: Presidio + custom recognizers, numbered placeholders, masked-account allowlist | Unit tests |
 | M3.3 | [x] | `pii.jsonl` (dev/test) + metrics + "originals never reach SQLite" eval | Recall reported |
-| M3.4 | [ ] | Injection: heuristics + LLM classifier; `injection.jsonl` with hard negatives, dev/test | P/R/FPR reported |
+| M3.4 | [x] | Injection: heuristics + LLM classifier; `injection.jsonl` with hard negatives, dev/test | P/R/FPR reported |
 | M3.5 | [ ] | Indirect injection via tool results (`inj_*` profiles) | Cases in suite |
 | M3.6 | [ ] | `policy/compliance.md` + rules + classifier; `compliance.jsonl` with compliant hard negatives | P/R reported |
 | M3.7 | [ ] | Compliance action: regenerate once → fallback; rates reported | Tests |
