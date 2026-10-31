@@ -6,7 +6,7 @@ Specs: `PRD.md` (§14 takes precedence). History and notes: `BUILD_LOG.md`.
 **Legend:** `[ ]` todo · `[~]` in progress · `[x]` done · `[!]` blocked (reason in log) · 👤 = needs the owner (Abhinav)
 
 **Current milestone:** M4 done-when PASSED 2026-10-31 (model-comparison.md + cost-variants.md). M4.1 OpenAI deferred by owner. Open: owner labels → judge calibration (M2.7/M2.8); case review (M1.16). Next build milestone: M5
-**Next task:** M5.4 (labeling view). Owner: M5.0 (Java?), M5.1 (Docker), M2.5 labels, M1.16 review
+**Next task:** M5.5 (promote button). Owner: M5.0 (Java?), M5.1 (Docker), M2.5 labels (now in the web UI), M1.16 review
 
 Each task is one small, reviewable commit. "Check" is how we know it's done.
 
@@ -77,7 +77,7 @@ Each task is one small, reviewable commit. "Check" is how we know it's done.
 | M2.2 | [x] | `prompts/system/v1-degraded.md` | Exists, immutable |
 | M2.3 | [x] | Labeling-pool builder (≥2 models × ≥2 prompt versions × hard categories; sampling recorded) | Pool of ≥130 responses |
 | M2.4 | [x] | CLI labeler: blind to judge, shuffled, keyboard-driven, writes `labels.jsonl` | Manual try-out |
-| M2.5 👤 | [ ] | Owner labels ≥100 responses (4 batches of 25) | ≥100 labels |
+| M2.5 👤 | [ ] | Owner labels ≥100 responses (4 batches of 25): web UI `#label` (keyboard shortcuts) or `uv run python -m evals label --labeler abhinav` | ≥100 labels |
 | M2.6 | [x] | Freeze held-out 30 (committed split file) | Split file committed before M2.8 |
 | M2.7 | [x] | `calibrate-judge`: P/R/F1/accuracy/kappa + bootstrap 95% CI + confusion matrix + Sonnet-vs-Haiku self-preference | Report generated |
 | M2.8 | [ ] | Judge-prompt iteration → `judge/v2.md`, tuned on dev only; before/after on held-out | Versioned calibration reports |
@@ -128,7 +128,7 @@ Each task is one small, reviewable commit. "Check" is how we know it's done.
 | M5.1 👤 | [ ] | Install Docker Desktop | `docker --version` |
 | M5.2 | [x] | Vite + React + TS scaffold, eslint/prettier, chat view (SSE, tool events, guardrail badges) | Manual + lint |
 | M5.3 | [x] | Transcript viewer (list + filter + detail) | Manual |
-| M5.4 | [ ] | Labeling view (keyboard shortcuts) feeding `labels.jsonl` | Manual |
+| M5.4 | [x] | Labeling view (keyboard shortcuts) feeding `labels.jsonl` | Manual |
 | M5.5 | [ ] | Promote-to-test button → `evals promote` code path | Test |
 | M5.6 | [ ] | Static dashboard from `reports/*.json` | Renders |
 | M5.7 | [ ] | `docker-compose.yml` for the full local stack | Fresh clone works |

@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 
 import Chat from "./Chat";
+import Label from "./Label";
 import Transcripts from "./Transcripts";
 
 // Views are picked by the URL hash (#chat, #transcripts/<id>, ...), so no router library.
 const VIEWS = [
   { id: "chat", label: "Chat" },
   { id: "transcripts", label: "Transcripts" },
+  { id: "label", label: "Label" },
 ] as const;
 
 function currentHash(): string {
@@ -43,6 +45,7 @@ export default function App() {
       <main>
         {view === "chat" && <Chat />}
         {view === "transcripts" && <Transcripts selectedId={param ?? null} />}
+        {view === "label" && <Label />}
         {!VIEWS.some((v) => v.id === view) && <p>Unknown view.</p>}
       </main>
     </div>

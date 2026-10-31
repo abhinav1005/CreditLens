@@ -14,6 +14,8 @@ on:
       - "config/**"
       - "policy/**"
       - "evals/**"
+      - "!src/assistant/api.py"
+      - "!evals/web_routes.py"
       - "reports/baseline/**"
   # Runs on main too (same paths), so PR branches can restore a warm response cache from main.
   # Docs-only pushes don't trigger a paid smoke run.
@@ -28,6 +30,8 @@ on:
       - "config/**"
       - "policy/**"
       - "evals/**"
+      - "!src/assistant/api.py"
+      - "!evals/web_routes.py"
       - "reports/baseline/**"
   workflow_dispatch:
 

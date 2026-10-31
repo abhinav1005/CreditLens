@@ -18,7 +18,7 @@ import uuid
 from collections.abc import Callable, Iterator
 from typing import Literal
 
-from fastapi import FastAPI, HTTPException
+from fastapi import APIRouter, FastAPI, HTTPException
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
@@ -92,12 +92,18 @@ def profile_summary(profile) -> dict:
 def create_app(
     provider_factory: Callable[[str], Provider] | None = None,
     storage: Storage | None = None,
+    eval_router: APIRouter | None = None,
 ) -> FastAPI:
     config = load_config()
     provider_factory = provider_factory or (lambda model: get_provider(model, config))
     # Resolve against the repo root so the DB location doesn't depend on the cwd.
     store = storage or SQLiteStorage(ROOT / config.storage.sqlite_path)
     app = FastAPI(title="CreditLens", description=DISCLAIMER)
+    if eval_router is None:
+        from evals.web_routes import make_router  # labeling (and promote) for the web UI
+
+        eval_router = make_router()
+    app.include_router(eval_router)
 
     @app.get("/health")
     def health() -> dict:

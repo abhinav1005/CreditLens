@@ -360,3 +360,106 @@ pre {
   font-size: 0.8rem;
   max-height: 400px;
 }
+
+/* Labeling */
+
+.narrow {
+  max-width: 480px;
+}
+
+.label-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 20px;
+  align-items: start;
+}
+
+@media (max-width: 760px) {
+  .label-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.panel {
+  position: sticky;
+  top: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px;
+}
+
+.dim {
+  border-left: 3px solid transparent;
+  padding-left: 8px;
+}
+
+.dim.current {
+  border-left-color: var(--accent);
+}
+
+.dim p {
+  margin: 4px 0 0;
+  font-size: 0.8rem;
+}
+
+.dim-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.choices {
+  display: flex;
+  gap: 4px;
+}
+
+.choices button {
+  padding: 4px 10px;
+  font-size: 0.85rem;
+}
+
+button.ghost {
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+button.chosen.pass {
+  background: var(--accent);
+  color: var(--accent-text);
+}
+
+button.chosen.fail {
+  background: var(--bad-text);
+  color: var(--surface);
+}
+
+.msg.reply {
+  max-width: 100%;
+  border-color: var(--accent);
+}
+
+textarea {
+  font: inherit;
+  color: inherit;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 7px 10px;
+  resize: vertical;
+}
+
+kbd {
+  font-family: inherit;
+  font-size: 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0 4px;
+}
+
+.keys {
+  font-size: 0.75rem;
+  margin: 0;
+}

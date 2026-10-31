@@ -15,6 +15,8 @@ ROOT = Path(__file__).resolve().parents[1]
 DATASET_FILE = ROOT / "data" / "profiles" / "v1.json"
 FIXTURES_FILE = ROOT / "contracts" / "tools" / "fixtures" / "v1.json"
 CODE_DIRS = ["src/assistant", "src/guardrails", "src/credit"]
+# The HTTP layer wraps `run_turn` but never changes an answer, and evals don't call it.
+CODE_EXCLUDE = {"src/assistant/api.py"}
 
 
 def _file_hash(path: Path) -> str:
@@ -28,7 +30,10 @@ def code_hash() -> str:
     Otherwise evals would keep scoring outputs from the old pipeline.
     """
     files = sorted(
-        p for d in CODE_DIRS for p in (ROOT / d).rglob("*.py") if "__pycache__" not in p.parts
+        p
+        for d in CODE_DIRS
+        for p in (ROOT / d).rglob("*.py")
+        if "__pycache__" not in p.parts and str(p.relative_to(ROOT)) not in CODE_EXCLUDE
     ) + [ROOT / "config.yaml"]
     digest = hashlib.sha256()
     for p in files:

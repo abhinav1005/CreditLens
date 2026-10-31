@@ -41,6 +41,24 @@ def append_label(label: dict, path: Path = LABELS_PATH) -> None:
         f.write(json.dumps(label, sort_keys=True) + "\n")
 
 
+def make_label(item_id: str, labeler: str, verdicts: dict[str, str], note: str) -> dict:
+    """One label record. The CLI and the web labeling view both write exactly this."""
+    if set(verdicts) != set(DIMENSIONS) or not set(verdicts.values()) <= {"pass", "fail"}:
+        raise ValueError(f"need pass/fail for each of {DIMENSIONS}")
+    return {
+        "item_id": item_id,
+        "labeler": labeler,
+        "labeled_at": datetime.now(UTC).isoformat(timespec="seconds"),
+        "verdicts": verdicts,
+        "note": note,
+    }
+
+
+def next_unlabeled(items: list[dict], already: set[str], skip: set[str] = frozenset()):
+    """The first pool item (in the pool's fixed order) not yet labeled or skipped."""
+    return next((i for i in items if i["item_id"] not in already | skip), None)
+
+
 def render_item(item: dict, case: Case) -> str:
     record = item["record"]
     if record["kind"] == "insights":
@@ -108,15 +126,7 @@ def label_items(
         if verdicts is None:
             continue
         note = read("note (Enter for none): ").strip()
-        save(
-            {
-                "item_id": item["item_id"],
-                "labeler": labeler,
-                "labeled_at": datetime.now(UTC).isoformat(timespec="seconds"),
-                "verdicts": verdicts,
-                "note": note,
-            }
-        )
+        save(make_label(item["item_id"], labeler, verdicts, note))
         labeled += 1
         write(f"saved. {done_count + labeled}/{TARGET} labeled")
     return labeled
