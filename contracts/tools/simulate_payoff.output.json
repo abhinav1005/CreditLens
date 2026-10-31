@@ -1,0 +1,64 @@
+{
+  "properties": {
+    "account_id": {
+      "title": "Account Id",
+      "type": "string"
+    },
+    "applied_amount": {
+      "title": "Applied Amount",
+      "type": "integer"
+    },
+    "card_balance_after": {
+      "title": "Card Balance After",
+      "type": "integer"
+    },
+    "card_balance_before": {
+      "title": "Card Balance Before",
+      "type": "integer"
+    },
+    "card_utilization_pct_after": {
+      "title": "Card Utilization Pct After",
+      "type": "number"
+    },
+    "card_utilization_pct_before": {
+      "title": "Card Utilization Pct Before",
+      "type": "number"
+    },
+    "note": {
+      "const": "This simulation shows utilization only. It does not predict or promise any score change.",
+      "default": "This simulation shows utilization only. It does not predict or promise any score change.",
+      "title": "Note",
+      "type": "string"
+    },
+    "overall_utilization_pct_after": {
+      "title": "Overall Utilization Pct After",
+      "type": "number"
+    },
+    "overall_utilization_pct_before": {
+      "title": "Overall Utilization Pct Before",
+      "type": "number"
+    },
+    "profile_id": {
+      "title": "Profile Id",
+      "type": "string"
+    },
+    "requested_amount": {
+      "title": "Requested Amount",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "profile_id",
+    "account_id",
+    "requested_amount",
+    "applied_amount",
+    "card_balance_before",
+    "card_balance_after",
+    "card_utilization_pct_before",
+    "card_utilization_pct_after",
+    "overall_utilization_pct_before",
+    "overall_utilization_pct_after"
+  ],
+  "title": "PayoffSimulation",
+  "type": "object"
+}

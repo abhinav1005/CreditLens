@@ -1,0 +1,23 @@
+{
+  "properties": {
+    "months": {
+      "default": 12,
+      "description": "How many recent months to return",
+      "maximum": 12,
+      "minimum": 1,
+      "title": "Months",
+      "type": "integer"
+    },
+    "profile_id": {
+      "description": "Synthetic profile id",
+      "pattern": "^(p|story|inj)_\\d{3}$",
+      "title": "Profile Id",
+      "type": "string"
+    }
+  },
+  "required": [
+    "profile_id"
+  ],
+  "title": "GetScoreHistoryInput",
+  "type": "object"
+}

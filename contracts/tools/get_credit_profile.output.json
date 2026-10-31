@@ -1,0 +1,212 @@
+{
+  "$defs": {
+    "AccountSummary": {
+      "properties": {
+        "account_id": {
+          "title": "Account Id",
+          "type": "string"
+        },
+        "balance": {
+          "title": "Balance",
+          "type": "integer"
+        },
+        "credit_limit": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Credit Limit"
+        },
+        "creditor_name": {
+          "title": "Creditor Name",
+          "type": "string"
+        },
+        "masked_number": {
+          "title": "Masked Number",
+          "type": "string"
+        },
+        "opened": {
+          "title": "Opened",
+          "type": "string"
+        },
+        "original_amount": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Original Amount"
+        },
+        "status": {
+          "enum": [
+            "OPEN",
+            "CLOSED"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/$defs/AccountType"
+        }
+      },
+      "required": [
+        "account_id",
+        "masked_number",
+        "type",
+        "creditor_name",
+        "opened",
+        "status",
+        "balance",
+        "credit_limit",
+        "original_amount"
+      ],
+      "title": "AccountSummary",
+      "type": "object"
+    },
+    "AccountType": {
+      "enum": [
+        "CREDIT_CARD",
+        "AUTO_LOAN",
+        "STUDENT_LOAN",
+        "PERSONAL_LOAN",
+        "MORTGAGE"
+      ],
+      "title": "AccountType",
+      "type": "string"
+    },
+    "FactorCode": {
+      "enum": [
+        "UTILIZATION",
+        "PAYMENT_HISTORY",
+        "RECENT_INQUIRIES",
+        "ACCOUNT_AGE",
+        "CREDIT_MIX",
+        "DEROGATORY"
+      ],
+      "title": "FactorCode",
+      "type": "string"
+    },
+    "InquirySummary": {
+      "properties": {
+        "creditor_name": {
+          "title": "Creditor Name",
+          "type": "string"
+        },
+        "month": {
+          "title": "Month",
+          "type": "string"
+        }
+      },
+      "required": [
+        "month",
+        "creditor_name"
+      ],
+      "title": "InquirySummary",
+      "type": "object"
+    },
+    "LatePaymentSummary": {
+      "properties": {
+        "account_id": {
+          "title": "Account Id",
+          "type": "string"
+        },
+        "days_late": {
+          "title": "Days Late",
+          "type": "integer"
+        },
+        "month": {
+          "title": "Month",
+          "type": "string"
+        }
+      },
+      "required": [
+        "account_id",
+        "month",
+        "days_late"
+      ],
+      "title": "LatePaymentSummary",
+      "type": "object"
+    }
+  },
+  "properties": {
+    "accounts": {
+      "items": {
+        "$ref": "#/$defs/AccountSummary"
+      },
+      "title": "Accounts",
+      "type": "array"
+    },
+    "as_of": {
+      "title": "As Of",
+      "type": "string"
+    },
+    "derogatory_marks": {
+      "title": "Derogatory Marks",
+      "type": "integer"
+    },
+    "factor_penalties": {
+      "additionalProperties": {
+        "type": "integer"
+      },
+      "propertyNames": {
+        "$ref": "#/$defs/FactorCode"
+      },
+      "title": "Factor Penalties",
+      "type": "object"
+    },
+    "hard_inquiries_last_12_months": {
+      "items": {
+        "$ref": "#/$defs/InquirySummary"
+      },
+      "title": "Hard Inquiries Last 12 Months",
+      "type": "array"
+    },
+    "late_payments_last_24_months": {
+      "items": {
+        "$ref": "#/$defs/LatePaymentSummary"
+      },
+      "title": "Late Payments Last 24 Months",
+      "type": "array"
+    },
+    "notes": {
+      "title": "Notes",
+      "type": "string"
+    },
+    "profile_id": {
+      "title": "Profile Id",
+      "type": "string"
+    },
+    "score": {
+      "title": "Score",
+      "type": "integer"
+    },
+    "top_factors": {
+      "items": {
+        "$ref": "#/$defs/FactorCode"
+      },
+      "title": "Top Factors",
+      "type": "array"
+    }
+  },
+  "required": [
+    "profile_id",
+    "as_of",
+    "score",
+    "top_factors",
+    "factor_penalties",
+    "accounts",
+    "late_payments_last_24_months",
+    "hard_inquiries_last_12_months",
+    "derogatory_marks",
+    "notes"
+  ],
+  "title": "CreditProfileSummary",
+  "type": "object"
+}

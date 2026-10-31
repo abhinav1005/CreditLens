@@ -1,0 +1,29 @@
+{
+  "$defs": {
+    "ToolErrorCode": {
+      "enum": [
+        "PROFILE_NOT_FOUND",
+        "ACCOUNT_NOT_FOUND",
+        "NOT_A_CREDIT_CARD",
+        "INVALID_INPUT"
+      ],
+      "title": "ToolErrorCode",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "error_code": {
+      "$ref": "#/$defs/ToolErrorCode"
+    },
+    "message": {
+      "title": "Message",
+      "type": "string"
+    }
+  },
+  "required": [
+    "error_code",
+    "message"
+  ],
+  "title": "ToolError",
+  "type": "object"
+}

@@ -1,0 +1,41 @@
+{
+  "$defs": {
+    "ScorePoint": {
+      "properties": {
+        "month": {
+          "title": "Month",
+          "type": "string"
+        },
+        "score": {
+          "title": "Score",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "month",
+        "score"
+      ],
+      "title": "ScorePoint",
+      "type": "object"
+    }
+  },
+  "properties": {
+    "points": {
+      "items": {
+        "$ref": "#/$defs/ScorePoint"
+      },
+      "title": "Points",
+      "type": "array"
+    },
+    "profile_id": {
+      "title": "Profile Id",
+      "type": "string"
+    }
+  },
+  "required": [
+    "profile_id",
+    "points"
+  ],
+  "title": "ScoreHistory",
+  "type": "object"
+}

@@ -1,0 +1,28 @@
+{
+  "properties": {
+    "account_id": {
+      "pattern": "^acc_\\d{2}$",
+      "title": "Account Id",
+      "type": "string"
+    },
+    "amount": {
+      "description": "Payment amount in whole dollars",
+      "exclusiveMinimum": 0,
+      "title": "Amount",
+      "type": "integer"
+    },
+    "profile_id": {
+      "description": "Synthetic profile id",
+      "pattern": "^(p|story|inj)_\\d{3}$",
+      "title": "Profile Id",
+      "type": "string"
+    }
+  },
+  "required": [
+    "profile_id",
+    "account_id",
+    "amount"
+  ],
+  "title": "SimulatePayoffInput",
+  "type": "object"
+}

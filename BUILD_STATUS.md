@@ -6,7 +6,7 @@ Specs: `PRD.md` (§14 takes precedence). History and notes: `BUILD_LOG.md`.
 **Legend:** `[ ]` todo · `[~]` in progress · `[x]` done · `[!]` blocked (reason in log) · 👤 = needs the owner (Abhinav)
 
 **Current milestone:** M1 (M0.2 and M0.4 pending, owner)
-**Next task:** M1.6
+**Next task:** M1.7
 
 Each task is one small, reviewable commit. "Check" is how we know it's done.
 
@@ -37,7 +37,7 @@ Each task is one small, reviewable commit. "Check" is how we know it's done.
 ### Tools
 | ID | Status | Task | Check |
 |---|---|---|---|
-| M1.6 | [ ] | Pydantic input/output contracts for the 5 tools; export JSON Schema to `contracts/tools/` | Export script is idempotent |
+| M1.6 | [x] | Pydantic input/output contracts for the 5 tools; export JSON Schema to `contracts/tools/` | Export script is idempotent |
 | M1.7 | [ ] | Python tool implementations + `explain_factor` static content + shared fixtures | Contract fixture tests pass |
 
 ### Assistant core

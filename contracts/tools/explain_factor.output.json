@@ -1,0 +1,44 @@
+{
+  "$defs": {
+    "FactorCode": {
+      "enum": [
+        "UTILIZATION",
+        "PAYMENT_HISTORY",
+        "RECENT_INQUIRIES",
+        "ACCOUNT_AGE",
+        "CREDIT_MIX",
+        "DEROGATORY"
+      ],
+      "title": "FactorCode",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "explanation": {
+      "title": "Explanation",
+      "type": "string"
+    },
+    "factor_code": {
+      "$ref": "#/$defs/FactorCode"
+    },
+    "title": {
+      "title": "Title",
+      "type": "string"
+    },
+    "what_helps": {
+      "items": {
+        "type": "string"
+      },
+      "title": "What Helps",
+      "type": "array"
+    }
+  },
+  "required": [
+    "factor_code",
+    "title",
+    "explanation",
+    "what_helps"
+  ],
+  "title": "FactorExplanation",
+  "type": "object"
+}
