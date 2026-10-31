@@ -11,6 +11,7 @@ since a person chose the transcript and wrote the expectations.
 
 import json
 import re
+from pathlib import Path
 
 from evals.cases import GOLDEN_PATH, Case, Category, load_cases
 
@@ -68,14 +69,23 @@ def build_case(
     return case
 
 
-def append_case(case: dict) -> None:
-    with GOLDEN_PATH.open("a") as f:
+def append_case(case: dict, path: Path = GOLDEN_PATH) -> None:
+    with path.open("a") as f:
         f.write(json.dumps(case, sort_keys=True) + "\n")
 
 
 def promote(
-    transcript_id: str, category: str, note: str, must_not_contain=(), must_contain=(), storage=None
+    transcript_id: str,
+    category: str,
+    note: str,
+    must_not_contain=(),
+    must_contain=(),
+    storage=None,
+    golden_path: Path = GOLDEN_PATH,
 ) -> dict:
+    """Append a case built from the transcript to the golden set. Used by the CLI and the
+    web UI's promote button. Raises KeyError for an unknown transcript, ValueError for an
+    invalid case (nothing is written then)."""
     if storage is None:
         from assistant.config import ROOT, load_config
         from storage.sqlite import SQLiteStorage
@@ -90,7 +100,7 @@ def promote(
         note,
         list(must_not_contain),
         list(must_contain),
-        [c.id for c in load_cases()],
+        [c.id for c in load_cases(golden_path)],
     )
-    append_case(case)
+    append_case(case, golden_path)
     return case

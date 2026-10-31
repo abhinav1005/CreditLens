@@ -1,7 +1,7 @@
-"""HTTP routes for the web UI's eval tools (labeling now, promote-to-test in M5.5).
+"""HTTP routes for the web UI's eval tools: blind labeling and promote-to-test.
 
-They call the same functions as the CLI (`python -m evals label`), so a label made in the
-browser is byte-for-byte the same kind of record as one made in the terminal.
+They call the same functions as the CLI (`python -m evals label`, `python -m evals promote`),
+so a label or a promoted case made in the browser is the same record the terminal makes.
 
 Labeling stays blind: an item is sent without the judge's verdict, the model, the prompt
 version, or the run it came from.
@@ -12,7 +12,7 @@ from pathlib import Path
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 
-from evals.cases import load_cases
+from evals.cases import GOLDEN_PATH, Category, load_cases
 from evals.judge import DIMENSIONS
 from evals.labeler import (
     DIMENSION_HINTS,
@@ -24,6 +24,7 @@ from evals.labeler import (
     next_unlabeled,
 )
 from evals.labeling import POOL_PATH, load_pool
+from evals.promote import promote
 
 
 class LabelIn(BaseModel):
@@ -31,6 +32,13 @@ class LabelIn(BaseModel):
     labeler: str = Field(min_length=1, max_length=40)
     verdicts: dict[str, str]
     note: str = Field(default="", max_length=2000)
+
+
+class PromoteIn(BaseModel):
+    category: Category
+    note: str = Field(min_length=1, max_length=2000)  # what was wrong → rubric_notes
+    must_not_contain: list[str] = []
+    must_contain: list[str] = []
 
 
 def item_view(item: dict, case) -> dict:
@@ -52,14 +60,19 @@ def item_view(item: dict, case) -> dict:
     }
 
 
-def make_router(pool_path: Path = POOL_PATH, labels_path: Path = LABELS_PATH) -> APIRouter:
-    router = APIRouter(prefix="/labeling")
+def make_router(
+    pool_path: Path = POOL_PATH,
+    labels_path: Path = LABELS_PATH,
+    storage=None,
+    golden_path: Path = GOLDEN_PATH,
+) -> APIRouter:
+    router = APIRouter()
 
-    @router.get("/dimensions")
+    @router.get("/labeling/dimensions")
     def dimensions() -> list[dict]:
         return [{"name": d, "hint": DIMENSION_HINTS[d]} for d in DIMENSIONS]
 
-    @router.get("/next")
+    @router.get("/labeling/next")
     def next_item(labeler: str, skip: str = "") -> dict:
         pool = load_pool(pool_path)
         mine = {lab["item_id"] for lab in load_labels(labels_path) if lab["labeler"] == labeler}
@@ -70,7 +83,7 @@ def make_router(pool_path: Path = POOL_PATH, labels_path: Path = LABELS_PATH) ->
         cases = {c.id: c for c in load_cases()}
         return {"item": item_view(item, cases[item["case_id"]]), "progress": progress}
 
-    @router.post("/labels")
+    @router.post("/labeling/labels")
     def save_label(label: LabelIn) -> dict:
         if label.item_id not in {i["item_id"] for i in load_pool(pool_path)}:
             raise HTTPException(status_code=404, detail="unknown item_id")
@@ -85,5 +98,23 @@ def make_router(pool_path: Path = POOL_PATH, labels_path: Path = LABELS_PATH) ->
             raise HTTPException(status_code=422, detail=str(exc)) from exc
         append_label(record, labels_path)
         return record
+
+    @router.post("/transcripts/{transcript_id}/promote")
+    def promote_transcript(transcript_id: str, body: PromoteIn) -> dict:
+        try:
+            case = promote(
+                transcript_id,
+                body.category.value,
+                body.note,
+                [s for s in body.must_not_contain if s.strip()],
+                [s for s in body.must_contain if s.strip()],
+                storage=storage,
+                golden_path=golden_path,
+            )
+        except KeyError as exc:
+            raise HTTPException(status_code=404, detail="unknown transcript_id") from exc
+        except ValueError as exc:
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
+        return case
 
     return router

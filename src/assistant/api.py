@@ -100,9 +100,9 @@ def create_app(
     store = storage or SQLiteStorage(ROOT / config.storage.sqlite_path)
     app = FastAPI(title="CreditLens", description=DISCLAIMER)
     if eval_router is None:
-        from evals.web_routes import make_router  # labeling (and promote) for the web UI
+        from evals.web_routes import make_router  # labeling and promote for the web UI
 
-        eval_router = make_router()
+        eval_router = make_router(storage=store)
     app.include_router(eval_router)
 
     @app.get("/health")

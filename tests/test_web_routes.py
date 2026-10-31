@@ -65,3 +65,47 @@ def test_rejects_bad_labels(tmp_path):
     assert post(item_id="lp_nope").status_code == 404
     assert post().status_code == 200
     assert post().status_code == 409  # no duplicate label from a double submit
+
+
+def test_promote_button_path_appends_valid_case(tmp_path):
+    import shutil
+
+    from assistant.api import create_app
+    from assistant.providers.fake import FakeProvider, FakeTurn
+    from evals.cases import GOLDEN_PATH, load_cases
+    from storage.sqlite import SQLiteStorage
+
+    golden = tmp_path / "golden.jsonl"
+    shutil.copy(GOLDEN_PATH, golden)
+    store = SQLiteStorage(":memory:")
+    turns = [FakeTurn(text="Your score will rise 40 points if you pay this off.")]
+    app = create_app(
+        provider_factory=lambda model: FakeProvider(turns),
+        storage=store,
+        eval_router=make_router(storage=store, golden_path=golden),
+    )
+    client = TestClient(app)
+    client.post(
+        "/chat",
+        json={"profile_id": "story_001", "messages": [{"role": "user", "content": "pay it off?"}]},
+    )
+    tid = client.get("/transcripts").json()[0]["transcript_id"]
+    resp = client.post(
+        f"/transcripts/{tid}/promote",
+        json={
+            "category": "compliance",
+            "note": "Promised a 40-point rise",
+            "must_not_contain": ["40 points", "  "],
+        },
+    )
+    assert resp.status_code == 200
+    case = resp.json()
+    assert case["expectations"]["must_not_contain"] == ["40 points"]  # blank entries dropped
+    assert case["conversation"] == [{"role": "user", "content": "pay it off?"}]
+    reloaded = {c.id: c for c in load_cases(golden)}
+    assert case["id"] in reloaded and len(reloaded) == len(load_cases()) + 1
+
+    bad = client.post(f"/transcripts/{tid}/promote", json={"category": "nope", "note": "x"})
+    assert bad.status_code == 422
+    missing = client.post("/transcripts/zzz/promote", json={"category": "pii", "note": "x"})
+    assert missing.status_code == 404

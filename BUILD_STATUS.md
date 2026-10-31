@@ -6,7 +6,7 @@ Specs: `PRD.md` (§14 takes precedence). History and notes: `BUILD_LOG.md`.
 **Legend:** `[ ]` todo · `[~]` in progress · `[x]` done · `[!]` blocked (reason in log) · 👤 = needs the owner (Abhinav)
 
 **Current milestone:** M4 done-when PASSED 2026-10-31 (model-comparison.md + cost-variants.md). M4.1 OpenAI deferred by owner. Open: owner labels → judge calibration (M2.7/M2.8); case review (M1.16). Next build milestone: M5
-**Next task:** M5.5 (promote button). Owner: M5.0 (Java?), M5.1 (Docker), M2.5 labels (now in the web UI), M1.16 review
+**Next task:** M5.6 (static dashboard from reports/*.json). Owner: M5.0 (Java?), M5.1 (Docker), M2.5 labels (web UI #label), M1.16 review
 
 Each task is one small, reviewable commit. "Check" is how we know it's done.
 
@@ -129,7 +129,7 @@ Each task is one small, reviewable commit. "Check" is how we know it's done.
 | M5.2 | [x] | Vite + React + TS scaffold, eslint/prettier, chat view (SSE, tool events, guardrail badges) | Manual + lint |
 | M5.3 | [x] | Transcript viewer (list + filter + detail) | Manual |
 | M5.4 | [x] | Labeling view (keyboard shortcuts) feeding `labels.jsonl` | Manual |
-| M5.5 | [ ] | Promote-to-test button → `evals promote` code path | Test |
+| M5.5 | [x] | Promote-to-test button → `evals promote` code path | Test |
 | M5.6 | [ ] | Static dashboard from `reports/*.json` | Renders |
 | M5.7 | [ ] | `docker-compose.yml` for the full local stack | Fresh clone works |
 | M5.8 | [ ] | (Conditional) Spring Boot tool service passing `contracts/tools/` fixtures, JUnit, spotless, OpenAPI | Fixtures pass |

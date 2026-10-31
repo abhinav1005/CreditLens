@@ -3,6 +3,7 @@ import Markdown from "react-markdown";
 
 import { getJSON, type GuardrailFlag } from "./api";
 import { flagLabel } from "./chatState";
+import Promote from "./Promote";
 
 export interface TranscriptRow {
   transcript_id: string;
@@ -253,6 +254,8 @@ function TranscriptView({ id }: { id: string }) {
       <div className="msg assistant">
         <Markdown>{t.final_text}</Markdown>
       </div>
+
+      <Promote transcriptId={t.transcript_id} />
 
       <h2>Guardrail decisions</h2>
       <div className="table-wrap">

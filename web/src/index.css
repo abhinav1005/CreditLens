@@ -463,3 +463,18 @@ kbd {
   font-size: 0.75rem;
   margin: 0;
 }
+
+.promote {
+  position: static;
+  max-width: 560px;
+}
+
+.promote h2 {
+  margin: 0;
+}
+
+.notice {
+  background: var(--user-bg);
+  border-radius: 8px;
+  padding: 8px 12px;
+}
