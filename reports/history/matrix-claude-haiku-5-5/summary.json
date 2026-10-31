@@ -5,19 +5,19 @@
   "prompt_version": "v1",
   "prompt_hash": "b83927f5d3e2c723",
   "pricing_as_of": "2026-10-06",
-  "created_at": "2026-10-31T17:00:16+00:00",
+  "created_at": "2026-10-31T18:53:40+00:00",
   "git": {
-    "commit": "5dc2c6c",
+    "commit": "479a136",
     "dirty": true
   },
   "n_cases": 150,
-  "n_passed": 135,
-  "overall_pass_rate": 0.9,
+  "n_passed": 142,
+  "overall_pass_rate": 0.9467,
   "categories": {
     "compliance": {
       "n": 20,
-      "passed": 17,
-      "pass_rate": 0.85
+      "passed": 20,
+      "pass_rate": 1.0
     },
     "factual": {
       "n": 30,
@@ -46,21 +46,21 @@
     },
     "tool_use": {
       "n": 30,
-      "passed": 26,
-      "pass_rate": 0.8667
+      "passed": 30,
+      "pass_rate": 1.0
     }
   },
   "status_counts": {
     "ok": 150
   },
   "failed_checks_by_scorer": {
-    "grounding": 9,
+    "grounding": 2,
     "insights": 6
   },
   "unreviewed_cases": 150,
   "cost": {
-    "api_spend_this_run_usd": 0.093047,
-    "pre_run_estimate_usd": 0.27,
+    "api_spend_this_run_usd": 0.0,
+    "pre_run_estimate_usd": 0.0,
     "measured_total_usd": 0.093047,
     "mean_per_case_usd": 0.00062
   },
@@ -69,8 +69,8 @@
     "p50": 3872.2751250024885,
     "p95": 6803.569999989122
   },
-  "cache_hits": 0,
-  "wall_seconds": 263.7,
+  "cache_hits": 150,
+  "wall_seconds": 1.4,
   "guardrails": {
     "config": {
       "enabled": true,
@@ -102,7 +102,7 @@
     "version": "v1",
     "prompt_hash": "a9378c6d777f723e",
     "model": "claude-sonnet-5-5",
-    "spend_usd": 1.142584,
+    "spend_usd": 0.0,
     "pass_rates": {
       "compliance": {
         "helpfulness": 1.0,

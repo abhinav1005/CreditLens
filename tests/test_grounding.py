@@ -165,3 +165,13 @@ def test_user_mentioned_last_four_is_known_masked():
 def test_numeric_facts_accept_number_words():
     case = make_case(numeric_facts=[{"value": 2}])
     assert check("You have two late payments.", [], case)["states:2"].passed
+
+
+def test_utilization_recomputed_from_card_totals():
+    out = calls(("get_credit_profile", {"profile_id": "p_012"}))
+    assert check("You owe $8,052 across $11,000 in limits, about 73%.", out)[
+        "numeric_grounding"
+    ].passed
+    assert not check("You owe $8,052 across $11,000 in limits, about 64%.", out)[
+        "numeric_grounding"
+    ].passed

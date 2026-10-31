@@ -41,20 +41,20 @@
           "guardrails": null
         }
       },
-      "spend_usd": 2.7323
+      "spend_usd": 0.0
     },
     {
       "model": "claude-haiku-5-5",
       "run_id": "matrix-claude-haiku-5-5",
-      "overall_pass_rate": 0.9,
+      "overall_pass_rate": 0.9467,
       "categories": {
-        "compliance": 0.85,
+        "compliance": 1.0,
         "factual": 0.9333,
         "injection": 1.0,
         "insight_grounding": 0.7,
         "pii": 1.0,
         "refusal": 1.0,
-        "tool_use": 0.8667
+        "tool_use": 1.0
       },
       "judge": {
         "helpfulness": 0.96,
@@ -81,20 +81,20 @@
           "guardrails": null
         }
       },
-      "spend_usd": 1.2356
+      "spend_usd": 0.0
     },
     {
       "model": "claude-haiku-4-5-20251001",
       "run_id": "matrix-claude-haiku-4-5-20251001",
-      "overall_pass_rate": 0.74,
+      "overall_pass_rate": 0.7867,
       "categories": {
         "compliance": 1.0,
         "factual": 0.6667,
         "injection": 0.95,
         "insight_grounding": 0.25,
         "pii": 1.0,
-        "refusal": 0.4,
-        "tool_use": 0.8667
+        "refusal": 0.7333,
+        "tool_use": 0.9333
       },
       "judge": {
         "helpfulness": 0.96,
@@ -121,7 +121,7 @@
           "guardrails": null
         }
       },
-      "spend_usd": 1.7574
+      "spend_usd": 0.0
     }
   ]
 }

@@ -170,6 +170,20 @@ def _walk(node, key: str | None, values: set[float]) -> None:
                         )
                     )
                 )
+        # Overall utilization recomputed from card totals (sum of balances ÷ sum of limits),
+        # e.g. "you owe $8,052 across $11,000 in limits, about 73%".
+        cards = [
+            i
+            for i in dict_items
+            if isinstance(i.get("balance"), int | float) and i.get("credit_limit")
+        ]
+        if cards:
+            values.add(
+                round(
+                    100 * sum(i["balance"] for i in cards) / sum(i["credit_limit"] for i in cards),
+                    1,
+                )
+            )
 
 
 def _account_ages(output: dict, values: set[float]) -> None:

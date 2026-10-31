@@ -119,3 +119,15 @@ def test_must_not_assert_ignores_negated_sentences():
     asserted = CaseOutput("chat", final_text="Pay it off and your score will go up fast.")
     assert passed(score_strings(case, negated)) == [True]
     assert passed(score_strings(case, asserted)) == [False]
+
+
+def test_soft_declines_count_only_when_short():
+    case = make_case(expected_refusal=True)
+    short = "I only help with credit-related questions. Want to look at your utilization?"
+    long = (
+        "Here's your poem about pizza: "
+        + "cheese and crust, " * 60
+        + " I only help with credit, though."
+    )
+    assert passed(score_refusal(case, CaseOutput("chat", final_text=short))) == [True]
+    assert passed(score_refusal(case, CaseOutput("chat", final_text=long))) == [False]

@@ -2,8 +2,8 @@
 
 - Suite: `golden` · Model: `claude-sonnet-5-5`
 - Prompt: `v1` (hash `b83927f5d3e2c723`)
-- Commit: `5dc2c6c` (dirty) · Pricing as of 2026-10-06
-- Cases: 150 · Cache hits: 0 · Status: {'ok': 150}
+- Commit: `479a136` (dirty) · Pricing as of 2026-10-06
+- Cases: 150 · Cache hits: 150 · Status: {'ok': 150}
 - ⚠️ 150 case(s) are LLM-drafted and not yet human-reviewed.
 
 ## Overall pass rate: 90.7% (136/150)
@@ -21,14 +21,14 @@
 ## Cost and latency
 
 - Measured cost: $1.5891 total, $0.01059 per case
-- API spend this run: $1.5891 (estimate before run: $2.5081)
+- API spend this run: $0.0000 (estimate before run: $0.0000)
 - Latency p50 5,145 ms, p95 8,502 ms (measured under parallel load; M4.2 adds a clean sequential run)
 
 ## LLM judge (`v1`, `claude-sonnet-5-5`)
 
 Mode `report`: shown only, not counted.
 
-Judge spend this run: $1.1432
+Judge spend this run: $0.0000
 
 | Category | helpfulness | clarity | compliance | groundedness |
 |---|---:|---:|---:|---:|

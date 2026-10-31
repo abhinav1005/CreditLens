@@ -22,6 +22,17 @@ REFUSAL_MARKERS = [
     "i cannot provide",
     "not something i can help",
 ]
+# Softer declines seen from Haiku 4.5 in the first matrix run. These only count for
+# SHORT replies (see looks_like_refusal), so an answer that does the off-topic task and
+# then adds "I'm here to help with your credit" isn't mistaken for a refusal.
+SOFT_REFUSAL_MARKERS = [
+    "only help with",
+    "here specifically to help",
+    "i'm here to help you understand your credit",
+    "i'm here to help with your credit",
+    "i can only answer",
+]
+REFUSAL_MAX_CHARS = 700  # every refusal in the first matrix run was under 420 characters
 
 # Words that count as mentioning a factor in an explanation.
 FACTOR_KEYWORDS = {
@@ -97,7 +108,9 @@ def asserted_sentences(text: str) -> list[str]:
 
 def looks_like_refusal(text: str) -> bool:
     lowered = text.lower().replace("’", "'")
-    return any(marker in lowered for marker in REFUSAL_MARKERS)
+    if any(marker in lowered for marker in REFUSAL_MARKERS):
+        return True
+    return len(text) <= REFUSAL_MAX_CHARS and any(m in lowered for m in SOFT_REFUSAL_MARKERS)
 
 
 def score_refusal(case: Case, out: CaseOutput) -> list[Check]:
