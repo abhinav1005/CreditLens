@@ -1,0 +1,22 @@
+{
+  "guardrail": "pii",
+  "split": "dev",
+  "n_items": 82,
+  "n_pii_values": 74,
+  "recall": 1.0,
+  "recall_by_type": {
+    "ACCOUNT_NUMBER": 1.0,
+    "ADDRESS": 1.0,
+    "CARD_NUMBER": 1.0,
+    "DOB": 1.0,
+    "EMAIL": 1.0,
+    "NAME": 1.0,
+    "PHONE": 1.0,
+    "SSN": 1.0
+  },
+  "precision": 1.0,
+  "n_negatives": 18,
+  "negative_false_positive_rate": 0.0,
+  "misses": [],
+  "false_positives": []
+}

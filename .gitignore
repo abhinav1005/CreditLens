@@ -23,6 +23,7 @@ reports/*/
 !reports/history/
 # Judge calibration results are versioned (one file per judge prompt version).
 !reports/calibration/
+!reports/guardrails/
 
 # OS / editors
 .DS_Store

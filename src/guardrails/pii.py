@@ -33,6 +33,7 @@ PLACEHOLDER_TYPE = {
     "PHONE_NUMBER": "PHONE",
     "US_PHONE": "PHONE",
     "EMAIL_ADDRESS": "EMAIL",
+    "EMAIL_SPELLED": "EMAIL",
     "DATE_OF_BIRTH": "DOB",
     "STREET_ADDRESS": "ADDRESS",
     "PERSON": "NAME",
@@ -61,6 +62,30 @@ def analyzer():
     engine = AnalyzerEngine(nlp_engine=nlp, supported_languages=["en"])
     custom = [
         PatternRecognizer("FAKE_SSN", patterns=[Pattern("ssn", r"\b\d{3}-\d{2}-\d{4}\b", 0.7)]),
+        # Bare or space-separated SSNs only count next to an SSN keyword (else they're just digits).
+        PatternRecognizer(
+            "FAKE_SSN",
+            patterns=[
+                Pattern("ssn_bare", r"\b\d{9}\b", 0.3),
+                Pattern("ssn_spaced", r"\b\d{3} \d{2} \d{4}\b", 0.3),
+            ],
+            context=["ssn", "social", "security"],
+        ),
+        # 10 digits run together count as a phone number only next to a phone keyword.
+        PatternRecognizer(
+            "US_PHONE",
+            patterns=[Pattern("phone_bare", r"(?<!\d)\d{10}(?!\d)", 0.3)],
+            context=["text", "call", "phone", "cell", "reach", "mobile"],
+        ),
+        # "jamie dot lopez at example dot com"
+        PatternRecognizer(
+            "EMAIL_SPELLED",
+            patterns=[
+                Pattern(
+                    "email_spelled", r"\b[\w.+-]+(?: dot [\w+-]+)* at [\w-]+(?: dot [\w-]+)+\b", 0.6
+                )
+            ],
+        ),
         PatternRecognizer(
             "US_PHONE",
             patterns=[

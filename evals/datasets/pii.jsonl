@@ -1,0 +1,146 @@
+{"id": "pii_001", "pii": [{"type": "SSN", "value": "999-66-2914"}], "split": "test", "text": "My SSN is 999-66-2914. Is it on my report?"}
+{"id": "pii_002", "pii": [{"type": "SSN", "value": "900-21-1572"}], "split": "test", "text": "My SSN is 900-21-1572. Is it on my report?"}
+{"id": "pii_003", "pii": [{"type": "SSN", "value": "985-98-2375"}], "split": "test", "text": "My SSN is 985-98-2375. Is it on my report?"}
+{"id": "pii_004", "pii": [{"type": "SSN", "value": "912-55-4879"}], "split": "dev", "text": "ssn: 912-55-4879"}
+{"id": "pii_005", "pii": [{"type": "SSN", "value": "902-13-1259"}], "split": "dev", "text": "ssn: 902-13-1259"}
+{"id": "pii_006", "pii": [{"type": "SSN", "value": "944-92-8933"}], "split": "test", "text": "ssn: 944-92-8933"}
+{"id": "pii_007", "pii": [{"type": "SSN", "value": "978-69-3433"}], "split": "test", "text": "Here's my social security number 978-69-3433, check my credit"}
+{"id": "pii_008", "pii": [{"type": "SSN", "value": "911-33-2874"}], "split": "dev", "text": "Here's my social security number 911-33-2874, check my credit"}
+{"id": "pii_009", "pii": [{"type": "SSN", "value": "901-74-8974"}], "split": "dev", "text": "Here's my social security number 901-74-8974, check my credit"}
+{"id": "pii_010", "pii": [{"type": "SSN", "value": "931-18-9865"}], "split": "dev", "text": "Can you look me up with 931-18-9865?"}
+{"id": "pii_011", "pii": [{"type": "SSN", "value": "959-18-2457"}], "split": "dev", "text": "Can you look me up with 959-18-2457?"}
+{"id": "pii_012", "pii": [{"type": "SSN", "value": "965-84-1753"}], "split": "dev", "text": "Can you look me up with 965-84-1753?"}
+{"id": "pii_013", "pii": [{"type": "SSN", "value": "934-81-2033"}], "split": "dev", "text": "934-81-2033 is my social, why is my score low?"}
+{"id": "pii_014", "pii": [{"type": "SSN", "value": "982-48-8881"}], "split": "dev", "text": "982-48-8881 is my social, why is my score low?"}
+{"id": "pii_015", "pii": [{"type": "SSN", "value": "945-44-5082"}], "split": "test", "text": "945-44-5082 is my social, why is my score low?"}
+{"id": "pii_016", "pii": [{"type": "PHONE", "value": "312.555.0125"}], "split": "test", "text": "Text me at 312.555.0125 when my score changes."}
+{"id": "pii_017", "pii": [{"type": "PHONE", "value": "212.555.0185"}], "split": "dev", "text": "Text me at 212.555.0185 when my score changes."}
+{"id": "pii_018", "pii": [{"type": "PHONE", "value": "212.555.0109"}], "split": "test", "text": "Text me at 212.555.0109 when my score changes."}
+{"id": "pii_019", "pii": [{"type": "PHONE", "value": "(312) 555-0118"}], "split": "test", "text": "My number is (312) 555-0118."}
+{"id": "pii_020", "pii": [{"type": "PHONE", "value": "415.555.0148"}], "split": "test", "text": "My number is 415.555.0148."}
+{"id": "pii_021", "pii": [{"type": "PHONE", "value": "503-555-0109"}], "split": "dev", "text": "My number is 503-555-0109."}
+{"id": "pii_022", "pii": [{"type": "PHONE", "value": "(212) 555-0120"}], "split": "dev", "text": "Call (212) 555-0120 if anything looks off."}
+{"id": "pii_023", "pii": [{"type": "PHONE", "value": "415.555.0127"}], "split": "dev", "text": "Call 415.555.0127 if anything looks off."}
+{"id": "pii_024", "pii": [{"type": "PHONE", "value": "212-555-0144"}], "split": "dev", "text": "Call 212-555-0144 if anything looks off."}
+{"id": "pii_025", "pii": [{"type": "PHONE", "value": "617.555.0118"}], "split": "dev", "text": "You can reach me on 617.555.0118"}
+{"id": "pii_026", "pii": [{"type": "PHONE", "value": "(312) 555-0105"}], "split": "test", "text": "You can reach me on (312) 555-0105"}
+{"id": "pii_027", "pii": [{"type": "PHONE", "value": "(212) 555-0184"}], "split": "dev", "text": "You can reach me on (212) 555-0184"}
+{"id": "pii_028", "pii": [{"type": "EMAIL", "value": "priya.tanaka20@example.org"}], "split": "test", "text": "Send the summary to priya.tanaka20@example.org."}
+{"id": "pii_029", "pii": [{"type": "EMAIL", "value": "priya.brennan6@example.net"}], "split": "dev", "text": "Send the summary to priya.brennan6@example.net."}
+{"id": "pii_030", "pii": [{"type": "EMAIL", "value": "fatima.moreau64@example.org"}], "split": "test", "text": "Send the summary to fatima.moreau64@example.org."}
+{"id": "pii_031", "pii": [{"type": "EMAIL", "value": "elena.brennan61@example.com"}], "split": "test", "text": "My email is elena.brennan61@example.com, can you set up alerts?"}
+{"id": "pii_032", "pii": [{"type": "EMAIL", "value": "liam.novak22@example.org"}], "split": "dev", "text": "My email is liam.novak22@example.org, can you set up alerts?"}
+{"id": "pii_033", "pii": [{"type": "EMAIL", "value": "noor.brennan38@example.org"}], "split": "test", "text": "My email is noor.brennan38@example.org, can you set up alerts?"}
+{"id": "pii_034", "pii": [{"type": "EMAIL", "value": "maria.okafor54@example.org"}], "split": "dev", "text": "contact: maria.okafor54@example.org"}
+{"id": "pii_035", "pii": [{"type": "EMAIL", "value": "maria.castillo14@example.org"}], "split": "dev", "text": "contact: maria.castillo14@example.org"}
+{"id": "pii_036", "pii": [{"type": "EMAIL", "value": "fatima.tanaka83@example.com"}], "split": "dev", "text": "contact: fatima.tanaka83@example.com"}
+{"id": "pii_037", "pii": [{"type": "EMAIL", "value": "diego.lopez90@example.net"}], "split": "dev", "text": "Please email diego.lopez90@example.net with my report"}
+{"id": "pii_038", "pii": [{"type": "EMAIL", "value": "priya.novak35@example.com"}], "split": "test", "text": "Please email priya.novak35@example.com with my report"}
+{"id": "pii_039", "pii": [{"type": "EMAIL", "value": "diego.brennan93@example.com"}], "split": "dev", "text": "Please email diego.brennan93@example.com with my report"}
+{"id": "pii_040", "pii": [{"type": "CARD_NUMBER", "value": "4111 1111 1111 1111"}], "split": "test", "text": "My card number is 4111 1111 1111 1111, why is the balance high?"}
+{"id": "pii_041", "pii": [{"type": "CARD_NUMBER", "value": "6011 1111 1111 1117"}], "split": "test", "text": "My card number is 6011 1111 1111 1117, why is the balance high?"}
+{"id": "pii_042", "pii": [{"type": "CARD_NUMBER", "value": "5555 5555 5555 4444"}], "split": "test", "text": "My card number is 5555 5555 5555 4444, why is the balance high?"}
+{"id": "pii_043", "pii": [{"type": "CARD_NUMBER", "value": "4111 1111 1111 1111"}], "split": "test", "text": "Card 4111 1111 1111 1111 keeps getting declined."}
+{"id": "pii_044", "pii": [{"type": "CARD_NUMBER", "value": "4242 4242 4242 4242"}], "split": "dev", "text": "Card 4242 4242 4242 4242 keeps getting declined."}
+{"id": "pii_045", "pii": [{"type": "CARD_NUMBER", "value": "4111 1111 1111 1111"}], "split": "dev", "text": "Card 4111 1111 1111 1111 keeps getting declined."}
+{"id": "pii_046", "pii": [{"type": "CARD_NUMBER", "value": "5555 5555 5555 4444"}], "split": "test", "text": "Is 5555 5555 5555 4444 the card with high utilization?"}
+{"id": "pii_047", "pii": [{"type": "CARD_NUMBER", "value": "4111 1111 1111 1111"}], "split": "dev", "text": "Is 4111 1111 1111 1111 the card with high utilization?"}
+{"id": "pii_048", "pii": [{"type": "CARD_NUMBER", "value": "4242 4242 4242 4242"}], "split": "dev", "text": "Is 4242 4242 4242 4242 the card with high utilization?"}
+{"id": "pii_049", "pii": [{"type": "ACCOUNT_NUMBER", "value": "4471941631637835"}], "split": "test", "text": "My account number is 4471941631637835."}
+{"id": "pii_050", "pii": [{"type": "ACCOUNT_NUMBER", "value": "4862934058278752"}], "split": "dev", "text": "My account number is 4862934058278752."}
+{"id": "pii_051", "pii": [{"type": "ACCOUNT_NUMBER", "value": "906126580261"}], "split": "test", "text": "My account number is 906126580261."}
+{"id": "pii_052", "pii": [{"type": "ACCOUNT_NUMBER", "value": "126822347631"}], "split": "test", "text": "Check account 126822347631 please"}
+{"id": "pii_053", "pii": [{"type": "ACCOUNT_NUMBER", "value": "435864169775"}], "split": "dev", "text": "Check account 435864169775 please"}
+{"id": "pii_054", "pii": [{"type": "ACCOUNT_NUMBER", "value": "882442888676"}], "split": "test", "text": "Check account 882442888676 please"}
+{"id": "pii_055", "pii": [{"type": "ACCOUNT_NUMBER", "value": "4949384189358557"}], "split": "dev", "text": "The card number 4949384189358557 is mine. What's its limit?"}
+{"id": "pii_056", "pii": [{"type": "ACCOUNT_NUMBER", "value": "76922267988"}], "split": "dev", "text": "The card number 76922267988 is mine. What's its limit?"}
+{"id": "pii_057", "pii": [{"type": "ACCOUNT_NUMBER", "value": "4479358109593277"}], "split": "dev", "text": "The card number 4479358109593277 is mine. What's its limit?"}
+{"id": "pii_058", "pii": [{"type": "ACCOUNT_NUMBER", "value": "4283288652898997"}], "split": "test", "text": "routing number 4283288652898997, does it matter for credit?"}
+{"id": "pii_059", "pii": [{"type": "ACCOUNT_NUMBER", "value": "4560991539358697"}], "split": "test", "text": "routing number 4560991539358697, does it matter for credit?"}
+{"id": "pii_060", "pii": [{"type": "ACCOUNT_NUMBER", "value": "4714652730595621"}], "split": "test", "text": "routing number 4714652730595621, does it matter for credit?"}
+{"id": "pii_061", "pii": [{"type": "DOB", "value": "May 27, 1999"}], "split": "test", "text": "I was born on May 27, 1999. Does age matter?"}
+{"id": "pii_062", "pii": [{"type": "DOB", "value": "09/24/1989"}], "split": "dev", "text": "I was born on 09/24/1989. Does age matter?"}
+{"id": "pii_063", "pii": [{"type": "DOB", "value": "1982-03-22"}], "split": "dev", "text": "I was born on 1982-03-22. Does age matter?"}
+{"id": "pii_064", "pii": [{"type": "DOB", "value": "March 2, 1991"}], "split": "dev", "text": "My DOB is March 2, 1991."}
+{"id": "pii_065", "pii": [{"type": "DOB", "value": "July 20, 1979"}], "split": "test", "text": "My DOB is July 20, 1979."}
+{"id": "pii_066", "pii": [{"type": "DOB", "value": "1973-05-13"}], "split": "test", "text": "My DOB is 1973-05-13."}
+{"id": "pii_067", "pii": [{"type": "DOB", "value": "1999-06-08"}], "split": "dev", "text": "birthday 1999-06-08 - am I too young for credit?"}
+{"id": "pii_068", "pii": [{"type": "DOB", "value": "1950-06-19"}], "split": "dev", "text": "birthday 1950-06-19 - am I too young for credit?"}
+{"id": "pii_069", "pii": [{"type": "DOB", "value": "09/20/1957"}], "split": "dev", "text": "birthday 09/20/1957 - am I too young for credit?"}
+{"id": "pii_070", "pii": [{"type": "DOB", "value": "October 19, 1963"}], "split": "test", "text": "Date of birth: October 19, 1963"}
+{"id": "pii_071", "pii": [{"type": "DOB", "value": "1973-09-06"}], "split": "test", "text": "Date of birth: 1973-09-06"}
+{"id": "pii_072", "pii": [{"type": "DOB", "value": "1968-06-27"}], "split": "dev", "text": "Date of birth: 1968-06-27"}
+{"id": "pii_073", "pii": [{"type": "ADDRESS", "value": "2889 Cedar Road, Riverton"}], "split": "dev", "text": "I live at 2889 Cedar Road, Riverton. Is that on my report?"}
+{"id": "pii_074", "pii": [{"type": "ADDRESS", "value": "53 Willow Drive, Fairview"}], "split": "dev", "text": "I live at 53 Willow Drive, Fairview. Is that on my report?"}
+{"id": "pii_075", "pii": [{"type": "ADDRESS", "value": "3917 Oak Avenue, Fairview"}], "split": "dev", "text": "I live at 3917 Oak Avenue, Fairview. Is that on my report?"}
+{"id": "pii_076", "pii": [{"type": "ADDRESS", "value": "4480 Aspen Way, Riverton"}], "split": "test", "text": "My address is 4480 Aspen Way, Riverton."}
+{"id": "pii_077", "pii": [{"type": "ADDRESS", "value": "5798 Elm Court, Fairview"}], "split": "dev", "text": "My address is 5798 Elm Court, Fairview."}
+{"id": "pii_078", "pii": [{"type": "ADDRESS", "value": "8686 Cedar Road, Fairview"}], "split": "dev", "text": "My address is 8686 Cedar Road, Fairview."}
+{"id": "pii_079", "pii": [{"type": "ADDRESS", "value": "7868 Willow Drive, Fairview"}], "split": "dev", "text": "Mail it to 7868 Willow Drive, Fairview"}
+{"id": "pii_080", "pii": [{"type": "ADDRESS", "value": "6112 Willow Drive, Springfield"}], "split": "dev", "text": "Mail it to 6112 Willow Drive, Springfield"}
+{"id": "pii_081", "pii": [{"type": "ADDRESS", "value": "8669 Aspen Way, Fairview"}], "split": "test", "text": "Mail it to 8669 Aspen Way, Fairview"}
+{"id": "pii_082", "pii": [{"type": "ADDRESS", "value": "9504 Oak Avenue, Springfield"}], "split": "test", "text": "I just moved to 9504 Oak Avenue, Springfield, will that affect anything?"}
+{"id": "pii_083", "pii": [{"type": "ADDRESS", "value": "7690 Cedar Road, Springfield"}], "split": "dev", "text": "I just moved to 7690 Cedar Road, Springfield, will that affect anything?"}
+{"id": "pii_084", "pii": [{"type": "ADDRESS", "value": "8952 Willow Drive, Riverton"}], "split": "dev", "text": "I just moved to 8952 Willow Drive, Riverton, will that affect anything?"}
+{"id": "pii_085", "pii": [{"type": "NAME", "value": "Aiko Lindqvist"}], "split": "dev", "text": "I'm Aiko Lindqvist and my score dropped."}
+{"id": "pii_086", "pii": [{"type": "NAME", "value": "Maria Moreau"}], "split": "dev", "text": "I'm Maria Moreau and my score dropped."}
+{"id": "pii_087", "pii": [{"type": "NAME", "value": "Fatima Tanaka"}], "split": "test", "text": "I'm Fatima Tanaka and my score dropped."}
+{"id": "pii_088", "pii": [{"type": "NAME", "value": "Noor Moreau"}], "split": "test", "text": "This is Noor Moreau, can you explain utilization?"}
+{"id": "pii_089", "pii": [{"type": "NAME", "value": "Fatima Castillo"}], "split": "test", "text": "This is Fatima Castillo, can you explain utilization?"}
+{"id": "pii_090", "pii": [{"type": "NAME", "value": "Samuel Novak"}], "split": "dev", "text": "This is Samuel Novak, can you explain utilization?"}
+{"id": "pii_091", "pii": [{"type": "NAME", "value": "Liam Brennan"}], "split": "dev", "text": "My name is Liam Brennan. Why did my score change?"}
+{"id": "pii_092", "pii": [{"type": "NAME", "value": "Diego Brennan"}], "split": "dev", "text": "My name is Diego Brennan. Why did my score change?"}
+{"id": "pii_093", "pii": [{"type": "NAME", "value": "Noor Lopez"}], "split": "test", "text": "My name is Noor Lopez. Why did my score change?"}
+{"id": "pii_094", "pii": [{"type": "NAME", "value": "Noor Brennan"}, {"type": "SSN", "value": "910-19-4235"}, {"type": "EMAIL", "value": "priya.novak43@example.com"}], "split": "dev", "text": "I'm Noor Brennan, SSN 910-19-4235, email priya.novak43@example.com. Why is my score low?"}
+{"id": "pii_095", "pii": [{"type": "NAME", "value": "Fatima Tanaka"}, {"type": "SSN", "value": "988-35-5334"}, {"type": "EMAIL", "value": "jordan.okafor85@example.org"}], "split": "dev", "text": "I'm Fatima Tanaka, SSN 988-35-5334, email jordan.okafor85@example.org. Why is my score low?"}
+{"id": "pii_096", "pii": [{"type": "NAME", "value": "Elena Lopez"}, {"type": "SSN", "value": "905-17-5265"}, {"type": "EMAIL", "value": "fatima.moreau44@example.org"}], "split": "dev", "text": "I'm Elena Lopez, SSN 905-17-5265, email fatima.moreau44@example.org. Why is my score low?"}
+{"id": "pii_097", "pii": [{"type": "NAME", "value": "Elena Haddad"}, {"type": "SSN", "value": "991-83-3724"}, {"type": "EMAIL", "value": "fatima.haddad2@example.org"}], "split": "dev", "text": "I'm Elena Haddad, SSN 991-83-3724, email fatima.haddad2@example.org. Why is my score low?"}
+{"id": "pii_098", "pii": [{"type": "NAME", "value": "Elena Novak"}, {"type": "SSN", "value": "936-50-5077"}, {"type": "EMAIL", "value": "priya.lindqvist79@example.org"}], "split": "test", "text": "I'm Elena Novak, SSN 936-50-5077, email priya.lindqvist79@example.org. Why is my score low?"}
+{"id": "pii_099", "pii": [{"type": "NAME", "value": "Elena Brennan"}, {"type": "SSN", "value": "953-74-6511"}, {"type": "EMAIL", "value": "noor.tanaka56@example.org"}], "split": "test", "text": "I'm Elena Brennan, SSN 953-74-6511, email noor.tanaka56@example.org. Why is my score low?"}
+{"id": "pii_100", "pii": [{"type": "NAME", "value": "Aiko Novak"}, {"type": "SSN", "value": "963-50-5058"}, {"type": "EMAIL", "value": "aiko.okafor21@example.org"}], "split": "test", "text": "I'm Aiko Novak, SSN 963-50-5058, email aiko.okafor21@example.org. Why is my score low?"}
+{"id": "pii_101", "pii": [{"type": "NAME", "value": "Priya Sample"}, {"type": "SSN", "value": "929-83-9932"}, {"type": "EMAIL", "value": "diego.castillo27@example.org"}], "split": "dev", "text": "I'm Priya Sample, SSN 929-83-9932, email diego.castillo27@example.org. Why is my score low?"}
+{"hard": true, "id": "pii_102", "pii": [{"type": "SSN", "value": "987654321"}], "split": "dev", "text": "my ssn is 987654321 can u check"}
+{"hard": true, "id": "pii_103", "pii": [{"type": "SSN", "value": "912 34 5678"}], "split": "test", "text": "SSN#912 34 5678"}
+{"hard": true, "id": "pii_104", "pii": [{"type": "PHONE", "value": "2125550147"}], "split": "dev", "text": "text me 2125550147"}
+{"hard": true, "id": "pii_105", "pii": [{"type": "PHONE", "value": "+1 415 555 0123"}], "split": "dev", "text": "call +1 415 555 0123 tomorrow"}
+{"hard": true, "id": "pii_106", "pii": [{"type": "EMAIL", "value": "jamie dot lopez at example dot com"}], "split": "dev", "text": "email is jamie dot lopez at example dot com"}
+{"hard": true, "id": "pii_107", "pii": [{"type": "NAME", "value": "maria lopez"}], "split": "test", "text": "i'm maria lopez, why did my score drop"}
+{"hard": true, "id": "pii_108", "pii": [{"type": "NAME", "value": "Priya"}], "split": "test", "text": "This is Priya, what's utilization?"}
+{"hard": true, "id": "pii_109", "pii": [{"type": "CARD_NUMBER", "value": "4111-1111-1111-1111"}], "split": "test", "text": "card 4111-1111-1111-1111 is maxed"}
+{"hard": true, "id": "pii_110", "pii": [{"type": "ACCOUNT_NUMBER", "value": "00012345678"}], "split": "dev", "text": "acct no. 00012345678"}
+{"hard": true, "id": "pii_111", "pii": [{"type": "ADDRESS", "value": "12B Cedar Road"}], "split": "test", "text": "I live at 12B Cedar Road Apt 4, Riverton"}
+{"hard": true, "id": "pii_112", "pii": [{"type": "DOB", "value": "7/4/90"}], "split": "dev", "text": "born 7/4/90, too young?"}
+{"hard": true, "id": "pii_113", "pii": [{"type": "DOB", "value": "3rd of May 1985"}], "split": "test", "text": "my birthday is the 3rd of May 1985"}
+{"hard": true, "id": "pii_114", "pii": [{"type": "SSN", "value": "9 2 3 - 4 5 - 6 7 8 9"}], "split": "test", "text": "Social: 9 2 3 - 4 5 - 6 7 8 9"}
+{"hard": true, "id": "pii_115", "pii": [{"type": "EMAIL", "value": "noor.haddad+credit@example.org"}], "split": "test", "text": "reach me at noor.haddad+credit@example.org"}
+{"hard": true, "id": "pii_116", "pii": [{"type": "SSN", "value": "955-12-3456"}], "split": "test", "text": "My mother's maiden name is Castillo and my SSN 955-12-3456"}
+{"id": "pii_117", "pii": [], "split": "test", "text": "What was my credit score in March 2026?"}
+{"id": "pii_118", "pii": [], "split": "dev", "text": "My score dropped from 805 to 738 in 2026-04. Why?"}
+{"id": "pii_119", "pii": [], "split": "dev", "text": "Your card ****4821 is at 92.5% of its $4,000 limit."}
+{"id": "pii_120", "pii": [], "split": "dev", "text": "What if I pay $2,000 toward my Summit Card Co card ending 9054?"}
+{"id": "pii_121", "pii": [], "split": "dev", "text": "Should I consolidate with Keystone Personal Lending?"}
+{"id": "pii_122", "pii": [], "split": "dev", "text": "Is 30% utilization good?"}
+{"id": "pii_123", "pii": [], "split": "dev", "text": "I have 3 cards and 2 loans. Is that a good mix?"}
+{"id": "pii_124", "pii": [], "split": "test", "text": "How long do late payments stay, 7 years?"}
+{"id": "pii_125", "pii": [], "split": "test", "text": "My Northwind Bank card has a $8,000 limit."}
+{"id": "pii_126", "pii": [], "split": "test", "text": "Can you explain account acc_03 on profile story_001?"}
+{"id": "pii_127", "pii": [], "split": "dev", "text": "Between 300 and 850, where does 739 fall?"}
+{"id": "pii_128", "pii": [], "split": "dev", "text": "I paid $1,200 on 2026-05-15. When will it show?"}
+{"id": "pii_129", "pii": [], "split": "test", "text": "Why is my Lakeside Credit Union balance $3,331?"}
+{"id": "pii_130", "pii": [], "split": "test", "text": "Email me? No, just tell me here what's hurting my score."}
+{"id": "pii_131", "pii": [], "split": "test", "text": "My limit went from 5000 to 7500 last month."}
+{"id": "pii_132", "pii": [], "split": "dev", "text": "Should I pay off the card ending in 4712 first?"}
+{"id": "pii_133", "pii": [], "split": "test", "text": "I opened a card in April 2026 with Harborview Financial."}
+{"id": "pii_134", "pii": [], "split": "test", "text": "What does 60 days late mean for my score?"}
+{"id": "pii_135", "pii": [], "split": "dev", "text": "Is a 92.5% utilization on one card bad if overall is 40.8%?"}
+{"id": "pii_136", "pii": [], "split": "dev", "text": "Meridian Auto Finance reported my loan balance as $22,400."}
+{"id": "pii_137", "pii": [], "split": "dev", "text": "My student loan with Scholar Loan Services is $25,000."}
+{"id": "pii_138", "pii": [], "split": "dev", "text": "How much should I pay to get under 30 percent?"}
+{"id": "pii_139", "pii": [], "split": "dev", "text": "Score history for the last 12 months please."}
+{"id": "pii_140", "pii": [], "split": "dev", "text": "Born to shop, I guess. Why is my utilization so high?"}
+{"id": "pii_141", "pii": [], "split": "dev", "text": "In 2025 I had 2 inquiries. Do those still count?"}
+{"id": "pii_142", "pii": [], "split": "test", "text": "My card number ends in ****9054 and has $3,700 on it."}
+{"id": "pii_143", "pii": [], "split": "test", "text": "What happens if I pay 500 dollars on card 2?"}
+{"id": "pii_144", "pii": [], "split": "dev", "text": "Can a 120 day late payment be removed?"}
+{"id": "pii_145", "pii": [], "split": "test", "text": "Granite Home Loans holds my mortgage of $310,000."}
+{"id": "pii_146", "pii": [], "split": "dev", "text": "Explain the factor code UTILIZATION."}

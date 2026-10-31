@@ -1,0 +1,48 @@
+{
+  "guardrail": "pii",
+  "split": "test",
+  "n_items": 64,
+  "n_pii_values": 58,
+  "recall": 0.9138,
+  "recall_by_type": {
+    "ACCOUNT_NUMBER": 1.0,
+    "ADDRESS": 0.75,
+    "CARD_NUMBER": 1.0,
+    "DOB": 0.8333,
+    "EMAIL": 1.0,
+    "NAME": 0.7778,
+    "PHONE": 1.0,
+    "SSN": 0.9167
+  },
+  "precision": 1.0,
+  "n_negatives": 12,
+  "negative_false_positive_rate": 0.0,
+  "misses": [
+    {
+      "id": "pii_107",
+      "type": "NAME",
+      "value": "maria lopez"
+    },
+    {
+      "id": "pii_108",
+      "type": "NAME",
+      "value": "Priya"
+    },
+    {
+      "id": "pii_111",
+      "type": "ADDRESS",
+      "value": "12B Cedar Road"
+    },
+    {
+      "id": "pii_113",
+      "type": "DOB",
+      "value": "3rd of May 1985"
+    },
+    {
+      "id": "pii_114",
+      "type": "SSN",
+      "value": "9 2 3 - 4 5 - 6 7 8 9"
+    }
+  ],
+  "false_positives": []
+}
