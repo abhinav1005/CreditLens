@@ -23,6 +23,7 @@ class AssistantConfig(BaseModel):
     prompt_caching: bool = False
     max_tokens: int
     max_tool_iterations: int
+    context_budget_tokens: int = 0  # 0 = no trimming
     effort: str
 
 

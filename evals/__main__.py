@@ -34,6 +34,9 @@ def main(argv: list[str] | None = None) -> int:
     )
     run.add_argument("--categories", default=None, help="only these comma-separated categories")
     run.add_argument("--routed", action="store_true", help="let the router pick the model per case")
+    run.add_argument(
+        "--context-budget", type=int, default=None, help="override context_budget_tokens (0 = off)"
+    )
     run.add_argument("--max-cost-usd", type=float, default=None)
     run.add_argument("--concurrency", type=int, default=None)
     run.add_argument(
@@ -297,6 +300,7 @@ def main(argv: list[str] | None = None) -> int:
                 tags=sorted(args.tags.split(",")) if args.tags else None,
                 guardrails_enabled=None if args.guardrails is None else args.guardrails == "on",
                 routing=args.routed,
+                context_budget_tokens=args.context_budget,
                 run_id=args.run_id,
             )
         except BudgetExceeded as exc:

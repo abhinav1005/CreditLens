@@ -184,6 +184,7 @@ def run_suite(
     read_cache: bool = True,
     prompt_caching: bool | None = None,
     routing: bool = False,
+    context_budget_tokens: int | None = None,
 ) -> dict:
     if judge_mode not in JUDGE_MODES:
         raise ValueError(f"judge_mode must be one of {JUDGE_MODES}")
@@ -196,6 +197,8 @@ def run_suite(
     if prompt_caching is not None:
         config.assistant.prompt_caching = prompt_caching
     config.routing.enabled = routing
+    if context_budget_tokens is not None:
+        config.assistant.context_budget_tokens = context_budget_tokens
     pricing = load_pricing()
     bundle = load_bundle(prompt_version, config.assistant.tools_prompt_version)
     _, insights_hash = load_insight_prompt(config.assistant.insights_prompt_version)
@@ -209,6 +212,7 @@ def run_suite(
         "guardrails": config.guardrails.model_dump(),
         "prompt_caching": config.assistant.prompt_caching,
         "routing": config.routing.model_dump(),
+        "context_budget_tokens": config.assistant.context_budget_tokens,
     }
 
     keys = {}

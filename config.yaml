@@ -7,6 +7,7 @@ assistant:
   max_tokens: 16000
   max_tool_iterations: 6
   effort: low            # chat route; see PRD §14 (API notes)
+  context_budget_tokens: 12000  # trim older whole turns past this (≈chars/4); 0 = off
   prompt_caching: false  # M4.4 measures before/after; enable only if it actually helps
 
 routing:

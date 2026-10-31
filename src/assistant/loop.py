@@ -14,6 +14,7 @@ from collections.abc import Callable
 from dataclasses import dataclass, field
 
 from assistant.config import Config, Usage, load_config, load_pricing, request_cost
+from assistant.context import trim_history
 from assistant.output_filters import (
     FilterDecision,
     OutputFilter,
@@ -183,6 +184,11 @@ def run_turn(
             m = {**m, "content": outcome.text}
         messages.append(m)
 
+    # Context budget: the model gets a trimmed copy; the transcript keeps everything.
+    full_history = list(messages)
+    messages, trimmed = trim_history(messages, config.assistant.context_budget_tokens)
+    sent_prefix = len(messages)
+
     stop = "max_iterations"
     iterations = 0
     if blocked_by is not None:
@@ -317,7 +323,7 @@ def run_turn(
         profile_id=profile_id,
         final_text=final_text,
         stop=stop,
-        messages=messages,
+        messages=full_history + messages[sent_prefix:],
         events=events,
         tool_calls=tool_calls,
         filter_decisions=[d.__dict__ for d in decisions],
@@ -334,7 +340,15 @@ def run_turn(
         pricing_as_of=pricing.as_of,
         retracted=retracted,
         model_requests=len(served),
-        extra={k: v for k, v in {"compliance": compliance, "route": route_info}.items() if v},
+        extra={
+            k: v
+            for k, v in {
+                "compliance": compliance,
+                "route": route_info,
+                "trimmed_messages": trimmed,
+            }.items()
+            if v
+        },
     )
 
 
