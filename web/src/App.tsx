@@ -4,19 +4,29 @@ import Chat from "./Chat";
 import Dashboard from "./Dashboard";
 import Evals from "./Evals";
 import Label from "./Label";
+import Overview from "./Overview";
 import Transcripts from "./Transcripts";
 
 // Views are picked by the URL hash (#chat, #transcripts/<id>, ...), so no router library.
 const VIEWS = [
-  { id: "chat", label: "Chat" },
-  { id: "transcripts", label: "Transcripts" },
-  { id: "evals", label: "Evals" },
-  { id: "label", label: "Label" },
-  { id: "dashboard", label: "Dashboard" },
+  { id: "overview", label: "Overview", intro: "" },
+  { id: "chat", label: "Try it", intro: "Chat with the assistant about a made-up person." },
+  {
+    id: "evals",
+    label: "Test runs",
+    intro: "Every saved exam: open one to see each question, the answer and its mark.",
+  },
+  {
+    id: "transcripts",
+    label: "Conversations",
+    intro: "Saved chats, and what the safety checks did in each one.",
+  },
+  { id: "dashboard", label: "All data", intro: "Every number behind the Overview page." },
+  { id: "label", label: "Label", intro: "Mark answers by hand, to check the AI marker." },
 ] as const;
 
 function currentHash(): string {
-  return window.location.hash.slice(1) || "chat";
+  return window.location.hash.slice(1) || "overview";
 }
 
 export default function App() {
@@ -30,6 +40,7 @@ export default function App() {
 
   const [view, ...params] = hash.split("/");
   const param = params[0];
+  const intro = VIEWS.find((v) => v.id === view)?.intro;
 
   return (
     <div className="app">
@@ -48,6 +59,8 @@ export default function App() {
         policy, not legal compliance.
       </p>
       <main>
+        {intro && <p className="view-intro">{intro}</p>}
+        {view === "overview" && <Overview />}
         {view === "chat" && <Chat />}
         {view === "transcripts" && <Transcripts selectedId={param ?? null} />}
         {view === "evals" && <Evals params={params} />}

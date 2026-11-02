@@ -14,6 +14,12 @@ Entry format:
 
 ---
 
+## 2026-11-02 — Plain-language results and public repo
+**Done:** added `evals/story.py` (short findings shared by the UI and README, with `check_claims` backing the wording), a new Overview landing tab, plainer tab names and collapsed sections in All data. The README now leads with findings; full tables moved to `docs/results.md` and architecture to `docs/how-it-works.md`. Repo made public at the owner's request, after scanning its history for secrets (none found). No license, by owner decision.
+**Decisions:** conclusions first, data one click behind (PRD §14). The model finding says the cheap model "kept up", not "beat", because Sonnet lost points only on summary cards, the least stable category.
+**Blockers:** same owner items: labels (M2.5), reviewing the 150 cases (M1.16), the gate-noise decision, Java (M5.0), Docker (M5.1), demo GIF.
+**Next:** simplify the wording inside Test runs and Conversations if the owner wants it. GitHub secret scanning is off; the owner hasn't decided whether to enable it.
+
 ## 2026-10-31 — Session 7 (M5: UI, dashboard, README, Docker files)
 **Done (one commit each, all pushed):**
 - M5.2 `be10147`: React + TS (Vite) chat UI: SSE via fetch, tool steps, guardrail badges (from the `transcript` event), cost/latency meta; `/profiles`; eslint + prettier; web lint/build job in CI. TypeScript pinned to 5.9 (typescript-eslint doesn't support TS 7 yet).

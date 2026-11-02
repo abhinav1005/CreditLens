@@ -13,6 +13,7 @@
   --bad-text: #8f1d14;
   --info-bg: #e3ecfa;
   --info-text: #1d3f7a;
+  --viz-quiet: #8d938f;
   font-family:
     system-ui,
     -apple-system,
@@ -38,6 +39,7 @@
     --bad-text: #f5aaa3;
     --info-bg: #1d2a40;
     --info-text: #a9c4f2;
+    --viz-quiet: #6f7672;
   }
 }
 
@@ -620,4 +622,219 @@ h3 {
 
 .toolbar select {
   max-width: 300px;
+}
+
+/* Overview page: conclusions first, one simple chart per finding. */
+.view-intro {
+  color: var(--muted);
+  margin: 0 0 16px;
+}
+.overview {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  max-width: 720px;
+  margin: 0 auto;
+}
+.hero h2 {
+  font-size: 2rem;
+  line-height: 1.2;
+  margin: 8px 0 12px;
+}
+.hero p {
+  font-size: 1.1rem;
+  line-height: 1.55;
+  margin: 0 0 16px;
+}
+.hero-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+}
+.steps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.steps li {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px;
+  line-height: 1.45;
+}
+.steps strong {
+  display: block;
+  margin-bottom: 4px;
+}
+.overview h3.group {
+  font-size: 1.25rem;
+  margin: 0;
+}
+.finding {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.finding h4 {
+  font-size: 1.15rem;
+  line-height: 1.3;
+  margin: 0;
+}
+.finding p {
+  line-height: 1.55;
+  margin: 0;
+}
+.finding details {
+  color: var(--muted);
+}
+.finding summary {
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+.finding details p {
+  font-size: 0.9rem;
+  margin-top: 6px;
+}
+.viz {
+  margin: 0;
+  min-width: 0;
+}
+.viz-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.viz-row {
+  display: grid;
+  grid-template-columns: minmax(90px, 34%) 1fr;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 6px;
+  font-size: 0.9rem;
+}
+.viz-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.viz-fill {
+  height: 18px;
+  min-width: 2px;
+  border-radius: 0 4px 4px 0;
+  background: var(--viz-quiet);
+}
+.viz-fill.highlight {
+  background: var(--accent);
+}
+.viz-value {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.viz-plot {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  height: 110px;
+  margin-top: 22px;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.viz-column {
+  position: relative;
+}
+.viz-dot {
+  position: absolute;
+  left: 50%;
+  width: 12px;
+  height: 12px;
+  margin: 0 0 -6px -6px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 2px var(--surface);
+}
+.viz-dot-label {
+  position: absolute;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+  margin-bottom: 10px;
+}
+.viz-axis {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.8rem;
+  margin-top: 6px;
+}
+.versus {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 12px;
+}
+.versus-card {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 14px;
+}
+.versus-label {
+  font-size: 0.9rem;
+  margin-bottom: 8px;
+}
+.versus-numbers {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+.versus-number {
+  display: block;
+  font-size: 2rem;
+  font-weight: 600;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+.versus-caption {
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+.versus-arrow {
+  color: var(--muted);
+  padding-top: 6px;
+}
+.small-multiples {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+}
+.todo {
+  margin: 12px 0 0;
+  padding-left: 20px;
+  line-height: 1.55;
+}
+
+/* All data page: a short list of questions that open up. */
+details.dash-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px 16px;
+}
+details.dash-section summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+details.dash-section[open] summary {
+  margin-bottom: 14px;
 }

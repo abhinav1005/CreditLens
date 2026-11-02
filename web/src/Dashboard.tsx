@@ -117,6 +117,12 @@ interface Experiments {
   }[];
 }
 
+const CHECK_NAMES: Record<string, string> = {
+  pii: "Personal data",
+  injection: "Trick instructions",
+  compliance: "Rule-breaking answers",
+};
+
 const pct = (x: number | null | undefined, digits = 1) =>
   x === null || x === undefined ? "n/a" : `${(100 * x).toFixed(digits)}%`;
 const secs = (ms: number | null | undefined) =>
@@ -139,6 +145,7 @@ function Meter({ value, label }: { value: number; label: string }) {
   );
 }
 
+// Collapsed by default, so the page reads as a short list of questions.
 function Section({
   title,
   source,
@@ -149,13 +156,15 @@ function Section({
   children: ReactNode;
 }) {
   return (
-    <section className="stack dash-section">
-      <h2>{title}</h2>
-      {children}
-      <p className="source">
-        Source: <code>{source}</code>
-      </p>
-    </section>
+    <details className="dash-section">
+      <summary>{title}</summary>
+      <div className="stack">
+        {children}
+        <p className="source">
+          Reproduce with: <code>{source}</code>
+        </p>
+      </div>
+    </details>
   );
 }
 
@@ -186,25 +195,25 @@ export default function Dashboard() {
 
   return (
     <div className="stack">
+      <p className="muted">Open any question below to see the numbers.</p>
       <div className="tiles">
         <div className="tile">
-          <span className="tile-label">Golden cases</span>
+          <span className="tile-label">Test questions</span>
           <span className="tile-value">{golden.n_cases}</span>
           <span className="muted">
-            {golden.human_reviewed} human-reviewed · {golden.smoke} in the CI smoke set
+            {golden.human_reviewed} checked by a person · {golden.smoke} in the shorter automatic
+            check
           </span>
         </div>
         <div className="tile">
-          <span className="tile-label">CI gate baseline</span>
+          <span className="tile-label">Automatic check: starting score</span>
           <span className="tile-value">{pct(gate.pass_rate)}</span>
           <span className="muted">
-            of {gate.n_cases} smoke cases · {gate.model}
+            of {gate.n_cases} questions · {gate.model}
           </span>
         </div>
         <div className="tile">
-          <span className="tile-label">
-            Judge vs human (κ, {calibration.rows[0]?.main_dimension ?? "compliance"})
-          </span>
+          <span className="tile-label">AI marker vs human marking</span>
           <span className="tile-value">
             {calibration.rows.length ? (calibration.rows.at(-1)!.test_kappa ?? "n/a") : "—"}
           </span>
@@ -212,18 +221,18 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <Section title={`Models (golden suite, ${models.n_cases} cases)`} source={models.source}>
+      <Section title="Which AI model did best?" source={models.source}>
         <div className="table-wrap">
           <table className="static">
             <thead>
               <tr>
                 <th>Model</th>
-                <th>Pass rate</th>
-                <th className="num">Cost / case</th>
-                <th className="num">Latency p50 / p95</th>
-                <th className="num">First text p50</th>
-                <th className="num">Judge: compliant</th>
-                <th className="num">Judge: grounded</th>
+                <th>Score</th>
+                <th className="num">Cost per question</th>
+                <th className="num">Reply time: typical / slow</th>
+                <th className="num">Time to first word</th>
+                <th className="num">AI marker: follows the rules</th>
+                <th className="num">AI marker: sticks to facts</th>
               </tr>
             </thead>
             <tbody>
@@ -251,7 +260,7 @@ export default function Dashboard() {
           <table className="static">
             <thead>
               <tr>
-                <th>Category (cases)</th>
+                <th>Question type (how many)</th>
                 {models.rows.map((r) => (
                   <th key={r.model} className="num">
                     <code>{r.model}</code>
@@ -276,27 +285,27 @@ export default function Dashboard() {
           </table>
         </div>
         <p className="muted">
-          One run per model; cases are LLM-drafted and not yet human-reviewed. Pricing as of{" "}
-          {models.pricing_as_of}.
+          One run per model. An AI wrote the questions and a person hasn't checked them yet. Prices
+          as of {models.pricing_as_of}.
         </p>
       </Section>
 
-      <Section title="Guardrails (held-out test split)" source={guardrails.source}>
+      <Section title="How well do the safety checks work?" source={guardrails.source}>
         <div className="table-wrap">
           <table className="static">
             <thead>
               <tr>
-                <th>Guardrail</th>
-                <th>Recall</th>
-                <th className="num">False-positive rate</th>
-                <th className="num">Rules-only recall</th>
-                <th className="num">Positives / negatives</th>
+                <th>Safety check</th>
+                <th>Bad examples caught</th>
+                <th className="num">False alarms</th>
+                <th className="num">Caught by simple rules alone</th>
+                <th className="num">Bad / good examples</th>
               </tr>
             </thead>
             <tbody>
               {guardrails.rows.map((r) => (
                 <tr key={r.guardrail}>
-                  <td>{r.guardrail}</td>
+                  <td>{CHECK_NAMES[r.guardrail] ?? r.guardrail}</td>
                   <td>
                     <Meter value={r.recall} label={pct(r.recall)} />
                   </td>
@@ -311,18 +320,19 @@ export default function Dashboard() {
           </table>
         </div>
         <p className="muted">
-          Small, self-written test sets: treat 100% as "no misses found here", not as proof.
+          Small test sets written for this project: treat 100% as "no misses found here", not as
+          proof.
         </p>
       </Section>
 
-      <Section title="Attack success end to end (guardrails off → on)" source={end_to_end.source}>
+      <Section title="Do attacks get through?" source={end_to_end.source}>
         <div className="table-wrap">
           <table className="static">
             <thead>
               <tr>
-                <th>System prompt</th>
-                <th className="num">Guardrails off</th>
-                <th className="num">Guardrails on</th>
+                <th>Chatbot instructions</th>
+                <th className="num">Safety checks off</th>
+                <th className="num">Safety checks on</th>
               </tr>
             </thead>
             <tbody>
@@ -343,34 +353,34 @@ export default function Dashboard() {
           </table>
         </div>
         <p className="muted">
-          <code>v1-degraded</code> is a deliberately weakened prompt, to show what the guardrails
-          catch when the model alone doesn't.
+          <code>v1-degraded</code> has deliberately weakened instructions, to show what the safety
+          checks catch when the chatbot alone doesn't.
         </p>
       </Section>
 
       {data.experiments && <ExperimentsSection x={data.experiments} />}
 
-      <Section title="Cost and latency variants" source={variants.source}>
+      <Section title="Can it be cheaper or faster?" source={variants.source}>
         <RunTable
-          caption="Model routing (golden suite)"
+          caption="Choosing a model for each question"
           rows={variants.routing}
-          extra={[{ head: "Measured cost", cell: (r) => usd(r.cost_usd, 2) }]}
+          extra={[{ head: "Cost", cell: (r) => usd(r.cost_usd, 2) }]}
         />
         <RunTable
-          caption="Prompt caching (Sonnet 5.5, smoke suite, sequential)"
+          caption="Reusing saved instructions (prompt caching)"
           rows={variants.caching}
           extra={[
             { head: "Cost", cell: (r) => usd(r.cost_usd, 3) },
-            { head: "Latency p50", cell: (r) => secs(r.latency_p50_ms) },
-            { head: "First text p50", cell: (r) => secs(r.ttft_p50_ms) },
+            { head: "Typical reply time", cell: (r) => secs(r.latency_p50_ms) },
+            { head: "Time to first word", cell: (r) => secs(r.ttft_p50_ms) },
           ]}
         />
         <RunTable
-          caption="Context trimming (long conversations)"
+          caption="Shortening long conversations"
           rows={variants.trimming}
           extra={[
-            { head: "Input tokens", cell: (r) => (r.input_tokens ?? 0).toLocaleString() },
-            { head: "Measured cost", cell: (r) => usd(r.cost_usd, 3) },
+            { head: "Tokens sent", cell: (r) => (r.input_tokens ?? 0).toLocaleString() },
+            { head: "Cost", cell: (r) => usd(r.cost_usd, 3) },
           ]}
         />
       </Section>
@@ -399,8 +409,8 @@ function RunTable({
         <caption>{caption}</caption>
         <thead>
           <tr>
-            <th>Variant</th>
-            <th>Pass rate</th>
+            <th>Option</th>
+            <th>Score</th>
             {extra.map((e) => (
               <th key={e.head} className="num">
                 {e.head}
@@ -438,13 +448,13 @@ function ExperimentsSection({ x }: { x: Experiments }) {
     return c ? `${c.harm}/${c.n}` : "n/a";
   };
   return (
-    <Section title={`Experiments (${x.model}, golden suite, judge off)`} source={x.source}>
-      <h3>E1 · Reliability: the same config, 5 fresh runs</h3>
+    <Section title="The experiments" source={x.source}>
+      <h3>Does the same test give the same score?</h3>
       <p>
-        Pass rate {pct(rel.min)}–{pct(rel.max)} (mean {pct(rel.mean)}).{" "}
-        <strong>{rel.flaky.length}</strong> of {rel.n_cases} cases were flaky; on the {rel.smoke_n}
-        -case smoke subset the count swung by <strong>{rel.smoke_swing}</strong> with nothing
-        changed (gate limit: {rel.gate_limit_cases}).
+        Score {pct(rel.min)}–{pct(rel.max)} (average {pct(rel.mean)}).{" "}
+        <strong>{rel.flaky.length}</strong> of {rel.n_cases} questions changed between runs. The
+        shorter {rel.smoke_n}-question check moved by <strong>{rel.smoke_swing}</strong> with
+        nothing changed (it allows {rel.gate_limit_cases}).
       </p>
       <div className="table-wrap">
         <table className="static">
@@ -460,7 +470,7 @@ function ExperimentsSection({ x }: { x: Experiments }) {
           </thead>
           <tbody>
             <tr>
-              <td>Pass rate</td>
+              <td>Score</td>
               {rel.pass_rates.map((p, i) => (
                 <td key={i} className="num">
                   {pct(p)}
@@ -468,7 +478,7 @@ function ExperimentsSection({ x }: { x: Experiments }) {
               ))}
             </tr>
             <tr>
-              <td>Smoke passed (of {rel.smoke_n})</td>
+              <td>Short check passed (of {rel.smoke_n})</td>
               {rel.smoke_passed.map((p, i) => (
                 <td key={i} className="num">
                   {p}
@@ -479,16 +489,16 @@ function ExperimentsSection({ x }: { x: Experiments }) {
         </table>
       </div>
 
-      <h3>E2 · Prompt ablation (guardrails off)</h3>
+      <h3>What happens when parts of the instructions are removed?</h3>
       <div className="table-wrap">
         <table className="static">
           <thead>
             <tr>
-              <th>Prompt</th>
-              <th>Pass rate</th>
-              <th className="num">Attack harm</th>
-              <th className="num">Grounding failures</th>
-              <th className="num">Output tokens / case</th>
+              <th>Instructions</th>
+              <th>Score</th>
+              <th className="num">Attacks that worked</th>
+              <th className="num">Numbers it couldn't back up</th>
+              <th className="num">Tokens per question</th>
             </tr>
           </thead>
           <tbody>
@@ -511,14 +521,14 @@ function ExperimentsSection({ x }: { x: Experiments }) {
         </table>
       </div>
 
-      <h3>E3 · Defense in depth: attack cases where harm got through</h3>
+      <h3>Do safety checks make up for weak instructions?</h3>
       <div className="table-wrap">
         <table className="static">
           <thead>
             <tr>
-              <th>Prompt</th>
-              <th className="num">Guardrails off</th>
-              <th className="num">Guardrails on</th>
+              <th>Instructions</th>
+              <th className="num">Safety checks off</th>
+              <th className="num">Safety checks on</th>
             </tr>
           </thead>
           <tbody>
@@ -535,14 +545,14 @@ function ExperimentsSection({ x }: { x: Experiments }) {
         </table>
       </div>
 
-      <h3>E4 · Thinking effort</h3>
+      <h3>Does letting it think harder help?</h3>
       <div className="table-wrap">
         <table className="static">
           <thead>
             <tr>
               <th>Effort</th>
-              <th>Pass rate</th>
-              <th className="num">Output tokens / case</th>
+              <th>Score</th>
+              <th className="num">Tokens per question</th>
             </tr>
           </thead>
           <tbody>
@@ -550,7 +560,7 @@ function ExperimentsSection({ x }: { x: Experiments }) {
               <tr key={r.effort}>
                 <td>
                   {r.effort}
-                  {r.runs > 1 && <span className="muted"> (mean of {r.runs})</span>}
+                  {r.runs > 1 && <span className="muted"> (average of {r.runs})</span>}
                 </td>
                 <td>
                   <Meter
@@ -570,8 +580,8 @@ function ExperimentsSection({ x }: { x: Experiments }) {
         </table>
       </div>
       <p className="muted">
-        Output tokens, not cost: measured cost depends on whether the prompt cache was warm, which
-        depends on run order.
+        Compared by tokens (roughly, words generated) rather than cost, because cost here depends on
+        the order the tests ran in.
       </p>
     </Section>
   );

@@ -21,7 +21,7 @@ uv run python scripts/make_fixtures.py --check     # shared tool fixtures in syn
 uv run python scripts/check_prompt_immutability.py # committed prompt files unchanged (--lock adds NEW files)
 uv run python -m evals validate                    # validate golden.jsonl, print counts
 uv run python -m evals dashboard                   # web/public/dashboard.json from reports/ (--check in CI)
-uv run python -m evals readme                      # README results tables from the same data (--check in CI)
+uv run python -m evals readme                      # README findings + docs/results.md tables from the same data (--check in CI)
 uv run python -m evals run --suite golden --model claude-sonnet-5-5 --prompt-version v1
 uv run uvicorn assistant.api:app --reload          # /chat (SSE), /insights/{id}, /health
 cd web && npm install && npm run dev              # React UI on :5173 (proxies /api to uvicorn on :8000)
@@ -34,8 +34,8 @@ docker compose up --build                          # full stack: UI on :8080, AP
 - `src/credit/`: domain. `factors.py` (FactorCode enum), `profile.py` (schema), `scoring.py` (toy formula, `docs/scoring.md`), `generate.py` + `stories.py` (seeded data), `dataset.py` (loads committed v1.json), `tools/` (contracts, impl, static factor content).
 - `src/assistant/`: `config.py` (config + pricing + `request_cost`), `prompts.py` (versioned bundle + content hash), `providers/` (neutral types, Fake, Anthropic), `loop.py` (`run_turn`, the one code path for API and evals), `output_filters.py` (sentence buffer + filter chain), `insights.py`, `api.py`.
 - `src/storage/`: `Transcript` + `Storage` protocol, `SQLiteStorage`.
-- `web/`: React + TypeScript (Vite). `src/api.ts` (fetch + SSE parsing), `src/chatState.ts` (stream events → screen state), `src/Chat.tsx`, `src/Transcripts.tsx` (+ `Promote.tsx`), `src/Evals.tsx` (saved runs, cases, compare), `src/Label.tsx`, `src/Dashboard.tsx`, `src/App.tsx` (hash-based views). Eval/labeling/promote HTTP routes live in `evals/web_routes.py`.
-- `evals/`: `cases.py` (schema/loader), `runner.py`, `cache.py`, `report.py`, `scorers/` (deterministic, grounding, insights).
+- `web/`: React + TypeScript (Vite). `src/api.ts` (fetch + SSE parsing), `src/chatState.ts` (stream events → screen state), `src/Chat.tsx`, `src/Transcripts.tsx` (+ `Promote.tsx`), `src/Overview.tsx` (landing page, plain-language findings from `story` in dashboard.json), `src/Evals.tsx` (saved runs, cases, compare), `src/Label.tsx`, `src/Dashboard.tsx` (the "All data" tab), `src/App.tsx` (hash-based views). Eval/labeling/promote HTTP routes live in `evals/web_routes.py`.
+- `evals/`: `cases.py` (schema/loader), `runner.py`, `cache.py`, `report.py`, `scorers/` (deterministic, grounding, insights), `story.py` (plain-language findings shared by the Overview page and README; `check_claims` fails a test if the data stops supporting the wording).
 - Gotcha: black reformats code, so string-replace edits in Python heredocs can silently miss. Use the Edit tool or assert that the replacement happened.
 
 ## Build workflow (every session)
